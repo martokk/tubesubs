@@ -1,0 +1,17 @@
+<html>
+    <header>
+        <title>All Videos<</title>
+    </header>
+    <body>
+        <h2 class="heading">All Videos</h2>
+        <ul class="ul-sources">
+            {% for video in videos %}
+                <li class="li-video">
+                    <span class="li-video-id">{{ video.id }}</span> 
+                    <a class="li-video-title" href="{{ video.url }}">{{ video.title }}</a> 
+                    <a class="li-video-url" href="{{ video.url }}">{{ video.url }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
