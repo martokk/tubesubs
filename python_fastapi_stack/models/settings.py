@@ -43,7 +43,6 @@ class Settings(BaseSettings):
     EMAILS_ENABLED: bool = False
 
     # Users
-    EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
     FIRST_SUPERUSER_USERNAME: str
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str

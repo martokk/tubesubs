@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from python_fastapi_stack.core.uuid import generate_uuid_from_string
 
 if TYPE_CHECKING:
-    from python_fastapi_stack.models.video import Video
+    from python_fastapi_stack.models.video import Video  # pragma: no cover
 
 
 class UserBase(SQLModel):

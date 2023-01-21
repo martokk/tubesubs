@@ -10,7 +10,9 @@ from telegram.error import BadRequest
 from python_fastapi_stack import logger, paths, settings
 
 
-async def notify(text: str, telegram=True, email=settings.EMAILS_ENABLED) -> dict[str, Any]:
+async def notify(
+    text: str, telegram: bool = True, email: bool = settings.EMAILS_ENABLED
+) -> dict[str, Any]:
     """
     Sends a notification via Telegram and email.
 
@@ -84,11 +86,11 @@ def send_email(
         Any: The email response.
 
     Raises:
-        AssertionError: If the email variables are not set.
+        ValueError: If the email variables are not set.
     """
 
     if not settings.EMAILS_ENABLED or email_to is None:
-        raise AssertionError("Emails are not enabled or email_to is None")
+        raise ValueError("Emails are not enabled or email_to is None")
 
     # Build the email
     message = emails.Message(  # type: ignore

@@ -21,25 +21,25 @@ def open_if_exists(filename, mode=...): # -> IO[Any] | None:
 class BaseLoader:
     def __getitem__(self, filename): # -> None:
         ...
-    
+
     def get_file(self, name):
         ...
-    
+
     def list_files(self):
         ...
-    
+
     def content(self, filename, is_html=..., decode=..., guess_charset=..., charset=...): # -> str | bytes | None:
         ...
-    
+
     def find_index_file(self, filename=..., extensions=..., stop_names=..., raise_if_not_found=...): # -> None:
         ...
-    
+
     def find_index_html(self, filename=...): # -> None:
         ...
-    
+
     def find_index_text(self, filename=...): # -> None:
         ...
-    
+
 
 
 class FileSystemLoader(BaseLoader):
@@ -58,13 +58,13 @@ class FileSystemLoader(BaseLoader):
     """
     def __init__(self, searchpath, encoding=..., base_path=...) -> None:
         ...
-    
+
     def get_file(self, filename): # -> tuple[Any, str]:
         ...
-    
+
     def list_files(self): # -> Generator[str, None, None]:
         ...
-    
+
 
 
 class ZipLoader(BaseLoader):
@@ -74,13 +74,13 @@ class ZipLoader(BaseLoader):
     common_filename_charsets = ...
     def __init__(self, file, encoding=..., base_path=...) -> None:
         ...
-    
+
     def get_file(self, name): # -> tuple[bytes, str | Unknown | <subclass of LiteralString and bytes>]:
         ...
-    
+
     def list_files(self): # -> list[Unknown]:
         ...
-    
+
 
 
 class MsgLoader(BaseLoader):
@@ -90,55 +90,55 @@ class MsgLoader(BaseLoader):
     common_charsets = ...
     def __init__(self, msg, base_path=...) -> None:
         ...
-    
+
     def decode_text(self, text, charset=...): # -> tuple[Unknown, Unknown] | tuple[Unknown, str] | tuple[Unknown, None]:
         ...
-    
+
     def clean_content_id(self, content_id):
         ...
-    
+
     def extract_part_text(self, part):
         ...
-    
+
     def add_html_part(self, part): # -> None:
         ...
-    
+
     def add_text_part(self, part): # -> None:
         ...
-    
+
     def add_attachment_part(self, part): # -> None:
         ...
-    
+
     def parse(self): # -> None:
         ...
-    
+
     def get_file(self, name): # -> tuple[Unknown, Unknown | None]:
         ...
-    
+
     def list_files(self): # -> dict[Unknown, Unknown]:
         ...
-    
+
     @property
     def attachments(self): # -> dict_values[Unknown, Unknown]:
         ...
-    
+
     @property
     def html(self): # -> list[Unknown] | None:
         ...
-    
+
     @property
     def text(self): # -> list[Unknown] | None:
         ...
-    
+
     def decode_header_value(self, v):
         ...
-    
+
     def decode_address_header_value(self, value, skip_invalid=...): # -> list[Unknown]:
         ...
-    
+
     def filter_header(self, name): # -> bool:
         ...
-    
+
     def copy_header_to_message(self, message, name, value): # -> None:
         """
         Set header in email.Message
@@ -149,7 +149,7 @@ class MsgLoader(BaseLoader):
         :return:
         """
         ...
-    
+
     def copy_headers_to_message(self, message): # -> None:
         """
         Decode headers from loaded email.Message object and copy them to emails.Message object
@@ -159,6 +159,3 @@ class MsgLoader(BaseLoader):
         :return: None
         """
         ...
-    
-
-

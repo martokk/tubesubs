@@ -1,5 +1,3 @@
-from typing import Any
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
 
@@ -134,12 +132,7 @@ async def update(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found")
     else:
         if crud.user.is_superuser(user_=current_user) or video.owner_id == current_user.id:
-            try:
-                return await model_crud.update(db=db, in_obj=in_obj, id=id)
-            except crud.RecordNotFoundError as exc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found"
-                ) from exc
+            return await model_crud.update(db=db, in_obj=in_obj, id=id)
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
@@ -172,11 +165,6 @@ async def delete(
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found")
     else:
         if crud.user.is_superuser(user_=current_user) or video.owner_id == current_user.id:
-            try:
-                return await model_crud.remove(id=id, db=db)
-            except crud.RecordNotFoundError as exc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Video Not Found"
-                ) from exc
+            return await model_crud.remove(id=id, db=db)
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")

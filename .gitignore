@@ -649,7 +649,7 @@ $RECYCLE.BIN/
 # Credentials
 .credentials
 
-# Linux & Windows Build/Dist 
+# Linux & Windows Build/Dist
 build_linux/
 build_win/
 dist_linux/

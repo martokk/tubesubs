@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from pydantic.networks import EmailStr
 from sqlmodel import Session
 
@@ -74,20 +74,20 @@ async def get_by_id(
     Raises:
         HTTPException: if object not found.
     """
+    is_superuser = crud.user.is_superuser(user_=current_user)
+
     user = await crud.user.get_or_none(db, id=id)
-    if user == current_user:
-        if not user:
+    if not user:
+        if not is_superuser:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="The user doesn't have enough privileges",
             )
-        return user
-    if not crud.user.is_superuser(user_=current_user):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if not is_superuser and user != current_user:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
         )
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return user
 
 
@@ -97,6 +97,7 @@ async def create_user(
     db: Session = Depends(deps.get_db),
     user_in: models.UserCreateWithPassword,
     _: models.User = Depends(deps.get_current_active_superuser),
+    background_tasks: BackgroundTasks,
 ) -> models.User:
     """
     Create new user.
@@ -105,6 +106,7 @@ async def create_user(
         db (Session): database session.
         user_in (models.UserCreate): user data.
         _ (models.User): Current active user.
+        background_tasks (BackgroundTasks): background tasks.
 
     Returns:
         models.User: Created user.
@@ -123,13 +125,16 @@ async def create_user(
 
     # Sends email
     if settings.EMAILS_ENABLED and user_in.email:
-        notify.send_new_account_email(
-            email_to=user_in.email, username=user_in.email, password=user_in.password
+        background_tasks.add_task(
+            notify.send_new_account_email,
+            email_to=user_in.email,
+            username=user_in.email,
+            password=user_in.password,
         )
     return user
 
 
-@router.post("/open", response_model=models.UserRead)
+@router.post("/open", response_model=models.UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user_open(
     *,
     db: Session = Depends(deps.get_db),
@@ -163,7 +168,7 @@ async def create_user_open(
     user = await crud.user.get_or_none(db, username=username)
     if user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="The user with this username already exists in the system",
         )
     user_in = models.UserCreateWithPassword(
@@ -192,18 +197,8 @@ async def update_user(
 
     Returns:
         models.UserRead: Updated user.
-
-    Raises:
-        HTTPException: if user not found.
     """
-    user = await crud.user.get(db, id=user_id)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The user with this username does not exist in the system",
-        )
-    user = await crud.user.update(db, id=user_id, in_obj=user_in)
-    return user
+    return await crud.user.update(db, id=user_id, in_obj=user_in)
 
 
 @router.put("/me", response_model=models.UserRead)
@@ -235,7 +230,7 @@ async def update_user_me(
         user_in.full_name = full_name
     if email is not None:
         user_in.email = email
-    user = await crud.user.update(db, db_obj=current_user, in_obj=user_in)
+    user = await crud.user.update(db, id=current_user.id, in_obj=user_in)
     return user
 
 
@@ -260,14 +255,7 @@ async def delete(
     Raises:
         HTTPException: if item not found.
     """
-
-    video = await model_crud.get_or_none(id=id, db=db)
-    if not video:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    else:
-        try:
-            return await model_crud.remove(id=id, db=db)
-        except crud.RecordNotFoundError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User Not Found"
-            ) from exc
+    try:
+        return await model_crud.remove(id=id, db=db)
+    except crud.RecordNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User Not Found") from exc

@@ -94,6 +94,10 @@ exclude = '''
 )/
 '''
 
+[tool.flake8]
+profile = 'black'
+
+
 [tool.darglint]
 # https://github.com/terrencepreilly/darglint
 strictness = "long"
@@ -103,13 +107,13 @@ message_template="{path}  :  {line} -  {msg_id} -{msg}"
 
 [tool.isort]
 # https://github.com/timothycrosley/isort/
+profile = "black"
 py_version = 310
 line_length = 100
 
 known_typing = ["typing", "typings", "types", "typing_extensions", "mypy", "mypy_extensions"]
 sections = ["FUTURE", "TYPING", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 include_trailing_comma = true
-profile = "black"
 multi_line_output = 3
 indent = 4
 color_output = true
@@ -153,6 +157,7 @@ norecursedirs =["hooks", "*.egg", ".eggs", "dist", "build", "docs", ".tox", ".gi
 doctest_optionflags = ["NUMBER", "NORMALIZE_WHITESPACE", "IGNORE_EXCEPTION_DETAIL"]
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 asyncio_mode="auto"
+
 
 # Extra options:
 addopts = [

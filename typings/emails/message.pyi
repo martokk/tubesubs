@@ -16,34 +16,34 @@ class BaseMessage:
     policy = ...
     def __init__(self, charset=..., message_id=..., date=..., subject=..., mail_from=..., mail_to=..., headers=..., html=..., text=..., attachments=..., cc=..., bcc=..., headers_encoding=...) -> None:
         ...
-    
+
     def set_mail_from(self, mail_from): # -> None:
         ...
-    
+
     def get_mail_from(self): # -> tuple[Unknown | str | bytes | None, Unknown | str | bytes | None] | None:
         ...
-    
+
     mail_from = ...
     def set_mail_to(self, mail_to): # -> None:
         ...
-    
+
     def get_mail_to(self): # -> list[tuple[Unknown | str | bytes | None, Unknown | str | bytes | None]]:
         ...
-    
+
     mail_to = ...
     def set_cc(self, addr): # -> None:
         ...
-    
+
     def get_cc(self): # -> list[tuple[Unknown | str | bytes | None, Unknown | str | bytes | None]]:
         ...
-    
+
     cc = ...
     def set_bcc(self, addr): # -> None:
         ...
-    
+
     def get_bcc(self): # -> list[tuple[Unknown | str | bytes | None, Unknown | str | bytes | None]]:
         ...
-    
+
     bcc = ...
     def get_recipients_emails(self): # -> list[Unknown | str | bytes | None]:
         """
@@ -51,68 +51,68 @@ class BaseMessage:
         :return: list of emails
         """
         ...
-    
+
     def set_headers(self, headers): # -> None:
         ...
-    
+
     def set_html(self, html, url=...): # -> None:
         ...
-    
+
     def get_html(self):
         ...
-    
+
     html = ...
     def set_text(self, text, url=...): # -> None:
         ...
-    
+
     def get_text(self):
         ...
-    
+
     text = ...
     @property
     @renderable
     def html_body(self):
         ...
-    
+
     @property
     @renderable
     def text_body(self):
         ...
-    
+
     def set_subject(self, value): # -> None:
         ...
-    
+
     @renderable
     def get_subject(self):
         ...
-    
+
     subject = ...
     def render(self, **kwargs): # -> None:
         ...
-    
+
     def set_date(self, value): # -> None:
         ...
-    
+
     def get_date(self): # -> str | None:
         ...
-    
+
     date = ...
     message_date = ...
     @property
     def message_id(self): # -> None:
         ...
-    
+
     @message_id.setter
     def message_id(self, value): # -> None:
         ...
-    
+
     @property
     def attachments(self): # -> filestore_cls:
         ...
-    
+
     def attach(self, **kwargs): # -> None:
         ...
-    
+
 
 
 class MessageBuildMixin:
@@ -122,21 +122,21 @@ class MessageBuildMixin:
     after_build = ...
     def encode_header(self, value): # -> str:
         ...
-    
+
     def encode_address_header(self, pair): # -> LiteralString | None:
         ...
-    
+
     encode_name_header = ...
     def set_header(self, msg, key, value, encode=...): # -> None:
         ...
-    
+
     def build_message(self, message_cls=...): # -> SafeMIMEMultipart:
         ...
-    
+
     _build_message = ...
     def as_message(self, message_cls=...): # -> SafeMIMEMultipart:
         ...
-    
+
     message = ...
     def as_string(self, message_cls=...): # -> str:
         """
@@ -149,7 +149,7 @@ class MessageBuildMixin:
         v0.4.2: now returns bytes, not native string
         """
         ...
-    
+
 
 
 class MessageSendMixin:
@@ -158,10 +158,10 @@ class MessageSendMixin:
     @cached_property
     def smtp_pool(self): # -> smtp_pool_factory:
         ...
-    
+
     def send(self, to=..., set_mail_to=..., mail_from=..., set_mail_from=..., render=..., smtp_mail_options=..., smtp_rcpt_options=..., smtp=...):
         ...
-    
+
 
 
 class MessageTransformerMixin:
@@ -169,20 +169,20 @@ class MessageTransformerMixin:
     _transformer = ...
     def create_transformer(self, transformer_cls=..., **kw): # -> MessageTransformer:
         ...
-    
+
     def destroy_transformer(self): # -> None:
         ...
-    
+
     @property
     def transformer(self): # -> MessageTransformer | None:
         ...
-    
+
     def transform(self, **kwargs): # -> None:
         ...
-    
+
     def set_html(self, **kw): # -> None:
         ...
-    
+
 
 
 class MessageSignMixin:
@@ -190,20 +190,20 @@ class MessageSignMixin:
     _signer = ...
     def sign(self, **kwargs): # -> Self@MessageSignMixin:
         ...
-    
+
     dkim = ...
     def sign_message(self, msg):
         """
         Add sign header to email.Message
         """
         ...
-    
+
     def sign_string(self, message_string): # -> bytes:
         """
         Add sign header to message-as-a-string
         """
         ...
-    
+
 
 
 class Message(MessageSendMixin, MessageTransformerMixin, MessageSignMixin, MessageBuildMixin, BaseMessage):
@@ -235,12 +235,9 @@ class DjangoMessageProxy:
     """
     def __init__(self, message, recipients=..., context=...) -> None:
         ...
-    
+
     def recipients(self): # -> list[Unknown]:
         ...
-    
+
     def message(self):
         ...
-    
-
-

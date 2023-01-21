@@ -86,4 +86,3 @@ WORKDIR /
 
 EXPOSE 5000
 ENTRYPOINT ["/bin/sh", "-c", "./start.sh"]
-

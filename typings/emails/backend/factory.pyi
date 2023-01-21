@@ -12,12 +12,9 @@ class ObjectFactory:
     """
     def __init__(self, cls) -> None:
         ...
-    
+
     def __getitem__(self, k):
         ...
-    
+
     def invalidate(self, k):
         ...
-    
-
-

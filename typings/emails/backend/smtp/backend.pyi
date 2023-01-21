@@ -17,30 +17,27 @@ class SMTPBackend:
     response_cls = SMTPResponse
     def __init__(self, ssl=..., fail_silently=..., **kwargs) -> None:
         ...
-    
+
     def get_client(self): # -> connection_ssl_cls | connection_cls:
         ...
-    
+
     def close(self): # -> None:
         """
         Closes the connection to the email server.
         """
         ...
-    
+
     def make_response(self, exception=...): # -> response_cls:
         ...
-    
+
     def retry_on_disconnect(self, func): # -> (*args: Unknown, **kwargs: Unknown) -> Unknown:
         ...
-    
+
     def sendmail(self, from_addr, to_addrs, msg, mail_options=..., rcpt_options=...): # -> None:
         ...
-    
+
     def __enter__(self): # -> Self@SMTPBackend:
         ...
-    
+
     def __exit__(self, exc_type, exc_value, traceback): # -> None:
         ...
-    
-
-

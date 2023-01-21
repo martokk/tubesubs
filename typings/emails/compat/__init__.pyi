@@ -46,13 +46,13 @@ if is_py2:
     NativeStringIO = ...
     def to_native(x, charset=..., errors=...): # -> str:
         ...
-    
+
     def is_callable(x): # -> bool:
         ...
-    
+
     def to_bytes(x, charset=..., errors=...): # -> bytes | None:
         ...
-    
+
 else:
     NativeStringIO = ...
     unichr = ...
@@ -61,13 +61,13 @@ else:
     integer_types = ...
     def to_native(x, charset=..., errors=...): # -> str:
         ...
-    
+
     def is_callable(x): # -> bool:
         ...
-    
+
     def to_bytes(x, charset=..., errors=...): # -> bytes | None:
         ...
-    
+
     def formataddr(pair): # -> LiteralString:
         """
         This code is copy of python2 email.utils.formataddr.
@@ -77,7 +77,6 @@ else:
         Python3 email.utils.formataddr do encode realname.
         """
         ...
-    
+
 def to_unicode(x, charset=..., errors=..., allow_none_charset=...): # -> str | bytes | None:
     ...
-
