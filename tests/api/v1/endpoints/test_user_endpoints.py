@@ -1,5 +1,7 @@
 from typing import Dict
 
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -35,6 +37,10 @@ def test_get_users_normal_user_me(
     assert current_user["username"] == "test_user"
 
 
+@patch("python_fastapi_stack.settings.EMAILS_ENABLED", True)
+@patch("python_fastapi_stack.settings.SMTP_PORT", 1025)
+@patch("python_fastapi_stack.settings.SMTP_HOST", "example.com")
+@patch("python_fastapi_stack.settings.EMAILS_FROM_EMAIL", "test@example.com")
 async def test_create_user_new_email(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:

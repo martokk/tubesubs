@@ -8,6 +8,8 @@ from python_fastapi_stack import logger, settings
 from python_fastapi_stack.core import notify
 
 
+@patch("python_fastapi_stack.settings.TELEGRAM_API_TOKEN", "valid_token")
+@patch("python_fastapi_stack.settings.TELEGRAM_CHAT_ID", 123)
 async def test_send_telegram_message() -> None:
     """
     Test that the telegram message is sent.
@@ -32,6 +34,8 @@ async def test_send_telegram_message_settings_not_set() -> None:
     )
 
 
+@patch("python_fastapi_stack.settings.TELEGRAM_API_TOKEN", "valid_token")
+@patch("python_fastapi_stack.settings.TELEGRAM_CHAT_ID", 123)
 async def test_telegram_message_bad_request() -> None:
     """
     Test that the telegram message raises a ValueError when a BadRequest is raised.
@@ -42,25 +46,29 @@ async def test_telegram_message_bad_request() -> None:
             await notify.send_telegram_message("test message")
 
 
+@patch("python_fastapi_stack.settings.EMAILS_ENABLED", True)
+@patch("python_fastapi_stack.settings.NOTIFY_EMAIL_TO", "test@example.com")
 async def test_notify() -> None:
     """
     Test that the notify function calls the telegram and email functions.
     """
     with patch("python_fastapi_stack.core.notify.send_telegram_message") as mock_telegram:
         with patch("python_fastapi_stack.core.notify.send_email") as mock_email:
-            await notify.notify("test message")
+            await notify.notify("test message", email=True, telegram=True)
 
     assert mock_telegram.called
     assert mock_email.called
 
 
+@patch("python_fastapi_stack.settings.TELEGRAM_API_TOKEN", "valid_token")
+@patch("python_fastapi_stack.settings.TELEGRAM_CHAT_ID", 123)
 async def test_notify_telegram_false() -> None:
     """
     Test that the notify function does not call the telegram function when telegram=False.
     """
     with patch("python_fastapi_stack.core.notify.send_telegram_message") as mock_telegram:
         with patch("python_fastapi_stack.core.notify.send_email") as mock_email:
-            await notify.notify("test message", telegram=False)
+            await notify.notify("test message", telegram=False, email=True)
 
     assert not mock_telegram.called
     assert mock_email.called
@@ -78,6 +86,11 @@ async def test_notify_email_false() -> None:
     assert not mock_email.called
 
 
+@patch("python_fastapi_stack.settings.TELEGRAM_API_TOKEN", "valid_token")
+@patch("python_fastapi_stack.settings.TELEGRAM_CHAT_ID", 123)
+@patch("python_fastapi_stack.settings.EMAILS_ENABLED", True)
+@patch("python_fastapi_stack.settings.SMTP_USER", "user")
+@patch("python_fastapi_stack.settings.SMTP_PASSWORD", "password")
 async def test_send_email() -> None:
     """
     Test that the send_email function calls the emails package.

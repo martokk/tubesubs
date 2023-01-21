@@ -43,9 +43,9 @@ class Settings(BaseSettings):
     EMAILS_ENABLED: bool = False
 
     # Users
-    FIRST_SUPERUSER_USERNAME: str
-    FIRST_SUPERUSER_EMAIL: EmailStr
-    FIRST_SUPERUSER_PASSWORD: str
+    FIRST_SUPERUSER_USERNAME: str = "admin"
+    FIRST_SUPERUSER_EMAIL: EmailStr = EmailStr("admin@example.com")
+    FIRST_SUPERUSER_PASSWORD: str = "2sd3f4g5h6j7k8l9"
     USERS_OPEN_REGISTRATION: bool = False
 
     # Notify
