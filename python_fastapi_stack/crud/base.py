@@ -12,7 +12,7 @@ ModelUpdateType = TypeVar("ModelUpdateType", bound=SQLModel)
 
 
 class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
-    def __init__(self, model: Type[ModelType]) -> None:
+    def __init__(self, model: type[ModelType]) -> None:
         """
         Initialize the CRUD object.
 
@@ -34,7 +34,7 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         statement = select(self.model)
         return db.exec(statement).all() or []
 
-    async def get(self, db: Session, *args: BinaryExpression[Any], **kwargs: Any) -> ModelType:
+    async def get(self, *args: BinaryExpression[Any], db: Session, **kwargs: Any) -> ModelType:
         """
         Get a record by its primary key(s).
 
@@ -73,7 +73,7 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
             The matching record, or None.
         """
         try:
-            result = await self.get(db, *args, **kwargs)
+            result = await self.get(db=db, *args, **kwargs)
         except RecordNotFoundError:
             return None
         return result
@@ -153,7 +153,7 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         """
         if not args and not kwargs:
             raise ValueError("crud.base.update() Must provide at least one filter")
-        db_obj = await self.get(*args, db=db, **kwargs)
+        db_obj = await self.get(db=db, *args, **kwargs)
 
         in_obj_values = in_obj.dict(exclude_unset=True, exclude_none=True)
         db_obj_values = db_obj.dict()
@@ -177,7 +177,7 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         Raises:
             DeleteError: If an error occurs while deleting the record.
         """
-        db_obj = await self.get(*args, db=db, **kwargs)
+        db_obj = await self.get(db=db, *args, **kwargs)
         try:
             db.delete(db_obj)
             db.commit()

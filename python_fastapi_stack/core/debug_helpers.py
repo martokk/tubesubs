@@ -1,7 +1,8 @@
-from typing import Any, Callable
+from typing import Any
 
 import functools
 import time
+from collections.abc import Callable
 
 from python_fastapi_stack import logger
 

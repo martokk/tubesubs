@@ -15,17 +15,27 @@
 [![License](https://img.shields.io/github/license/martokk/python_fastapi_stack)](https://github.com/martokk/python_fastapi_stack/blob/master/LICENSE)
 
 
-A python project template created by Martokk.
+A project template stack for FastAPI projects.
 
 </div>
 
 ---
 
 ## Features
+- FastApi, SQLModel, Pydantic, Alembic
+- JWT Authentication
+- CRUD
+- Notify
+- Proxy
+- CLI
+
 
 ## Installation
 
 ## Usage
+<!-- TODO: Update with Cookicutter Template -->
+See [cookiecutter_python_fastapi_stack]() page.
+
 
 ## 📈 Releases
 

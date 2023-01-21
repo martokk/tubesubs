@@ -1,6 +1,5 @@
 """A python project created by Martokk."""
 
-import warnings
 from importlib import metadata as importlib_metadata
 from os import getenv as _getenv
 
@@ -11,8 +10,8 @@ from python_fastapi_stack.models.settings import Settings as _Settings
 from python_fastapi_stack.paths import ENV_FILE as _ENV_FILE
 from python_fastapi_stack.paths import LOG_FILE as _LOG_FILE
 
-# Temporary fix for pytest warnings related to importlib_metadata
-warnings.filterwarnings("ignore", "SelectableGroups dict interface")
+# # Temporary fix for pytest warnings related to importlib_metadata
+# warnings.filterwarnings("ignore", "SelectableGroups dict interface")
 
 
 def get_version() -> str:

@@ -56,22 +56,28 @@ pre-commit-install: install-pre-commit-hooks ## Install Pre-Commit Git Hooks
 # Linting, Formatting, TypeCheck
 #-----------------------------------------------------------------------------------------
 .PHONY: lint
-lint: test check-codestyle mypy check-safety ## Lint, Format, Check Types, Check Safety
+lint: test check-codestyle mypy pre-commit ## Lint, Format, Check Types, Check Safety
 
 .PHONY: formatting
 formatting: codestyle ## Apply Formatting via PyUpgrade, ISort, Black.
 
 .PHONY: codestyle
 codestyle: ## Apply Formatting via PyUpgrade, ISort, Black.
+	@echo -e "\n### PYUPGRADE ###"
 	poetry run pyupgrade --exit-zero-even-if-changed --py310-plus **/*.py
+	@echo -e "\n### ISORT ###"
 	poetry run isort --settings-path pyproject.toml ./
+	@echo -e "\n### BLACK ###"
 	poetry run black --config pyproject.toml ./
 
 .PHONY: check-codestyle
 check-codestyle: ## Check Formatting via ISort, Black, darglint.
-	poetry run isort --diff --check-only --settings-path pyproject.toml ./
-	poetry run black --diff --check --config pyproject.toml ./
-	poetry run darglint --verbosity 2 $(PROJECT) tests
+	@echo -e "\n### ISORT ###"
+	@poetry run isort --diff --check-only --settings-path pyproject.toml ./
+	@echo -e "\n### BLACK ###"
+	@poetry run black --diff --check --config pyproject.toml ./
+	@echo -e "\n### DARGLINT ###"
+	@poetry run darglint --verbosity 2 $(PROJECT) tests
 
 .PHONY: check-safety
 check-safety: ## Check Securty & Safty via Bandit, Safety.
@@ -81,7 +87,13 @@ check-safety: ## Check Securty & Safty via Bandit, Safety.
 
 .PHONY: mypy
 mypy: ## Typechecking via MyPy
-	poetry run mypy --config-file pyproject.toml ./
+	@echo -e "\n### MYPY ###"
+	@poetry run mypy --config-file pyproject.toml ./
+
+.PHONY: pre-commit
+pre-commit: ## Run Pre-Commit Hooks
+	@printf "\n### PRE-COMMIT ###"
+	@poetry run pre-commit run --all-files
 
 
 #-----------------------------------------------------------------------------------------
@@ -92,10 +104,11 @@ tests: test ## Run Tests & Coverage
 
 .PHONY: test
 test: ## Run Tests & Coverage
-	PWD=$(PWD) poetry run pytest -c pyproject.toml --cov-report=html --cov=$(PROJECT) tests/
-	poetry run coverage-badge -o assets/images/coverage.svg -f
-
-
+	@printf "\n### PYTEST ###\n"
+	@PWD=$(PWD) poetry run pytest -c pyproject.toml --cov-report=html --cov-report=xml  --cov=$(PROJECT) tests/
+	@# poetry run pytest --cov=$(PROJECT) tests/ --cov-fail-under=100
+	@poetry run coverage-badge -o assets/images/coverage.svg -f
+	@printf "\n"
 #-----------------------------------------------------------------------------------------
 # BUILD PACKAGE
 #-----------------------------------------------------------------------------------------

@@ -39,16 +39,17 @@ async def get_current_user(
     user_id: str = Depends(get_current_user_id),
 ) -> models.User:
     try:
-        user = await crud.user.get(db, id=user_id)
+        user = await crud.user.get(db=db, id=user_id)
     except crud.RecordNotFoundError as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found") from e
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User from access token not found"
+        ) from e
     return user
 
 
 def get_current_active_user(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
-    print(f"{crud.user.is_active(current_user)=}")
     if not crud.user.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user

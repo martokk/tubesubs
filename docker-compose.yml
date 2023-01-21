@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  { { cookiecutter.project_module } }:
+  python_fastapi_stack:
     container_name: "python_fastapi_stack"
     image: "python_fastapi_stack"
     build:

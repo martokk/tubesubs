@@ -1,14 +1,16 @@
 import datetime
 import os
-from collections.abc import AsyncGenerator, Generator
+from collections.abc import AsyncGenerator
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
+from fastapi import Request
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 
-from python_fastapi_stack import crud, models
+from python_fastapi_stack import crud, models, settings
 from python_fastapi_stack.api import deps
 from python_fastapi_stack.core import security
 from python_fastapi_stack.core.app import app
@@ -18,7 +20,10 @@ from python_fastapi_stack.db.init_db import create_all, init_initial_data
 
 
 @pytest.fixture(name="db")
-async def fixture_db(tmpdir, monkeypatch) -> AsyncGenerator[Session, None]:
+async def fixture_db(tmpdir: str, monkeypatch: MagicMock) -> AsyncGenerator[Session, None]:
+    """
+    Fixture that creates a temporary database file and returns a database session.
+    """
     # Set up test database file in a temporary directory
     db_file = Path(tmpdir.join("test_db.sqlite"))
 
@@ -54,10 +59,11 @@ async def fixture_db(tmpdir, monkeypatch) -> AsyncGenerator[Session, None]:
 
 
 @pytest.fixture(name="client")
-async def fixture_client(db: Session) -> TestClient:
+async def fixture_client(db: Session) -> AsyncGenerator[TestClient, None]:
     # Configure the TestClient to use the temporary database
     app.dependency_overrides[deps.get_db] = lambda: db
-    return TestClient(app=app)
+    with TestClient(app) as c:
+        yield c
 
 
 @pytest.fixture(name="db_with_user")
@@ -95,6 +101,7 @@ async def fixture_db_with_videos(db_with_user: Session) -> Session:
         - R6iBBN3J
         - fEpPZMry
     """
+    owner = await crud.user.get(db=db_with_user, username="test_user")
     videos = []
     for i in range(3):
         video_create = models.VideoCreate(
@@ -109,16 +116,48 @@ async def fixture_db_with_videos(db_with_user: Session) -> Session:
             added_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),
         )
-        video = await crud.video.create(in_obj=video_create, db=db_with_user)
+        video = await crud.video.create_with_owner_id(
+            in_obj=video_create, db=db_with_user, owner_id=owner.id
+        )
         videos.append(video)
     return db_with_user
 
 
-# @pytest.fixture(scope="module")
-# def superuser_token_headers(client: TestClient) -> dict[str, str]:
-#     return get_superuser_token_headers(client)
+@pytest.fixture(name="superuser_token_headers")
+def superuser_token_headers(client: TestClient) -> dict[str, str]:
+    """
+    Fixture that returns the headers for a superuser.
+    """
+    login_data = {
+        "username": settings.FIRST_SUPERUSER_USERNAME,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
+    r = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
+    tokens = r.json()
+    a_token = tokens["access_token"]
+    headers = {"Authorization": f"Bearer {a_token}"}
+    return headers
 
 
-# @pytest.fixture(scope="module")
-# def normal_user_token_headers(client: TestClient, db: Session) -> dict[str, str]:
-#     return authentication_token_from_email(client=client, email=settings.EMAIL_TEST_USER, db=db)
+@pytest.fixture(name="normal_user_token_headers")
+def normal_user_token_headers(client: TestClient) -> dict[str, str]:
+    """
+    Fixture that returns the headers for a normal user.
+    """
+    login_data = {
+        "username": "test_user",
+        "password": "test_password",
+    }
+    r = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
+    tokens = r.json()
+    a_token = tokens["access_token"]
+    headers = {"Authorization": f"Bearer {a_token}"}
+    return headers
+
+
+@pytest.fixture(name="test_request")
+def fixture_request() -> Request:
+    """
+    Fixture that returns a request object.
+    """
+    return Request(scope={"type": "http", "method": "GET", "path": "/"})

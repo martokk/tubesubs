@@ -13,12 +13,9 @@ class JinjaTemplate(BaseTemplate):
     DEFAULT_JINJA_ENVIRONMENT = ...
     def __init__(self, template_text, environment=...) -> None:
         ...
-    
+
     def compile_template(self):
         ...
-    
+
     def render(self, **kwargs):
         ...
-    
-
-

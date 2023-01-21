@@ -11,7 +11,7 @@ from python_fastapi_stack.core.cli import version_callback
 from python_fastapi_stack.core.server import start_server
 
 
-def test_version_callback(mocker: MagicMock):
+def test_version_callback(mocker: MagicMock) -> None:
     mock_console = mocker.patch("python_fastapi_stack.core.cli.console")
 
     try:
@@ -19,7 +19,6 @@ def test_version_callback(mocker: MagicMock):
     except Exit:
         pass
     version = get_version()
-    print(version)
     mock_console.print.assert_called_with(
         f"[yellow]{settings.PROJECT_NAME}[/] version: [bold blue]{version}[/]"
     )

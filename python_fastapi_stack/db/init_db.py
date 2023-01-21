@@ -1,14 +1,13 @@
 from typing import Any
 
-from fastapi import Depends
+from sqlalchemy.engine.base import Engine
 from sqlmodel import Session, SQLModel
 
 from python_fastapi_stack import crud, logger, models, settings
-from python_fastapi_stack.core import security
 from python_fastapi_stack.db.session import engine as _engine
 
 
-async def create_all(engine=_engine, sqlmodel_create_all=False) -> None:
+async def create_all(engine: Engine = _engine, sqlmodel_create_all: bool = False) -> None:
     """
     Create all tables in the database.
 
@@ -25,7 +24,7 @@ async def create_all(engine=_engine, sqlmodel_create_all=False) -> None:
     # sqlmodel_create_all=True
     if sqlmodel_create_all:
         logger.debug("Initializing database...")
-        SQLModel.metadata.create_all(engine)
+        SQLModel.metadata.create_all(bind=engine)
     return
 
 

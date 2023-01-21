@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
 
@@ -63,12 +63,15 @@ async def test_token(current_user: models.User = Depends(deps.get_current_user))
 
 
 @router.post("/password-recovery/{username}", response_model=models.Msg)
-async def recover_password(username: str, db: Session = Depends(deps.get_db)) -> Any:
+async def recover_password(
+    username: str, background_tasks: BackgroundTasks, db: Session = Depends(deps.get_db)
+) -> Any:
     """
     Password recovery endpoint.
 
     Args:
         username (str): The email of the user.
+        background_tasks (BackgroundTasks): The background tasks.
         db (Session): The database session.
 
     Returns:
@@ -76,6 +79,7 @@ async def recover_password(username: str, db: Session = Depends(deps.get_db)) ->
 
     Raises:
         HTTPException: if the user does not exist.
+
     """
     user = await crud.user.get_or_none(db, username=username)
     if not user:
@@ -84,18 +88,26 @@ async def recover_password(username: str, db: Session = Depends(deps.get_db)) ->
             detail="The user with this username does not exist in the system.",
         )
 
+    # Handle inactive user
+    if not crud.user.is_active(user):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+
     # Send email with password recovery link
     password_reset_token = security.encode_token(
         subject=user.id, key=settings.JWT_ACCESS_SECRET_KEY
     )
-    notify.send_reset_password_email(
-        email_to=user.email, username=username, token=password_reset_token
+
+    background_tasks.add_task(
+        notify.send_reset_password_email,
+        email_to=user.email,
+        username=username,
+        token=password_reset_token,
     )
 
     return {"msg": "Password recovery email sent"}
 
 
-@router.post("/reset-password/")
+@router.post("/reset-password")
 async def reset_password(
     token: str = Body(...),
     new_password: str = Body(...),
@@ -119,8 +131,6 @@ async def reset_password(
     """
     # Verify the token
     user_id = security.decode_token(token=token, key=settings.JWT_ACCESS_SECRET_KEY)
-    if not user_id:
-        raise HTTPException(status_code=400, detail="Invalid token")
 
     # Get the user
     user = await crud.user.get_or_none(db, id=user_id)

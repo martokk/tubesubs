@@ -19,19 +19,19 @@ class cached_property:
     """
     def __init__(self, func) -> None:
         ...
-    
+
     def __get__(self, obj, cls): # -> Self@cached_property:
         ...
-    
+
 
 
 class CachedDnsName:
     def __str__(self) -> str:
         ...
-    
+
     def get_fqdn(self): # -> str:
         ...
-    
+
 
 
 DNS_NAME = ...
@@ -48,10 +48,10 @@ class MessageID:
     """
     def __init__(self, domain=..., idstring=...) -> None:
         ...
-    
+
     def __call__(self): # -> str:
         ...
-    
+
 
 
 def parse_name_and_email_list(elements, encoding=...): # -> list[tuple[Unknown | str | bytes | None, Unknown | str | bytes | None]]:
@@ -85,7 +85,7 @@ class MIMEMixin:
         lines that begin with 'From '. See bug #13433 for details.
         """
         ...
-    
+
     if is_py2:
         as_bytes = ...
     else:
@@ -97,19 +97,19 @@ class MIMEMixin:
             lines that begin with 'From '. See bug #13433 for details.
             """
             ...
-        
+
 
 
 class SafeMIMEText(MIMEMixin, MIMEText):
     def __init__(self, text, subtype, charset) -> None:
         ...
-    
+
 
 
 class SafeMIMEMultipart(MIMEMixin, MIMEMultipart):
     def __init__(self, _subtype=..., boundary=..., _subparts=..., encoding=..., **_params) -> None:
         ...
-    
+
 
 
 DEFAULT_REQUESTS_PARAMS = ...
@@ -124,4 +124,3 @@ def renderable(f): # -> (self: Unknown, *args: Unknown, **kwargs: Unknown) -> (A
 
 def format_date_header(v, localtime=...): # -> str:
     ...
-

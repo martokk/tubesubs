@@ -7,6 +7,3 @@ class SMTPConnectNetworkError(IOError):
     @classmethod
     def from_ioerror(cls, exc): # -> Self@SMTPConnectNetworkError:
         ...
-    
-
-

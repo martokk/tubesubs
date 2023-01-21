@@ -12,5 +12,3 @@ class BadHeaderError(ValueError):
 
 class IncompleteMessage(ValueError):
     ...
-
-
