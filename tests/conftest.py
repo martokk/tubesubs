@@ -47,11 +47,6 @@ async def fixture_db(tmpdir: str, monkeypatch: MagicMock) -> AsyncGenerator[Sess
 
     db = SessionLocal()
     await init_initial_data(db=db)
-    # user_create = models.UserCreateWithPassword(
-    #     username="test_user", email="test@example.com", password="test_password"
-    # )
-    # db_user = await crud.user.create_with_password(db=db, in_obj=user_create)
-    # print(db_user)
     try:
         yield db
     finally:
