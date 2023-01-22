@@ -96,10 +96,10 @@ async def test_get_existing_user(
     """
     Test that a superuser can retrieve an existing user.
     """
-    username = "test_username"
-    password = "test_password"
+    username = "test_user2"
+    password = "test_password2"
     user_in = models.UserCreateWithPassword(
-        username=username, password=password, email="test@example.com"
+        username=username, password=password, email="test2@example.com"
     )
     user = await crud.user.create_with_password(db, in_obj=user_in)
     user_id = user.id
@@ -136,8 +136,8 @@ async def test_create_user_existing_username(
     username = "test_user"
     password = "test_password"
     email = "test@example.com"
-    user_in = models.UserCreateWithPassword(username=username, password=password, email=email)
-    await crud.user.create_with_password(db=db, in_obj=user_in)
+    # user_in = models.UserCreateWithPassword(username=username, password=password, email=email)
+    # await crud.user.create_with_password(db=db, in_obj=user_in)
     data = {"username": username, "password": password, "email": email}
     r = client.post(
         f"{settings.API_V1_PREFIX}/user/",

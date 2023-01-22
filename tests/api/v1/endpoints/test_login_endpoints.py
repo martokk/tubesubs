@@ -8,7 +8,10 @@ from sqlmodel import Session
 from python_fastapi_stack import crud, models, settings
 
 
-async def test_get_access_token(db_with_user: Session, client: TestClient) -> None:
+async def test_get_access_token(
+    db_with_user: Session,
+    client: TestClient,
+) -> None:
     login_data = {
         "username": "test_user",
         "password": "test_password",

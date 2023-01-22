@@ -1,64 +1,95 @@
+from typing import Any, AsyncGenerator, Generator
+
 import datetime
-import os
-from collections.abc import AsyncGenerator
-from pathlib import Path
-from unittest.mock import MagicMock
+import sqlite3
 
 import pytest
+import sqlalchemy as sa
 from fastapi import Request
 from fastapi.testclient import TestClient
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import Session, create_engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from python_fastapi_stack import crud, models, settings
-from python_fastapi_stack.api import deps
+from python_fastapi_stack.api.deps import get_db
 from python_fastapi_stack.core import security
 from python_fastapi_stack.core.app import app
-from python_fastapi_stack.db.init_db import create_all, init_initial_data
+from python_fastapi_stack.db.init_db import init_initial_data
 
-# from python_fastapi_stack.db.session import SessionLocal
+# Set up the databsase
+db_url = "sqlite:///:memory:"
+engine = create_engine(
+    db_url,
+    echo=False,
+    connect_args={"check_same_thread": False},
+    pool_pre_ping=True,
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=Session)
+SQLModel.metadata.drop_all(bind=engine)
+SQLModel.metadata.create_all(bind=engine)
+
+
+# These two event listeners are only needed for sqlite for proper
+# SAVEPOINT / nested transaction support. Other databases like postgres
+# don't need them.
+# From: https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#serializable-isolation-savepoints-transactional-ddl
+@sa.event.listens_for(engine, "connect")  # type: ignore
+def do_connect(dbapi_connection: Any, connection_record: Any) -> None:
+    # disable pysqlite's emitting of the BEGIN statement entirely.
+    # also stops it from emitting COMMIT before any DDL.
+    dbapi_connection.isolation_level = None
+
+
+@sa.event.listens_for(engine, "begin")  # type: ignore
+def do_begin(conn: Any) -> None:
+    # emit our own BEGIN
+    conn.exec_driver_sql("BEGIN")
 
 
 @pytest.fixture(name="db")
-async def fixture_db(tmpdir: str, monkeypatch: MagicMock) -> AsyncGenerator[Session, None]:
-    """
-    Fixture that creates a temporary database file and returns a database session.
-    """
-    # Set up test database file in a temporary directory
-    db_file = Path(tmpdir.join("test_db.sqlite"))
+async def fixture_db() -> AsyncGenerator[Session, None]:
+    connection = engine.connect()
+    transaction = connection.begin()
+    session = TestingSessionLocal(bind=connection)
 
-    # Patch the database file path
-    monkeypatch.setattr("python_fastapi_stack.paths.DATABASE_FILE", db_file)
+    # Begin a nested transaction (using SAVEPOINT).
+    nested = connection.begin_nested()
+    await init_initial_data(db=session)
 
-    # Ensure the test database does not exist before running the function
-    if os.path.exists(db_file):
-        os.remove(db_file)
+    # If the application code calls session.commit, it will end the nested
+    # transaction. Need to start a new one when that happens.
+    @sa.event.listens_for(session, "after_transaction_end")  # type: ignore
+    def end_savepoint(session: Any, transaction: Any) -> None:  # type: ignore
+        nonlocal nested
+        if not nested.is_active:
+            nested = connection.begin_nested()
 
-    db_url = f"sqlite:///{db_file}"
-    test_engine = create_engine(
-        db_url,
-        echo=False,
-        connect_args={"check_same_thread": False},
-        pool_pre_ping=True,
-    )
+    yield session
 
-    await create_all(engine=test_engine, sqlmodel_create_all=True)
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_engine, class_=Session)
-
-    db = SessionLocal()
-    await init_initial_data(db=db)
-    try:
-        yield db
-    finally:
-        db.close()
+    # Rollback the overall transaction, restoring the state before the test ran.
+    session.close()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture(name="client")
 async def fixture_client(db: Session) -> AsyncGenerator[TestClient, None]:
-    # Configure the TestClient to use the temporary database
-    app.dependency_overrides[deps.get_db] = lambda: db
-    with TestClient(app) as c:
-        yield c
+    """
+    Fixture that creates a test client with the database session override.
+
+    Args:
+        db (Session): database session.
+
+    Returns:
+        AsyncGenerator[TestClient, None]: test client.
+    """
+
+    def override_get_db() -> Generator[Session, None, None]:
+        yield db
+
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+    del app.dependency_overrides[get_db]
 
 
 @pytest.fixture(name="db_with_user")
@@ -119,7 +150,7 @@ async def fixture_db_with_videos(db_with_user: Session) -> Session:
 
 
 @pytest.fixture(name="superuser_token_headers")
-def superuser_token_headers(client: TestClient) -> dict[str, str]:
+def superuser_token_headers(db_with_user, client: TestClient) -> dict[str, str]:
     """
     Fixture that returns the headers for a superuser.
     """
