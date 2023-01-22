@@ -1,7 +1,8 @@
-from typing import Any, AsyncGenerator, Generator
+from typing import Any
 
 import datetime
 import sqlite3
+from collections.abc import AsyncGenerator, Generator
 
 import pytest
 import sqlalchemy as sa

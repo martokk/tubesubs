@@ -123,12 +123,15 @@ async def test_send_email_not_enabled() -> None:
     assert not mock_message.called
 
 
+@patch("python_fastapi_stack.core.notify.get_html_template", "")
 async def test_send_test_email() -> None:
     """
     Test that the send_test_email function calls the send_email function.
     """
-    with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
-        notify.send_test_email(email_to="test@example.com")
+    with patch("python_fastapi_stack.core.notify.get_html_template") as mock_get_html_template:
+        mock_get_html_template.return_value = ""
+        with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
+            notify.send_test_email(email_to="test@example.com")
 
     assert mock_send_email.called
     assert mock_send_email.call_count == 1
@@ -138,8 +141,12 @@ async def test_send_reset_password_email() -> None:
     """
     Test that the send_reset_password_email function calls the send_email function.
     """
-    with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
-        notify.send_reset_password_email(email_to="test@example.com", username="test", token="test")
+    with patch("python_fastapi_stack.core.notify.get_html_template") as mock_get_html_template:
+        mock_get_html_template.return_value = ""
+        with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
+            notify.send_reset_password_email(
+                email_to="test@example.com", username="test", token="test"
+            )
 
     assert mock_send_email.called
     assert mock_send_email.call_count == 1
@@ -149,8 +156,12 @@ async def test_send_new_account_email() -> None:
     """
     Test that the send_new_account_email function calls the send_email function.
     """
-    with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
-        notify.send_new_account_email(email_to="test@example.com", username="test", password="test")
+    with patch("python_fastapi_stack.core.notify.get_html_template") as mock_get_html_template:
+        mock_get_html_template.return_value = ""
+        with patch("python_fastapi_stack.core.notify.send_email") as mock_send_email:
+            notify.send_new_account_email(
+                email_to="test@example.com", username="test", password="test"
+            )
 
     assert mock_send_email.called
     assert mock_send_email.call_count == 1
@@ -161,9 +172,11 @@ async def test_notify_on_start(client: TestClient) -> None:
     """
     Test that the notify_on_start function calls the notify function.
     """
-    with patch("python_fastapi_stack.core.notify.notify") as mock_notify:
-        with client as c:
-            c.get("/'")
+    with patch("python_fastapi_stack.core.notify.get_html_template") as mock_get_html_template:
+        mock_get_html_template.return_value = ""
+        with patch("python_fastapi_stack.core.notify.notify") as mock_notify:
+            with client as c:
+                c.get("/'")
     assert mock_notify.called
     assert mock_notify.call_count == 1
     assert mock_notify.call_args[1] == {
