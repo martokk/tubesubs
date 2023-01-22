@@ -128,7 +128,7 @@ async def create_user(
         background_tasks.add_task(
             notify.send_new_account_email,
             email_to=user_in.email,
-            username=user_in.email,
+            username=user_in.username,
             password=user_in.password,
         )
     return user
