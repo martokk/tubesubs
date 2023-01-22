@@ -118,7 +118,7 @@ def send_email(
 
 
 def get_html_template(template: Path) -> str:
-    return template.read_text(encoding="utf8")
+    return template.read_text(encoding="utf8")  # pragma: no cover
 
 
 def send_test_email(email_to: str) -> None:

@@ -1,5 +1,7 @@
 from typing import Dict
 
+from unittest.mock import patch
+
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -35,11 +37,15 @@ def test_get_users_normal_user_me(
     assert current_user["username"] == "test_user"
 
 
-async def test_create_user_new_email(
+@patch("python_fastapi_stack.settings.EMAILS_ENABLED", True)
+@patch("python_fastapi_stack.settings.SMTP_PORT", 1025)
+@patch("python_fastapi_stack.settings.SMTP_HOST", "example.com")
+@patch("python_fastapi_stack.settings.EMAILS_FROM_EMAIL", "test@example.com")
+async def test_create_user(
     client: TestClient, superuser_token_headers: dict[str, str], db: Session
 ) -> None:
     """
-    Test that a superuser can create a new user with a new email.
+    Test that a superuser can create a new user.
     """
     username = "test_user2"
     data = {
@@ -47,16 +53,25 @@ async def test_create_user_new_email(
         "password": "test_password2",
         "email": "testemail2@example.com",
     }
-    r = client.post(
-        f"{settings.API_V1_PREFIX}/user/",
-        headers=superuser_token_headers,
-        json=data,
-    )
-    assert 200 <= r.status_code < 300
+
+    with patch("python_fastapi_stack.core.notify.send_new_account_email") as mock:
+        r = client.post(
+            f"{settings.API_V1_PREFIX}/user/",
+            headers=superuser_token_headers,
+            json=data,
+        )
+    assert r.status_code == 200
+
+    # Check that the user was created
     created_user = r.json()
     user = await crud.user.get(db=db, username=username)
     assert user
     assert user.username == created_user["username"]
+    mock.assert_called_once_with(
+        email_to=created_user["email"],
+        username=created_user["username"],
+        password=data["password"],
+    )
 
 
 def test_get_users_not_superuser(
@@ -90,10 +105,10 @@ async def test_get_existing_user(
     """
     Test that a superuser can retrieve an existing user.
     """
-    username = "test_username"
-    password = "test_password"
+    username = "test_user2"
+    password = "test_password2"
     user_in = models.UserCreateWithPassword(
-        username=username, password=password, email="test@example.com"
+        username=username, password=password, email="test2@example.com"
     )
     user = await crud.user.create_with_password(db, in_obj=user_in)
     user_id = user.id
@@ -130,8 +145,8 @@ async def test_create_user_existing_username(
     username = "test_user"
     password = "test_password"
     email = "test@example.com"
-    user_in = models.UserCreateWithPassword(username=username, password=password, email=email)
-    await crud.user.create_with_password(db=db, in_obj=user_in)
+    # user_in = models.UserCreateWithPassword(username=username, password=password, email=email)
+    # await crud.user.create_with_password(db=db, in_obj=user_in)
     data = {"username": username, "password": password, "email": email}
     r = client.post(
         f"{settings.API_V1_PREFIX}/user/",

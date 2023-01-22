@@ -20,7 +20,7 @@ def test_version_callback(mocker: MagicMock) -> None:
         pass
     version = get_version()
     mock_console.print.assert_called_with(
-        f"[yellow]{settings.PROJECT_NAME}[/] version: [bold blue]{version}[/]"
+        f"[yellow]{settings.PACKAGE_NAME}[/] version: [bold blue]{version}[/]"
     )
 
 
