@@ -80,8 +80,8 @@ async def fixture_client(db: Session) -> AsyncGenerator[TestClient, None]:
     Args:
         db (Session): database session.
 
-    Returns:
-        AsyncGenerator[TestClient, None]: test client.
+    Yields:
+        TestClient: test client with database session override.
     """
 
     def override_get_db() -> Generator[Session, None, None]:
@@ -150,9 +150,16 @@ async def fixture_db_with_videos(db_with_user: Session) -> Session:
 
 
 @pytest.fixture(name="superuser_token_headers")
-def superuser_token_headers(db_with_user, client: TestClient) -> dict[str, str]:
+def superuser_token_headers(db_with_user: Session, client: TestClient) -> dict[str, str]:
     """
     Fixture that returns the headers for a superuser.
+
+    Args:
+        db_with_user (Session): database session.
+        client (TestClient): test client.
+
+    Returns:
+        dict[str, str]: headers for a superuser.
     """
     login_data = {
         "username": settings.FIRST_SUPERUSER_USERNAME,
@@ -169,6 +176,12 @@ def superuser_token_headers(db_with_user, client: TestClient) -> dict[str, str]:
 def normal_user_token_headers(client: TestClient) -> dict[str, str]:
     """
     Fixture that returns the headers for a normal user.
+
+    Args:
+        client (TestClient): test client.
+
+    Returns:
+        dict[str, str]: headers for a normal user.
     """
     login_data = {
         "username": "test_user",
@@ -185,5 +198,8 @@ def normal_user_token_headers(client: TestClient) -> dict[str, str]:
 def fixture_request() -> Request:
     """
     Fixture that returns a request object.
+
+    Returns:
+        Request: request object.
     """
     return Request(scope={"type": "http", "method": "GET", "path": "/"})
