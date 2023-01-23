@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
+from python_fastapi_stack import settings
 from python_fastapi_stack.core.cli import typer_app
 
 
@@ -12,7 +13,7 @@ def test_cli_version() -> None:
     runner = CliRunner()
     result = runner.invoke(typer_app, ["--version"])
     assert result.exit_code == 0
-    assert "python_fastapi_stack version:" in result.output
+    assert f"{settings.PACKAGE_NAME} version:" in result.output
 
 
 def test_cli_main() -> None:
