@@ -112,7 +112,7 @@ async def test_reset_password_with_invalid_username(
 
 async def test_reset_password_with_invalid_token(db_with_user: Session, client: TestClient) -> None:
     """
-    Test that the reset password endpoint returns a 400 if the token is invalid
+    Test that the reset password endpoint returns a 401 if the token is invalid
     """
     r = client.post(
         f"{settings.API_V1_PREFIX}/reset-password",
@@ -207,7 +207,7 @@ async def test_get_current_active_user_inactive_user(
             f"{settings.API_V1_PREFIX}/user/me",
             headers=normal_user_token_headers,
         )
-    assert r.status_code == 400
+    assert r.status_code == 403
     assert r.json() == {"detail": "Inactive user"}
 
 
