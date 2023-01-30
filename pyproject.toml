@@ -40,7 +40,7 @@ uvicorn = "^0.20.0"
 fastapi-utils = "^0.2.1"
 jinja2 = "^3.1.2"
 pyjwt = "^2.6.0"
-passlib = "^1.7.4"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 alembic = "^1.9.2"
 asyncpg = "^0.27.0"
 emails = "^0.6"
