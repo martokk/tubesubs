@@ -5,11 +5,11 @@ from python_fastapi_stack import crud, models
 from python_fastapi_stack.api import deps
 
 router = APIRouter()
-ModelClass = models.Video
-ModelReadClass = models.VideoRead
-ModelCreateClass = models.VideoCreate
-ModelUpdateClass = models.VideoUpdate
-model_crud = crud.video
+ModelClass = models.Item
+ModelReadClass = models.ItemRead
+ModelCreateClass = models.ItemCreate
+ModelUpdateClass = models.ItemUpdate
+model_crud = crud.item
 
 
 @router.post("/", response_model=ModelReadClass, status_code=status.HTTP_201_CREATED)
@@ -38,7 +38,7 @@ async def create_with_uploader_id(
             db=db, in_obj=in_obj, owner_id=current_active_user.id
         )
     except crud.RecordAlreadyExistsError as exc:
-        raise HTTPException(status_code=status.HTTP_200_OK, detail="Video already exists") from exc
+        raise HTTPException(status_code=status.HTTP_200_OK, detail="Item already exists") from exc
 
 
 @router.get("/{id}", response_model=ModelReadClass)
@@ -63,13 +63,13 @@ async def get(
         HTTPException: if object does not exist.
         HTTPException: if user is not superuser and object does not belong to user.
     """
-    video = await model_crud.get_or_none(id=id, db=db)
-    if not video:
+    item = await model_crud.get_or_none(id=id, db=db)
+    if not item:
         if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     else:
-        if crud.user.is_superuser(user_=current_user) or video.owner_id == current_user.id:
-            return video
+        if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
+            return item
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
@@ -126,12 +126,12 @@ async def update(
     Raises:
         HTTPException: if object not found.
     """
-    video = await model_crud.get_or_none(id=id, db=db)
-    if not video:
+    item = await model_crud.get_or_none(id=id, db=db)
+    if not item:
         if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     else:
-        if crud.user.is_superuser(user_=current_user) or video.owner_id == current_user.id:
+        if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
             return await model_crud.update(db=db, in_obj=in_obj, id=id)
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
@@ -159,12 +159,12 @@ async def delete(
         HTTPException: if item not found.
     """
 
-    video = await model_crud.get_or_none(id=id, db=db)
-    if not video:
+    item = await model_crud.get_or_none(id=id, db=db)
+    if not item:
         if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Video not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     else:
-        if crud.user.is_superuser(user_=current_user) or video.owner_id == current_user.id:
+        if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
             return await model_crud.remove(id=id, db=db)
 
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")

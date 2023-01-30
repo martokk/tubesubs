@@ -2,16 +2,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from python_fastapi_stack import settings
-
-TEST_ITEM = {
-    "uploader": "test",
-    "uploader_id": "test_uploader_id",
-    "title": "Example Video 1",
-    "description": "This is example video 1.",
-    "duration": 417,
-    "thumbnail": "https://sp.rmbl.ws/s8d/R/0_FRh.oq1b.jpg",
-    "url": "https://rumble.com/1111111/test.html",
-}
+from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
 
 
 def test_create_item(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -19,19 +10,19 @@ def test_create_item(client: TestClient, superuser_token_headers: dict[str, str]
     Test that a superuser can create a new item.
     """
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 201
     item = response.json()
-    assert item["uploader"] == TEST_ITEM["uploader"]
-    assert item["uploader_id"] == TEST_ITEM["uploader_id"]
-    assert item["title"] == TEST_ITEM["title"]
-    assert item["description"] == TEST_ITEM["description"]
-    assert item["duration"] == TEST_ITEM["duration"]
-    assert item["thumbnail"] == TEST_ITEM["thumbnail"]
-    assert item["url"] == TEST_ITEM["url"]
+    assert item["uploader"] == MOCKED_ITEM_1["uploader"]
+    assert item["uploader_id"] == MOCKED_ITEM_1["uploader_id"]
+    assert item["title"] == MOCKED_ITEM_1["title"]
+    assert item["description"] == MOCKED_ITEM_1["description"]
+    assert item["duration"] == MOCKED_ITEM_1["duration"]
+    assert item["thumbnail"] == MOCKED_ITEM_1["thumbnail"]
+    assert item["url"] == MOCKED_ITEM_1["url"]
     assert "id" in item
     assert "owner_id" in item
 
@@ -41,21 +32,21 @@ def test_create_duplicate_item(client: TestClient, superuser_token_headers: dict
     Test a duplicate item cannot be created.
     """
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 201
 
     # Try to create a duplicate item
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 200
     duplicate = response.json()
-    assert duplicate["detail"] == "Video already exists"
+    assert duplicate["detail"] == "Item already exists"
 
 
 def test_read_item(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -63,28 +54,28 @@ def test_read_item(client: TestClient, superuser_token_headers: dict[str, str]) 
     Test that a superuser can read an item.
     """
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 201
     created_item = response.json()
 
     # Read Item
     response = client.get(
-        f"{settings.API_V1_PREFIX}/video/{created_item['id']}",
+        f"{settings.API_V1_PREFIX}/item/{created_item['id']}",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
     read_item = response.json()
 
-    assert read_item["uploader"] == TEST_ITEM["uploader"]
-    assert read_item["uploader_id"] == TEST_ITEM["uploader_id"]
-    assert read_item["title"] == TEST_ITEM["title"]
-    assert read_item["description"] == TEST_ITEM["description"]
-    assert read_item["duration"] == TEST_ITEM["duration"]
-    assert read_item["thumbnail"] == TEST_ITEM["thumbnail"]
-    assert read_item["url"] == TEST_ITEM["url"]
+    assert read_item["uploader"] == MOCKED_ITEM_1["uploader"]
+    assert read_item["uploader_id"] == MOCKED_ITEM_1["uploader_id"]
+    assert read_item["title"] == MOCKED_ITEM_1["title"]
+    assert read_item["description"] == MOCKED_ITEM_1["description"]
+    assert read_item["duration"] == MOCKED_ITEM_1["duration"]
+    assert read_item["thumbnail"] == MOCKED_ITEM_1["thumbnail"]
+    assert read_item["url"] == MOCKED_ITEM_1["url"]
 
 
 def test_get_item_not_found(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -92,22 +83,22 @@ def test_get_item_not_found(client: TestClient, superuser_token_headers: dict[st
     Test that a item not found error is returned.
     """
     response = client.get(
-        f"{settings.API_V1_PREFIX}/video/1",
+        f"{settings.API_V1_PREFIX}/item/1",
         headers=superuser_token_headers,
     )
     assert response.status_code == 404
     content = response.json()
-    assert content["detail"] == "Video not found"
+    assert content["detail"] == "Item not found"
 
 
 def test_get_item_forbidden(
-    db_with_videos: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     """
     Test that a forbidden error is returned.
     """
     response = client.get(
-        f"{settings.API_V1_PREFIX}/video/5kwf8hFn",
+        f"{settings.API_V1_PREFIX}/item/5kwf8hFn",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 403
@@ -116,13 +107,26 @@ def test_get_item_forbidden(
 
 
 def test_superuser_get_all_items(
-    db_with_videos: Session, client: TestClient, superuser_token_headers: dict[str, str]
+    db_with_user: Session,  # pylint: disable=unused-argument
+    client: TestClient,
+    superuser_token_headers: dict[str, str],
 ) -> None:
     """
     Test that a superuser can get all items.
     """
+
+    # Create 3 items
+    for item in MOCKED_ITEMS:
+        response = client.post(
+            f"{settings.API_V1_PREFIX}/item/",
+            headers=superuser_token_headers,
+            json=item,
+        )
+        assert response.status_code == 201
+
+    # Get all items as superuser
     response = client.get(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
     )
     assert response.status_code == 200
@@ -131,18 +135,44 @@ def test_superuser_get_all_items(
 
 
 def test_normal_user_get_all_items(
-    db_with_videos: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+    db_with_user: Session,  # pylint: disable=unused-argument
+    client: TestClient,
+    normal_user_token_headers: dict[str, str],
+    superuser_token_headers: dict[str, str],
 ) -> None:
     """
-    Test that a normal user can get all thier own items.
+    Test that a normal user can get all their own items.
     """
+    # Create 2 items as normal user
+    response = client.post(
+        f"{settings.API_V1_PREFIX}/item/",
+        headers=normal_user_token_headers,
+        json=MOCKED_ITEMS[0],
+    )
+    assert response.status_code == 201
+    response = client.post(
+        f"{settings.API_V1_PREFIX}/item/",
+        headers=normal_user_token_headers,
+        json=MOCKED_ITEMS[1],
+    )
+    assert response.status_code == 201
+
+    # Create 1 item as super user
+    response = client.post(
+        f"{settings.API_V1_PREFIX}/item/",
+        headers=superuser_token_headers,
+        json=MOCKED_ITEMS[2],
+    )
+    assert response.status_code == 201
+
+    # Get all items as normal user
     response = client.get(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 200
     items = response.json()
-    assert len(items) == 3
+    assert len(items) == 2
 
 
 def test_update_item(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -150,18 +180,18 @@ def test_update_item(client: TestClient, superuser_token_headers: dict[str, str]
     Test that a superuser can update an item.
     """
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 201
     created_item = response.json()
 
     # Update Item
-    update_data = TEST_ITEM.copy()
+    update_data = MOCKED_ITEM_1.copy()
     update_data["title"] = "Updated Title"
     response = client.patch(
-        f"{settings.API_V1_PREFIX}/video/{created_item['id']}",
+        f"{settings.API_V1_PREFIX}/item/{created_item['id']}",
         headers=superuser_token_headers,
         json=update_data,
     )
@@ -171,7 +201,7 @@ def test_update_item(client: TestClient, superuser_token_headers: dict[str, str]
 
     # Update wrong item
     response = client.patch(
-        f"{settings.API_V1_PREFIX}/video/99999",
+        f"{settings.API_V1_PREFIX}/item/99999",
         headers=superuser_token_headers,
         json=update_data,
     )
@@ -179,15 +209,15 @@ def test_update_item(client: TestClient, superuser_token_headers: dict[str, str]
 
 
 def test_update_item_forbidden(
-    db_with_videos: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     """
     Test that a forbidden error is returned.
     """
     response = client.patch(
-        f"{settings.API_V1_PREFIX}/video/5kwf8hFn",
+        f"{settings.API_V1_PREFIX}/item/5kwf8hFn",
         headers=normal_user_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 403
     content = response.json()
@@ -199,36 +229,36 @@ def test_delete_item(client: TestClient, superuser_token_headers: dict[str, str]
     Test that a superuser can delete an item.
     """
     response = client.post(
-        f"{settings.API_V1_PREFIX}/video/",
+        f"{settings.API_V1_PREFIX}/item/",
         headers=superuser_token_headers,
-        json=TEST_ITEM,
+        json=MOCKED_ITEM_1,
     )
     assert response.status_code == 201
     created_item = response.json()
 
     # Delete Item
     response = client.delete(
-        f"{settings.API_V1_PREFIX}/video/{created_item['id']}",
+        f"{settings.API_V1_PREFIX}/item/{created_item['id']}",
         headers=superuser_token_headers,
     )
     assert response.status_code == 204
 
     # Delete wrong item
     response = client.delete(
-        f"{settings.API_V1_PREFIX}/video/99999",
+        f"{settings.API_V1_PREFIX}/item/99999",
         headers=superuser_token_headers,
     )
     assert response.status_code == 404
 
 
 def test_delete_item_forbidden(
-    db_with_videos: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
 ) -> None:
     """
     Test that a forbidden error is returned.
     """
     response = client.delete(
-        f"{settings.API_V1_PREFIX}/video/5kwf8hFn",
+        f"{settings.API_V1_PREFIX}/item/5kwf8hFn",
         headers=normal_user_token_headers,
     )
     assert response.status_code == 403

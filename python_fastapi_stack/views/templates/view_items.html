@@ -1,0 +1,17 @@
+<html>
+	<header>
+		<title>All Items<</title>
+	</header>
+	<body>
+		<h2 class="heading">All Items</h2>
+		<ul class="ul-sources">
+			{% for item in items %}
+			<li class="li-item">
+				<span class="li-item-id">{{ item.id }}</span>
+				<a class="li-item-title" href="{{ item.url }}">{{ item.title }}</a>
+				<a class="li-item-url" href="{{ item.url }}">{{ item.url }}</a>
+			</li>
+			{% endfor %}
+		</ul>
+	</body>
+</html>

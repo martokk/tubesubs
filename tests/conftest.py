@@ -3,6 +3,8 @@ from typing import Any
 import datetime
 import sqlite3
 from collections.abc import AsyncGenerator, Generator
+from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 import sqlalchemy as sa
@@ -17,7 +19,7 @@ from python_fastapi_stack.core import security
 from python_fastapi_stack.core.app import app
 from python_fastapi_stack.db.init_db import init_initial_data
 
-# Set up the databsase
+# Set up the database
 db_url = "sqlite:///:memory:"
 engine = create_engine(
     db_url,
@@ -33,7 +35,8 @@ SQLModel.metadata.create_all(bind=engine)
 # These two event listeners are only needed for sqlite for proper
 # SAVEPOINT / nested transaction support. Other databases like postgres
 # don't need them.
-# From: https://docs.sqlalchemy.org/en/14/dialects/sqlite.html#serializable-isolation-savepoints-transactional-ddl
+# From: https://docs.sqlalchemy.org/en/14/dialects/sqlite.html
+# #serializable-isolation-savepoints-transactional-ddl
 @sa.event.listens_for(engine, "connect")  # type: ignore
 def do_connect(dbapi_connection: Any, connection_record: Any) -> None:
     # disable pysqlite's emitting of the BEGIN statement entirely.
@@ -47,8 +50,14 @@ def do_begin(conn: Any) -> None:
     conn.exec_driver_sql("BEGIN")
 
 
+@pytest.fixture(name="init")
+def fixture_init(mocker: MagicMock, tmp_path: Path) -> None:  # pylint: disable=unused-argument
+    # mocker.patch("python_fastapi_stack.paths.FEEDS_PATH", return_value=tmp_path)
+    pass
+
+
 @pytest.fixture(name="db")
-async def fixture_db() -> AsyncGenerator[Session, None]:
+async def fixture_db(init: Any) -> AsyncGenerator[Session, None]:  # pylint: disable=unused-argument
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -60,7 +69,9 @@ async def fixture_db() -> AsyncGenerator[Session, None]:
     # If the application code calls session.commit, it will end the nested
     # transaction. Need to start a new one when that happens.
     @sa.event.listens_for(session, "after_transaction_end")  # type: ignore
-    def end_savepoint(session: Any, transaction: Any) -> None:  # type: ignore
+    def end_savepoint(  # type: ignore
+        session: Any, transaction: Any  # pylint: disable=unused-argument
+    ) -> None:
         nonlocal nested
         if not nested.is_active:
             nested = connection.begin_nested()
@@ -112,44 +123,6 @@ async def fixture_db_with_user(db: Session) -> Session:
     return db
 
 
-@pytest.fixture(name="db_with_videos")
-async def fixture_db_with_videos(db_with_user: Session) -> Session:
-    """
-    Fixture that creates example videos for the example source in the test database.
-
-    Args:
-        db_with_user (Session): database session.
-
-    Returns:
-        Session: database session with example videos.
-
-    Returns the following video_ids:
-        - 5kwf8hFn
-        - R6iBBN3J
-        - fEpPZMry
-    """
-    owner = await crud.user.get(db=db_with_user, username="test_user")
-    videos = []
-    for i in range(3):
-        video_create = models.VideoCreate(
-            id=f"{i}{i}{i}{i}{i}{i}{i}{i}",
-            uploader="test",
-            uploader_id="test_uploader_id",
-            title=f"Example Video {i}",
-            description=f"This is example video {i}.",
-            duration=417,
-            thumbnail="https://sp.rmbl.ws/s8d/R/0_FRh.oq1b.jpg",
-            url=f"https://rumble.com/{i}{i}{i}{i}/test.html",
-            added_at=datetime.datetime.now(),
-            updated_at=datetime.datetime.now(),
-        )
-        video = await crud.video.create_with_owner_id(
-            in_obj=video_create, db=db_with_user, owner_id=owner.id
-        )
-        videos.append(video)
-    return db_with_user
-
-
 @pytest.fixture(name="superuser_token_headers")
 def superuser_token_headers(db_with_user: Session, client: TestClient) -> dict[str, str]:
     """
@@ -169,8 +142,7 @@ def superuser_token_headers(db_with_user: Session, client: TestClient) -> dict[s
     r = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
     tokens = r.json()
     a_token = tokens["access_token"]
-    headers = {"Authorization": f"Bearer {a_token}"}
-    return headers
+    return {"Authorization": f"Bearer {a_token}"}
 
 
 @pytest.fixture(name="normal_user_token_headers")
@@ -191,8 +163,7 @@ def normal_user_token_headers(client: TestClient) -> dict[str, str]:
     r = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
     tokens = r.json()
     a_token = tokens["access_token"]
-    headers = {"Authorization": f"Bearer {a_token}"}
-    return headers
+    return {"Authorization": f"Bearer {a_token}"}
 
 
 @pytest.fixture(name="test_request")
