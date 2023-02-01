@@ -31,7 +31,7 @@ async def list_items(
 
     """
 
-    items = await crud.item.get_all(db=db)
+    items = await crud.item.get_multi(db=db, owner_id=current_user.id)
     return templates.TemplateResponse(
         "item/list.html", {"request": request, "items": items, "current_user": current_user}
     )
@@ -57,8 +57,14 @@ async def view_item(
 
     Returns:
         Response: View of the item
+
+    Raises:
+        HTTPException: If the item is not found.
     """
-    item = await crud.item.get(db=db, id=item_id)
+    try:
+        item = await crud.item.get(db=db, id=item_id)
+    except crud.RecordNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return templates.TemplateResponse(
         "item/view.html", {"request": request, "item": item, "current_user": current_user}
     )
@@ -86,7 +92,7 @@ async def create_item(
     )
 
 
-@router.post("/items/create", response_class=HTMLResponse)
+@router.post("/items/create", response_class=HTMLResponse, status_code=status.HTTP_201_CREATED)
 async def handle_create_item(
     title: str = Form(...),
     description: str = Form(...),
@@ -188,7 +194,7 @@ async def handle_edit_item(
     )
 
 
-@router.get("/item/{item_id}/delete", response_class=HTMLResponse)
+@router.post("/item/{item_id}/delete", response_class=HTMLResponse)
 async def delete_item(
     item_id: str,
     db: Session = Depends(deps.get_db),
@@ -208,4 +214,4 @@ async def delete_item(
         Response: Form to create a new item
     """
     await crud.item.remove(db=db, id=item_id)
-    return RedirectResponse(url="/items", status_code=status.HTTP_204_OK)
+    return RedirectResponse(url="/items", status_code=status.HTTP_204_NO_CONTENT)

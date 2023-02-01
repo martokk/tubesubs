@@ -1,23 +1,23 @@
 from typing import Any
 
-import datetime
-import sqlite3
 from collections.abc import AsyncGenerator, Generator
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import sqlalchemy as sa
-from fastapi import Request
+from fastapi import Request, Response
 from fastapi.testclient import TestClient
+from httpx import Cookies
 from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session, SQLModel, create_engine
 
 from python_fastapi_stack import crud, models, settings
-from python_fastapi_stack.api.deps import get_db
+from python_fastapi_stack.api import deps as api_deps
 from python_fastapi_stack.core import security
 from python_fastapi_stack.core.app import app
 from python_fastapi_stack.db.init_db import init_initial_data
+from python_fastapi_stack.views import deps as views_deps
 
 # Set up the database
 db_url = "sqlite:///:memory:"
@@ -99,9 +99,11 @@ async def fixture_client(db: Session) -> AsyncGenerator[TestClient, None]:
     def override_get_db() -> Generator[Session, None, None]:
         yield db
 
-    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[api_deps.get_db] = override_get_db
+    app.dependency_overrides[views_deps.get_db] = override_get_db
     yield TestClient(app)
-    del app.dependency_overrides[get_db]
+    del app.dependency_overrides[api_deps.get_db]
+    del app.dependency_overrides[views_deps.get_db]
 
 
 @pytest.fixture(name="db_with_user")
@@ -175,3 +177,52 @@ def fixture_request() -> Request:
         Request: request object.
     """
     return Request(scope={"type": "http", "method": "GET", "path": "/"})
+
+
+@pytest.fixture(name="normal_user_cookie")
+def fixture_normal_user_cookie(
+    db_with_user: Session, client: TestClient  # pylint: disable=unused-argument
+) -> Cookies:
+    """
+    Fixture that returns the cookie_data for a normal user.
+
+    Args:
+        db_with_user (Session): database session.
+        client (TestClient): test client.
+
+    Returns:
+        Cookies: cookie_data for a normal user.
+    """
+    form_data = {"username": "test_user", "password": "test_password"}
+
+    with patch("python_fastapi_stack.views.endpoints.login.RedirectResponse") as mock:
+        mock.return_value = Response(status_code=302)
+        response = client.post("/login", data=form_data)
+        print(response.cookies)
+        return response.cookies
+
+
+@pytest.fixture(name="superuser_cookie")
+def fixture_superuser_cookie(
+    db_with_user: Session, client: TestClient  # pylint: disable=unused-argument
+) -> Cookies:
+    """
+    Fixture that returns the cookie_data for a normal user.
+
+    Args:
+        db_with_user (Session): database session.
+        client (TestClient): test client.
+
+    Returns:
+        Cookies: cookie_data for a normal user.
+    """
+    form_data = {
+        "username": settings.FIRST_SUPERUSER_USERNAME,
+        "password": settings.FIRST_SUPERUSER_PASSWORD,
+    }
+
+    with patch("python_fastapi_stack.views.endpoints.login.RedirectResponse") as mock:
+        mock.return_value = Response(status_code=302)
+        response = client.post("/login", data=form_data)
+        print(response.cookies)
+        return response.cookies

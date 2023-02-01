@@ -55,7 +55,7 @@ async def handle_login(
     return response
 
 
-@router.get("/logout")
+@router.get("/logout", response_class=HTMLResponse)
 async def logout(response: Response) -> Response:
     """
     Logout user by deleting the cookie.
@@ -72,7 +72,7 @@ async def logout(response: Response) -> Response:
     return response
 
 
-@router.get("/register")
+@router.get("/register", response_class=HTMLResponse)
 async def register(
     request: Request,
 ) -> Response:
