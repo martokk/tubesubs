@@ -16,15 +16,11 @@ def test_create_item(client: TestClient, superuser_token_headers: dict[str, str]
     )
     assert response.status_code == 201
     item = response.json()
-    assert item["uploader"] == MOCKED_ITEM_1["uploader"]
-    assert item["uploader_id"] == MOCKED_ITEM_1["uploader_id"]
     assert item["title"] == MOCKED_ITEM_1["title"]
     assert item["description"] == MOCKED_ITEM_1["description"]
-    assert item["duration"] == MOCKED_ITEM_1["duration"]
-    assert item["thumbnail"] == MOCKED_ITEM_1["thumbnail"]
     assert item["url"] == MOCKED_ITEM_1["url"]
-    assert "id" in item
-    assert "owner_id" in item
+    assert item["owner_id"] is not None
+    assert item["id"] is not None
 
 
 def test_create_duplicate_item(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -69,13 +65,11 @@ def test_read_item(client: TestClient, superuser_token_headers: dict[str, str]) 
     assert response.status_code == 200
     read_item = response.json()
 
-    assert read_item["uploader"] == MOCKED_ITEM_1["uploader"]
-    assert read_item["uploader_id"] == MOCKED_ITEM_1["uploader_id"]
     assert read_item["title"] == MOCKED_ITEM_1["title"]
     assert read_item["description"] == MOCKED_ITEM_1["description"]
-    assert read_item["duration"] == MOCKED_ITEM_1["duration"]
-    assert read_item["thumbnail"] == MOCKED_ITEM_1["thumbnail"]
     assert read_item["url"] == MOCKED_ITEM_1["url"]
+    assert read_item["owner_id"] is not None
+    assert read_item["id"] is not None
 
 
 def test_get_item_not_found(client: TestClient, superuser_token_headers: dict[str, str]) -> None:

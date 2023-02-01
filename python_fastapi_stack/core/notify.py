@@ -33,7 +33,7 @@ async def notify(
             email_to=settings.NOTIFY_EMAIL_TO,
             subject_template="Server Notification",
             html_template=text,
-            environment={"name": "Python FastAPI Stack"},
+            environment={"name": f"{settings.PROJECT_NAME}"},
         )
     return response
 

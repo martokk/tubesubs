@@ -15,12 +15,8 @@ if TYPE_CHECKING:
 
 class ItemBase(TimestampModel, SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
-    uploader: str = Field(default=None)
-    uploader_id: str = Field(default=None)
     title: str = Field(default=None)
     description: str = Field(default=None)
-    duration: int = Field(default=None)
-    thumbnail: str = Field(default=None)
     url: str = Field(default=None)
     owner_id: str = Field(foreign_key="user.id", nullable=False, default=None)
 

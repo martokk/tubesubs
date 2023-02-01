@@ -8,7 +8,7 @@
     "method": "POST",
     "sortNum": 10000,
     "created": "2023-01-30T20:46:15.438Z",
-    "modified": "2023-01-31T00:43:52.445Z",
+    "modified": "2023-01-31T05:50:08.073Z",
     "headers": [],
     "params": [],
     "body": {
@@ -17,21 +17,21 @@
       "form": [
         {
           "name": "username",
-          "value": "{{USERNAME}}",
-          "isDisabled": true
+          "value": "{{USERNAME}}"
         },
         {
           "name": "password",
-          "value": "{{PASSWORD}}",
-          "isDisabled": true
+          "value": "{{PASSWORD}}"
         },
         {
           "name": "username",
-          "value": "{{ADMIN_USERNAME}}"
+          "value": "{{ADMIN_USERNAME}}",
+          "isDisabled": true
         },
         {
           "name": "password",
-          "value": "{{ADMIN_PASSWORD}}"
+          "value": "{{ADMIN_PASSWORD}}",
+          "isDisabled": true
         }
       ]
     },
@@ -104,7 +104,7 @@
     "method": "GET",
     "sortNum": 50000,
     "created": "2023-01-30T20:46:15.442Z",
-    "modified": "2023-01-31T00:45:37.348Z",
+    "modified": "2023-01-31T05:41:59.746Z",
     "headers": [],
     "params": [],
     "tests": []
@@ -132,12 +132,12 @@
     "method": "POST",
     "sortNum": 70000,
     "created": "2023-01-30T20:46:15.444Z",
-    "modified": "2023-01-31T00:47:07.744Z",
+    "modified": "2023-01-31T01:58:58.432Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n\t\"username\": \"new_user\",\n\t\"password\": \"123456\",\n\t\"email\": \"asdasd@outlook.com\"\n}",
+      "raw": "{\n\t\"username\": \"martokk\",\n\t\"password\": \"42557406\",\n\t\"email\": \"asd@outlook.com\"\n}",
       "form": []
     },
     "tests": []
@@ -259,12 +259,12 @@
     "method": "POST",
     "sortNum": 230000,
     "created": "2023-01-30T20:46:15.461Z",
-    "modified": "2023-01-31T00:50:17.440Z",
+    "modified": "2023-01-31T01:59:43.298Z",
     "headers": [],
     "params": [],
     "body": {
       "type": "json",
-      "raw": "{\n    \"url\": \"https://rumble.com/c/Styxhexenhammer666\"\n}",
+      "raw": "{\n    \"url\": \"https://rumble.com/c/test2\"\n}",
       "form": []
     },
     "tests": []

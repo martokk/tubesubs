@@ -1,31 +1,22 @@
 MOCKED_ITEM_1 = {
-    "uploader": "test",
-    "uploader_id": "test_uploader_id",
-    "title": "Example Item 1",
-    "description": "This is example item 1.",
-    "duration": 417,
-    "thumbnail": "https://sp.rmbl.ws/s8d/R/0_FRh.oq1b.jpg",
-    "url": "https://rumble.com/1111111/test.html",
+    "id": "BYcsoDpX",
+    "title": "test_1_title",
+    "description": "test_1_description",
+    "url": "https://rumble.com/c/test1",
 }
 
 MOCKED_ITEM_2 = {
-    "uploader": "test",
-    "uploader_id": "test_uploader_id",
-    "title": "Example Item 2",
-    "description": "This is example item 2.",
-    "duration": 222,
-    "thumbnail": "https://sp.rmbl.ws/s8d/R/0_FRh.oq1b2.jpg",
-    "url": "https://rumble.com/2222222/test.html",
+    "id": "Rr7DVNR6",
+    "title": "test_2_title",
+    "description": "test_2_description",
+    "url": "https://rumble.com/c/test2",
 }
 
 MOCKED_ITEM_3 = {
-    "uploader": "test",
-    "uploader_id": "test_uploader_id",
-    "title": "Example Item 3",
-    "description": "This is example item 1.",
-    "duration": 333,
-    "thumbnail": "https://sp.rmbl.ws/s8d/R/0_FRh.oq1b3.jpg",
-    "url": "https://rumble.com/3333333/test.html",
+    "id": "5LKeh4An",
+    "title": "test_3_title",
+    "description": "test_3_description",
+    "url": "https://rumble.com/c/test3",
 }
 
 MOCKED_ITEMS = [MOCKED_ITEM_1, MOCKED_ITEM_2, MOCKED_ITEM_3]

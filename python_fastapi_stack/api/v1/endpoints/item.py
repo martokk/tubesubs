@@ -64,13 +64,12 @@ async def get(
         HTTPException: if user is not superuser and object does not belong to user.
     """
     item = await model_crud.get_or_none(id=id, db=db)
-    if not item:
-        if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
-    else:
+    if item:
         if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
             return item
 
+    elif crud.user.is_superuser(user_=current_user):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
 
@@ -94,13 +93,13 @@ async def get_multi(
     Returns:
         list[ModelClass]: List of objects.
     """
-    if crud.user.is_superuser(user_=current_user):
-        items = await model_crud.get_multi(db=db, skip=skip, limit=limit)
-    else:
-        items = await model_crud.get_multi_by_owner_id(
+    return (
+        await model_crud.get_multi(db=db, skip=skip, limit=limit)
+        if crud.user.is_superuser(user_=current_user)
+        else await model_crud.get_multi_by_owner_id(
             db=db, owner_id=current_user.id, skip=skip, limit=limit
         )
-    return items
+    )
 
 
 @router.patch("/{id}", response_model=ModelReadClass)
@@ -127,13 +126,12 @@ async def update(
         HTTPException: if object not found.
     """
     item = await model_crud.get_or_none(id=id, db=db)
-    if not item:
-        if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
-    else:
+    if item:
         if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
             return await model_crud.update(db=db, in_obj=in_obj, id=id)
 
+    elif crud.user.is_superuser(user_=current_user):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
 
 
@@ -160,11 +158,10 @@ async def delete(
     """
 
     item = await model_crud.get_or_none(id=id, db=db)
-    if not item:
-        if crud.user.is_superuser(user_=current_user):
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
-    else:
+    if item:
         if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
             return await model_crud.remove(id=id, db=db)
 
+    elif crud.user.is_superuser(user_=current_user):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")

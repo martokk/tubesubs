@@ -4,10 +4,11 @@ from datetime import datetime, timedelta
 
 import jwt
 from fastapi import HTTPException, status
-from fastapi.security import HTTPBearer
+from fastapi.security import HTTPBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from sqlmodel import Session
 
-from python_fastapi_stack import settings
+from python_fastapi_stack import crud, settings
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -85,3 +86,35 @@ def decode_token(
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token") from e
     return payload["sub"]
+
+
+async def login_access_token(db: Session, form_data: OAuth2PasswordRequestForm) -> dict[str, str]:
+    """
+    OAuth2 compatible token login, get an access token for future requests
+
+    Args:
+        db (Session): The database session.
+        form_data (OAuth2PasswordRequestForm): the username and password
+
+    Returns:
+        dict[str, str]: a dictionary with the access token and refresh token
+
+    Raises:
+        HTTPException: if the username or password is incorrect.
+        HTTPException: if the user is inactive.
+    """
+    user = await crud.user.authenticate(
+        db, username=form_data.username, password=form_data.password
+    )
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password"
+        )
+    if not crud.user.is_active(user):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
+
+    # Create the tokens
+    return {
+        "access_token": encode_token(subject=user.id, key=settings.JWT_ACCESS_SECRET_KEY),
+        "refresh_token": encode_token(subject=user.id, key=settings.JWT_REFRESH_SECRET_KEY),
+    }

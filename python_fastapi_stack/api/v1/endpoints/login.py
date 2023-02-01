@@ -24,28 +24,8 @@ async def login_access_token(
 
     Returns:
         dict[str, str]: a dictionary with the access token and refresh token
-
-    Raises:
-        HTTPException: if the username or password is incorrect.
-        HTTPException: if the user is inactive.
     """
-    user = await crud.user.authenticate(
-        db, username=form_data.username, password=form_data.password
-    )
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password"
-        )
-    if not crud.user.is_active(user):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
-
-    # Create the tokens
-    return {
-        "access_token": security.encode_token(subject=user.id, key=settings.JWT_ACCESS_SECRET_KEY),
-        "refresh_token": security.encode_token(
-            subject=user.id, key=settings.JWT_REFRESH_SECRET_KEY
-        ),
-    }
+    return await security.login_access_token(db=db, form_data=form_data)
 
 
 @router.post("/login/test-token", response_model=models.UserRead)
