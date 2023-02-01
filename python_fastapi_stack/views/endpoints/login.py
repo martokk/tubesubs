@@ -44,13 +44,14 @@ async def handle_login(
         Response: Redirect to home page after login
     """
     try:
-        tokens = await security.login_access_token(db=db, form_data=form_data)
+        tokens = await security.get_tokens_from_username_password(db=db, form_data=form_data)
     except HTTPException as e:
         return templates.TemplateResponse("login/login.html", {"request": request, "error": e})
 
     # Set the cookie
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-    response.set_cookie(key="access_token", value=f"Bearer {tokens['access_token']}", httponly=True)
+    response.set_cookie(key="access_token", value=f"Bearer {tokens.access_token}", httponly=True)
+    response.set_cookie(key="refresh_token", value=f"Bearer {tokens.refresh_token}", httponly=True)
 
     return response
 
@@ -67,6 +68,7 @@ async def logout(response: Response) -> Response:
         Response: Redirect to home page after logout
     """
     response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
     return response

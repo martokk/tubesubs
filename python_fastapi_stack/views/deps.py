@@ -1,6 +1,9 @@
+from typing import Any
+
 from collections.abc import Generator
 
 from fastapi import Cookie, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models, settings
@@ -22,41 +25,88 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
-async def get_access_token_from_cookie(access_token: str | None = Cookie(None)) -> str | None:
+async def get_tokens_from_cookie(
+    access_token: str | None = Cookie(None), refresh_token: str | None = Cookie(None)
+) -> models.Tokens:
     """
-    Gets the access token from the cookie.
+    Gets the tokens from the cookie.
 
     Args:
         access_token (str | None): The access token.
+        refresh_token (str | None): The refresh token.
 
     Returns:
-        str | None: The access token.
+        models.Tokens: The tokens.
     """
-    if access_token and "Bearer" in access_token:
-        return access_token.split("Bearer ")[1]
-    return None
+    access_token_value = (
+        access_token.split("Bearer ")[1] if access_token and "Bearer" in access_token else None
+    )
+    refresh_token_value = (
+        refresh_token.split("Bearer ")[1] if refresh_token and "Bearer" in refresh_token else None
+    )
+    return models.Tokens(access_token=access_token_value, refresh_token=refresh_token_value)
+
+
+async def get_tokens_from_refresh_token(refresh_token: str) -> models.Tokens:
+    """
+    Gets the access token from the refresh token.
+
+    Args:
+        refresh_token (str): The refresh token.
+
+    Returns:
+        models.Tokens: The tokens.
+    """
+    try:
+        new_tokens = await security.get_tokens_from_refresh_token(refresh_token=refresh_token)
+    except HTTPException:
+        return models.Tokens()
+
+    # Set the tokens in the cookie
+    response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(
+        key="access_token", value=f"Bearer {new_tokens.access_token}", httponly=True
+    )
+    response.set_cookie(
+        key="refresh_token", value=f"Bearer {new_tokens.refresh_token}", httponly=True
+    )
+
+    return new_tokens
 
 
 async def get_current_user(
-    access_token: str | None = Depends(get_access_token_from_cookie), db: Session = Depends(get_db)
+    tokens: models.Tokens = Depends(get_tokens_from_cookie), db: Session = Depends(get_db)
 ) -> models.User | None:
     """
     Gets the current user. If the access token is
     invalid or not found in cookie, returns None.
 
     Args:
-        access_token (str | None): The access token.
+        tokens (models.Tokens): The tokens.
         db (Session): The database session.
 
     Returns:
         models.User | None: The current user.
     """
-    if not access_token:
-        return None
     try:
-        user_id = security.decode_token(token=access_token, key=settings.JWT_ACCESS_SECRET_KEY)
+        user_id = security.decode_token(
+            token=str(tokens.access_token), key=settings.JWT_ACCESS_SECRET_KEY
+        )
     except HTTPException:
-        return None
+        if not tokens.refresh_token:
+            return None
+        try:
+            new_tokens = await get_tokens_from_refresh_token(refresh_token=tokens.refresh_token)
+        except HTTPException:
+            return None
+
+        try:
+            user_id = security.decode_token(
+                token=str(new_tokens.access_token), key=settings.JWT_ACCESS_SECRET_KEY
+            )
+        except HTTPException:
+            return None
+
     return await crud.user.get(db=db, id=user_id)
 
 
