@@ -89,11 +89,9 @@ async def update_user_account(
     db_user = await crud.user.get(db=db, username=username)
 
     if current_user.is_superuser:
-        user_update = models.UserUpdate(full_name=full_name, email=email)
-        if is_active != db_user.is_active:
-            user_update.is_active = is_active
-        if is_superuser != db_user.is_superuser:
-            user_update.is_superuser = is_superuser
+        user_update = models.UserUpdate(
+            full_name=full_name, email=email, is_active=is_active, is_superuser=is_superuser
+        )
     else:
         user_update = models.UserUpdate(full_name=full_name, email=email)
 

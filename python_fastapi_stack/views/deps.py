@@ -1,5 +1,3 @@
-from typing import Any
-
 from collections.abc import Generator
 
 from fastapi import Cookie, Depends, HTTPException, status
@@ -49,7 +47,7 @@ async def get_tokens_from_cookie(
 
 async def get_tokens_from_refresh_token(refresh_token: str) -> models.Tokens:
     """
-    Gets the access token from the refresh token.
+    Gets new tokens from a refresh token. Sets the new tokens in the cookie.
 
     Args:
         refresh_token (str): The refresh token.
@@ -89,10 +87,12 @@ async def get_current_user(
         models.User | None: The current user.
     """
     try:
+        # Try to get the user from the access token
         user_id = security.decode_token(
             token=str(tokens.access_token), key=settings.JWT_ACCESS_SECRET_KEY
         )
     except HTTPException:
+        # If the access token is invalid, try to get the user from the refresh token
         if not tokens.refresh_token:
             return None
         try:
@@ -100,6 +100,7 @@ async def get_current_user(
         except HTTPException:
             return None
 
+        # Get the user_id from the new access token
         try:
             user_id = security.decode_token(
                 token=str(new_tokens.access_token), key=settings.JWT_ACCESS_SECRET_KEY
@@ -114,8 +115,16 @@ async def get_current_user_or_raise(
     current_user: models.User | None = Depends(get_current_user),
 ) -> models.User | None:
     """
-    Gets the current user or raises 401
+    Gets the current user. If the user is not found, raises an exception.
 
+    Args:
+        current_user (models.User | None): The current user.
+
+    Returns:
+        models.User | None: The current user.
+
+    Raises:
+        HTTPException: If the user is not found.
     """
     if not current_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")

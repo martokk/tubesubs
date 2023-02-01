@@ -114,7 +114,7 @@ async def get_tokens_from_username_password(
     db: Session, form_data: OAuth2PasswordRequestForm
 ) -> models.Tokens:
     """
-    OAuth2 compatible token login, get an access token for future requests
+    Get access and refresh tokens from a username and password.
 
     Args:
         db (Session): The database session.
@@ -143,7 +143,7 @@ async def get_tokens_from_username_password(
 
 async def get_tokens_from_refresh_token(refresh_token: str) -> models.Tokens:
     """
-    OAuth2 compatible token login, get an access token for future requests
+    Get new access and refresh tokens from a refresh token.
 
     Args:
         refresh_token (str): the refresh token

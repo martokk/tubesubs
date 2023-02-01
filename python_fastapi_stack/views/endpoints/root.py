@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, Response, status
+from fastapi import APIRouter, Depends, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -27,17 +27,12 @@ async def root_index_router(
     """
     if current_user:
         return await root_index_authenticated(request, current_user)
-    return await root_index_unauthenticated(request)
+    return await root_index_unauthenticated()
 
 
-async def root_index_unauthenticated(
-    request: Request,
-) -> Response:
+async def root_index_unauthenticated() -> Response:
     """
     Home page (Not authenticated)
-
-    Args:
-        request(Request): The request object
 
     Returns:
         Response: Home page
