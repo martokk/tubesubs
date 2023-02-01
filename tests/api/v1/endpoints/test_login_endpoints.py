@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import jwt
-from fastapi import HTTPException, status
+from fastapi import status
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 

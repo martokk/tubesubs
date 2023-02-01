@@ -1,5 +1,7 @@
 from typing import Any
 
+from datetime import timedelta
+
 from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session
@@ -14,7 +16,7 @@ router = APIRouter()
 @router.post("/login/access-token", response_model=models.Tokens)
 async def login_access_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
-) -> dict[str, str]:
+) -> models.Tokens:
     """
     OAuth2 compatible token login, get an access token for future requests
 
@@ -25,7 +27,7 @@ async def login_access_token(
     Returns:
         dict[str, str]: a dictionary with the access token and refresh token
     """
-    return await security.login_access_token(db=db, form_data=form_data)
+    return await security.get_tokens_from_username_password(db=db, form_data=form_data)
 
 
 @router.post("/login/test-token", response_model=models.UserRead)
@@ -74,7 +76,9 @@ async def recover_password(
 
     # Send email with password recovery link
     password_reset_token = security.encode_token(
-        subject=user.id, key=settings.JWT_ACCESS_SECRET_KEY
+        subject=user.id,
+        key=settings.JWT_ACCESS_SECRET_KEY,
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
     background_tasks.add_task(

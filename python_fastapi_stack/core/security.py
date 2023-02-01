@@ -8,7 +8,7 @@ from fastapi.security import HTTPBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from sqlmodel import Session
 
-from python_fastapi_stack import crud, settings
+from python_fastapi_stack import crud, models, settings
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
@@ -41,19 +41,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bool(password_context.verify(secret=plain_password, hash=hashed_password))
 
 
-def encode_token(subject: str | Any, key: str, expires_delta: timedelta | None = None) -> str:
+def encode_token(subject: str | Any, key: str, expires_delta: timedelta) -> str:
     """
     Encode subject in token
 
     Args:
         subject (str): subject to be encoded
         key (str): secret key
-        expires_delta (timedelta, optional): token expiration time. Defaults to None.
+        expires_delta (timedelta): token expiration time.
 
     Returns:
         token (str): encoded token
     """
-    expires_delta = expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "exp": datetime.utcnow() + expires_delta,
         "iat": datetime.utcnow(),
@@ -88,7 +87,32 @@ def decode_token(
     return payload["sub"]
 
 
-async def login_access_token(db: Session, form_data: OAuth2PasswordRequestForm) -> dict[str, str]:
+async def get_tokens(user_id: str) -> models.Tokens:
+    """
+    Get access and refresh tokens for a user.
+
+    Args:
+        user_id (str): The user id.
+
+    Returns:
+        models.Tokens: The tokens.
+    """
+    access_token = encode_token(
+        subject=user_id,
+        key=settings.JWT_ACCESS_SECRET_KEY,
+        expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+    )
+    refresh_token = encode_token(
+        subject=user_id,
+        key=settings.JWT_REFRESH_SECRET_KEY,
+        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_MINUTES),
+    )
+    return models.Tokens(access_token=access_token, refresh_token=refresh_token)
+
+
+async def get_tokens_from_username_password(
+    db: Session, form_data: OAuth2PasswordRequestForm
+) -> models.Tokens:
     """
     OAuth2 compatible token login, get an access token for future requests
 
@@ -97,7 +121,7 @@ async def login_access_token(db: Session, form_data: OAuth2PasswordRequestForm) 
         form_data (OAuth2PasswordRequestForm): the username and password
 
     Returns:
-        dict[str, str]: a dictionary with the access token and refresh token
+        models.Tokens: a dictionary with the access token and refresh token
 
     Raises:
         HTTPException: if the username or password is incorrect.
@@ -114,7 +138,26 @@ async def login_access_token(db: Session, form_data: OAuth2PasswordRequestForm) 
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
 
     # Create the tokens
-    return {
-        "access_token": encode_token(subject=user.id, key=settings.JWT_ACCESS_SECRET_KEY),
-        "refresh_token": encode_token(subject=user.id, key=settings.JWT_REFRESH_SECRET_KEY),
-    }
+    return await get_tokens(user_id=user.id)
+
+
+async def get_tokens_from_refresh_token(refresh_token: str) -> models.Tokens:
+    """
+    OAuth2 compatible token login, get an access token for future requests
+
+    Args:
+        refresh_token (str): the refresh token
+
+    Returns:
+        dict[str, str]: a dictionary with the access token and refresh token
+
+    Raises:
+        HTTPException: if the refresh token is invalid.
+    """
+    try:
+        user_id = decode_token(token=refresh_token, key=settings.JWT_REFRESH_SECRET_KEY)
+    except HTTPException as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token") from e
+
+    # Create the tokens
+    return await get_tokens(user_id=user_id)
