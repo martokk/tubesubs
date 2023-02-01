@@ -2,11 +2,9 @@
 
 {% block title %}{{ db_user.username }}'s Account{% endblock %}
 
+{% block content_header %}{{ db_user.username }}'s Account{% endblock %}
 
 {% block content %}
-
-<h3>{{ db_user.username }}'s Account</h3>
-
 <div class="container text-left">
     <div class="row">
         <div class="col-4 text-right font-weight-bold">

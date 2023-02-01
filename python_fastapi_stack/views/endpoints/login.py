@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
+from python_fastapi_stack import settings
 from python_fastapi_stack.api.deps import get_db
 from python_fastapi_stack.core import security
 
@@ -79,12 +80,14 @@ async def register(
     request: Request,
 ) -> Response:
     """
-    TODO: Registration page
-
     Args:
         request(Request): The request object
 
     Returns:
         Response: Registration page
     """
-    return RedirectResponse(url="/login")
+
+    return templates.TemplateResponse(
+        "login/register.html",
+        {"request": request, "registration_enabled": settings.USERS_OPEN_REGISTRATION},
+    )

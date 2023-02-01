@@ -2,43 +2,44 @@
 
 {% block title %} Items ({{ items|length }}){% endblock %}
 
+{% block content_header %}Items ({{ items|length }}){% endblock %}
 
 {%block content %}
-<h3 class="heading">Items ({{ items|length }})</h3>
+<div class="container">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col" class="w-75">Title</th>
+                <th scope="col" class="d-none d-md-table-cell w-25">Description</th>
+                <th scope="col" class="w-auto"></th>
+            </tr>
+        </thead>
+        <tbody>
 
-<table class="table table-hover table-sm">
-    <thead>
-        <tr>
-            <th scope="col" class="w-75">Title</th>
-            <th scope="col" class="d-none d-md-table-cell w-25">Description</th>
-            <th scope="col" class="w-auto"></th>
-        </tr>
-    </thead>
-    <tbody>
+            {% for item in items %}
+            <tr>
+                <td class="">
+                    <a href="/item/{{ item.id }}" class="">{{ item.title }}</a>
+                </td>
 
-        {% for item in items %}
-        <tr>
-            <td class="">
-                <a href="/item/{{ item.id }}" class="">{{ item.title }}</a>
-            </td>
+                <td class="">{{ item.description }}</td>
 
-            <td class="">{{ item.description }}</td>
-
-            <td class="">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-light btn-transparent dropdown-toggle "
-                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right p-0">
-                        <a class="dropdown-item" href="/item/{{ item.id }}/edit">Edit</a>
-                        <a class="dropdown-item" href="/item/{{ item.id }}/delete">Delete</a>
+                <td class="">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-light btn-transparent dropdown-toggle "
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right p-0">
+                            <a class="dropdown-item" href="/item/{{ item.id }}/edit">Edit</a>
+                            <a class="dropdown-item" href="/item/{{ item.id }}/delete">Delete</a>
+                        </div>
                     </div>
-                </div>
-            </td>
-        </tr>
-        {% endfor %}
+                </td>
 
-    </tbody>
-</table>
+            </tr>
+            {% endfor %}
 
+        </tbody>
+    </table>
+</div>
 {% endblock %}
