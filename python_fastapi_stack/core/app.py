@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-
-# from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from sqlmodel import Session
 
@@ -9,6 +8,7 @@ from python_fastapi_stack.api import deps
 from python_fastapi_stack.api.v1.api import api_router
 from python_fastapi_stack.core import notify
 from python_fastapi_stack.db.init_db import init_initial_data
+from python_fastapi_stack.paths import STATIC_PATH
 from python_fastapi_stack.views.router import views_router
 
 # Initialize FastAPI App
@@ -22,7 +22,7 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 app.include_router(views_router)
 
 # STATIC_PATH.mkdir(parents=True, exist_ok=True)
-# app.mount("/feed", StaticFiles(directory=STATIC_PATH), name="feed")
+app.mount("/static", StaticFiles(directory=STATIC_PATH))
 
 
 @app.on_event("startup")  # type: ignore

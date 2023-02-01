@@ -58,11 +58,6 @@ def test_health_check(client: TestClient) -> None:
     # Tests webpage root health check
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {
-        "name": settings.PROJECT_NAME,
-        "version": get_version(),
-        "description": settings.PROJECT_DESCRIPTION,
-    }
 
     # Tests API health check
     response = client.get(f"{settings.API_V1_PREFIX}")

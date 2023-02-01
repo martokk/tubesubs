@@ -1,0 +1,40 @@
+/* Default styles */
+.container-fluid {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Medium screen (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .container-fluid {
+        max-width: 720px;
+    }
+}
+
+/* Large screens (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .container-fluid {
+        max-width: 960px;
+    }
+}
+
+/* Extra large screens (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .container-fluid {
+        max-width: 1140px;
+    }
+}
+
+
+html,
+body {
+    height: 100%;
+}
+
+.d-flex.flex-column {
+    min-height: 100%;
+}
+
+.container-fluid.mt-3.mb-5 {
+    flex: 1;
+}
