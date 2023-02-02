@@ -116,7 +116,7 @@ async def create_user(
     """
     # Creates user
     try:
-        user = await crud.user.create_with_password(db, in_obj=user_in)
+        user = await crud.user.create_with_password(db, obj_in=user_in)
     except crud.RecordAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -154,7 +154,7 @@ async def update_user(
     Returns:
         models.UserRead: Updated user.
     """
-    return await crud.user.update(db, id=user_id, in_obj=user_in)
+    return await crud.user.update(db, id=user_id, obj_in=user_in)
 
 
 @router.put("/me", response_model=models.UserRead)
@@ -186,7 +186,7 @@ async def update_user_me(
         user_in.full_name = full_name
     if email is not None:
         user_in.email = email
-    user = await crud.user.update(db, id=current_user.id, in_obj=user_in)
+    user = await crud.user.update(db, id=current_user.id, obj_in=user_in)
     return user
 
 

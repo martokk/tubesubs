@@ -156,7 +156,7 @@ async def handle_create_item(
         title=title, description=description, url=url, owner_id=current_user.id
     )
     try:
-        await crud.item.create(db=db, in_obj=item_create)
+        await crud.item.create(db=db, obj_in=item_create)
     except crud.RecordAlreadyExistsError:
         alerts.danger.append("Item already exists")
         response = RedirectResponse("/items/create", status_code=status.HTTP_302_FOUND)
@@ -236,7 +236,7 @@ async def handle_edit_item(
     item_update = models.ItemUpdate(title=title, description=description, url=url)
 
     try:
-        new_item = await crud.item.update(db=db, in_obj=item_update, id=item_id)
+        new_item = await crud.item.update(db=db, obj_in=item_update, id=item_id)
     except crud.RecordNotFoundError:
         alerts.danger.append("Item not found")
         response = RedirectResponse(url="/items", status_code=status.HTTP_303_SEE_OTHER)

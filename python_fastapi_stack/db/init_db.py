@@ -39,4 +39,4 @@ async def init_initial_data(db: Session, **kwargs: Any) -> None:
             password=settings.FIRST_SUPERUSER_PASSWORD,
             is_superuser=True,
         )
-        await crud.user.create_with_password(db=db, in_obj=user_create)
+        await crud.user.create_with_password(db=db, obj_in=user_create)

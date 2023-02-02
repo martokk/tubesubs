@@ -7,21 +7,21 @@ from .base import BaseCRUD
 
 class ItemCRUD(BaseCRUD[models.Item, models.ItemCreate, models.ItemUpdate]):
     async def create_with_owner_id(
-        self, db: Session, *, in_obj: models.ItemCreate, owner_id: str
+        self, db: Session, *, obj_in: models.ItemCreate, owner_id: str
     ) -> models.Item:
         """
         Create a new item with an owner_id.
 
         Args:
             db (Session): The database session.
-            in_obj (models.ItemCreate): The item to create.
+            obj_in (models.ItemCreate): The item to create.
             owner_id (str): The owner_id to set on the item.
 
         Returns:
             models.Item: The created item.
         """
-        in_obj.owner_id = owner_id
-        return await self.create(db, in_obj=in_obj)
+        obj_in.owner_id = owner_id
+        return await self.create(db, obj_in=obj_in)
 
     async def get_multi_by_owner_id(
         self, db: Session, *, owner_id: str, skip: int = 0, limit: int = 100

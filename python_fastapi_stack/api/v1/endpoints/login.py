@@ -181,7 +181,7 @@ async def create_user_open(
     user_in = models.UserCreateWithPassword(
         username=username, password=password, email=email, full_name=full_name
     )
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
 
     # Sends email
     if settings.EMAILS_ENABLED and user_in.email:

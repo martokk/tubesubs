@@ -121,7 +121,7 @@ async def fixture_db_with_user(db: Session) -> Session:
     user_create = models.UserCreate(
         username="test_user", email="test@example.com", hashed_password=user_hashed_password
     )
-    await crud.user.create(in_obj=user_create, db=db)
+    await crud.user.create(obj_in=user_create, db=db)
     return db
 
 

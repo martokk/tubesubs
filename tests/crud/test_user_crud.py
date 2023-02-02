@@ -10,7 +10,7 @@ async def test_create_user(db: Session) -> None:
     password = "test_password9"
     email = "test9@example.com"
     user_in = models.UserCreateWithPassword(username=username, email=email, password=password)
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
     assert user.username == username
     assert hasattr(user, "hashed_password")
 
@@ -55,7 +55,7 @@ async def test_check_if_user_is_active_inactive(db: Session) -> None:
     user_in = models.UserCreateWithPassword(
         username=username, email=email, password=password, is_active=False
     )
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
     assert crud.user.is_active(user) is False
 
 
@@ -69,7 +69,7 @@ async def test_check_if_user_is_superuser(db: Session) -> None:
     user_in = models.UserCreateWithPassword(
         username=username, email=email, password=password, is_superuser=True
     )
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
     is_superuser = crud.user.is_superuser(user_=user)
     assert is_superuser is True
 
@@ -82,7 +82,7 @@ async def test_check_if_user_is_superuser_normal_user(db: Session) -> None:
     password = "test_password9"
     email = "test9@example.com"
     user_in = models.UserCreateWithPassword(username=username, email=email, password=password)
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
     is_superuser = crud.user.is_superuser(user_=user)
     assert is_superuser is False
 
@@ -95,7 +95,7 @@ async def test_get_user(db: Session) -> None:
     password = "test_password9"
     email = "test9@example.com"
     user_in = models.UserCreateWithPassword(username=username, email=email, password=password)
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
 
     user_2 = await crud.user.get(db=db, id=user.id)
     assert user_2
@@ -112,11 +112,11 @@ async def test_update_user(db: Session) -> None:
     password = "test_password9"
     email = "test9@example.com"
     user_in = models.UserCreateWithPassword(username=username, email=email, password=password)
-    user = await crud.user.create_with_password(db, in_obj=user_in)
+    user = await crud.user.create_with_password(db, obj_in=user_in)
 
     new_hashed_password = security.get_password_hash(password="new_password")
     user_in_update = models.UserUpdate(hashed_password=new_hashed_password, is_superuser=True)
-    await crud.user.update(db, id=user.id, in_obj=user_in_update)
+    await crud.user.update(db, id=user.id, obj_in=user_in_update)
 
     user_2 = await crud.user.get(db=db, id=user.id)
     assert user_2

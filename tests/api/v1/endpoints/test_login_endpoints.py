@@ -47,7 +47,7 @@ async def test_get_access_token_bad_username(client: TestClient) -> None:
 
 async def test_get_access_token_inactive_user(db_with_user: Session, client: TestClient) -> None:
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
     login_data = {
         "username": "test_user",
@@ -144,7 +144,7 @@ async def test_password_recovery_for_inactive_user(
     Test that the reset password endpoint returns a 400 if the user is inactive
     """
     await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.core.notify.send_reset_password_email") as mock_send_email:
@@ -160,7 +160,7 @@ async def test_reset_password_for_inactive_user(db_with_user: Session, client: T
     Test that the reset password endpoint returns a 400 if the user is inactive
     """
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.core.security.decode_token") as mock_decode_token:
@@ -198,7 +198,7 @@ async def test_get_current_active_user_inactive_user(
     Test that the current user endpoint returns a 400 if the user is inactive
     """
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.api.deps.get_current_user_id") as mock_get_current_user_id:

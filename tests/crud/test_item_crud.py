@@ -15,7 +15,7 @@ async def get_mocked_item(db: Session) -> models.Item:
     owner = await crud.user.get(db=db, username="test_user")
     item_create = models.ItemCreate(**MOCKED_ITEM_1)
 
-    return await crud.item.create_with_owner_id(db=db, in_obj=item_create, owner_id=owner.id)
+    return await crud.item.create_with_owner_id(db=db, obj_in=item_create, owner_id=owner.id)
 
 
 async def test_create_item(db_with_user: Session) -> None:
@@ -55,7 +55,7 @@ async def test_update_item(db_with_user: Session) -> None:
     db_item = await crud.item.get(db=db_with_user, id=created_item.id)
     db_item_update = models.ItemUpdate(description="New Description")
     updated_item = await crud.item.update(
-        db=db_with_user, id=created_item.id, in_obj=db_item_update
+        db=db_with_user, id=created_item.id, obj_in=db_item_update
     )
     assert db_item.id == updated_item.id
     assert db_item.title == updated_item.title
@@ -73,7 +73,7 @@ async def test_update_item_without_filter(db_with_user: Session) -> None:
     await crud.item.get(db=db_with_user, id=created_item.id)
     db_item_update = models.ItemUpdate(description="New Description")
     with pytest.raises(ValueError):
-        await crud.item.update(db=db_with_user, in_obj=db_item_update)
+        await crud.item.update(db=db_with_user, obj_in=db_item_update)
 
 
 async def test_delete_item(db_with_user: Session) -> None:

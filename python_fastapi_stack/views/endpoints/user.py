@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlmodel import Session
-
 from python_fastapi_stack import crud, models
 from python_fastapi_stack.views import deps, templates
 
@@ -124,7 +123,7 @@ async def update_user_account(
     else:
         user_update = models.UserUpdate(full_name=full_name, email=email)
 
-    db_user = await crud.user.update(db=db, in_obj=user_update, id=db_user.id)
+    db_user = await crud.user.update(db=db, obj_in=user_update, id=db_user.id)
 
     context = {
         "request": request,

@@ -16,14 +16,14 @@ model_crud = crud.item
 async def create_with_uploader_id(
     *,
     db: Session = Depends(deps.get_db),
-    in_obj: ModelCreateClass,
+    obj_in: ModelCreateClass,
     current_active_user: models.User = Depends(deps.get_current_active_user),
 ) -> ModelClass:
     """
     Create a new item.
 
     Args:
-        in_obj (ModelCreateClass): object to be created.
+        obj_in (ModelCreateClass): object to be created.
         db (Session): database session.
         current_active_user (models.User): Current active user.
 
@@ -35,7 +35,7 @@ async def create_with_uploader_id(
     """
     try:
         return await model_crud.create_with_owner_id(
-            db=db, in_obj=in_obj, owner_id=current_active_user.id
+            db=db, obj_in=obj_in, owner_id=current_active_user.id
         )
     except crud.RecordAlreadyExistsError as exc:
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Item already exists") from exc
@@ -107,7 +107,7 @@ async def update(
     *,
     db: Session = Depends(deps.get_db),
     id: str,
-    in_obj: ModelUpdateClass,
+    obj_in: ModelUpdateClass,
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> ModelClass:
     """
@@ -115,7 +115,7 @@ async def update(
 
     Args:
         id (str): ID of the item to update.
-        in_obj (ModelUpdateClass): object to update.
+        obj_in (ModelUpdateClass): object to update.
         db (Session): database session.
         current_user (Any): authenticated user.
 
@@ -128,7 +128,7 @@ async def update(
     item = await model_crud.get_or_none(id=id, db=db)
     if item:
         if crud.user.is_superuser(user_=current_user) or item.owner_id == current_user.id:
-            return await model_crud.update(db=db, in_obj=in_obj, id=id)
+            return await model_crud.update(db=db, obj_in=obj_in, id=id)
 
     elif crud.user.is_superuser(user_=current_user):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Item not found")

@@ -87,7 +87,7 @@ async def update_user_account(
     else:
         user_update = models.UserUpdate(full_name=full_name, email=email)
 
-    db_user = await crud.user.update(db=db, in_obj=user_update, id=current_user.id)
+    db_user = await crud.user.update(db=db, obj_in=user_update, id=current_user.id)
 
     alerts.success.append("User updated successfully")
     context = {"request": request, "current_user": db_user, "db_user": db_user, "alerts": alerts}
