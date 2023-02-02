@@ -20,10 +20,6 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
 	<link rel="manifest" href="/site.webmanifest">
 	{% endblock head %}
-
-
-
-
 </head>
 
 <body class="d-flex flex-column">
@@ -34,6 +30,7 @@
 	{% endif %}
 
 	<div class="container-fluid mt-3 mb-5">
+		{% include 'base/alerts.html' %}
 
 		<div class="container my-5">
 			<h3>{% block content_header %} {% endblock %}</h3>
@@ -45,9 +42,6 @@
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
 		crossorigin="anonymous"></script>
-
-
-
 	<footer class="bg-dark text-white py-3">
 		<div class="container-fluid text-center">
 			<p class="text-center">Copyright &copy; Python FastAPI Stack 2023</p>

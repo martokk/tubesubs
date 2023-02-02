@@ -1,3 +1,4 @@
+from .alerts import *
 from .item import *
 from .msg import *
 from .server import *
