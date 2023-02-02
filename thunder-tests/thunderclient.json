@@ -145,13 +145,13 @@
   {
     "_id": "8edaed40-9b78-4a5d-ba00-c54187d8ea31",
     "colId": "fd4bbae6-1678-481a-94f0-3046b14d11cf",
-    "containerId": "765355ac-01d9-47e9-a053-de02bfb68c9b",
-    "name": "Create/Register User (Open Regestration)",
-    "url": "{{BASE_API_URL}}/user/open",
+    "containerId": "622b1939-1347-4ea6-9bb3-0875813593d4",
+    "name": "Create/Register User (Open Registration)",
+    "url": "{{BASE_API_URL}}/register",
     "method": "POST",
-    "sortNum": 80000,
+    "sortNum": 50000,
     "created": "2023-01-30T20:46:15.445Z",
-    "modified": "2023-01-31T00:45:56.662Z",
+    "modified": "2023-02-02T00:08:21.929Z",
     "headers": [],
     "params": [],
     "body": {

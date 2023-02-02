@@ -134,50 +134,6 @@ async def create_user(
     return user
 
 
-@router.post("/open", response_model=models.UserRead, status_code=status.HTTP_201_CREATED)
-async def create_user_open(
-    *,
-    db: Session = Depends(deps.get_db),
-    username: str = Body(...),
-    password: str = Body(...),
-    email: EmailStr = Body(...),
-    full_name: str = Body(None),
-) -> models.User:
-    """
-    Create new user without the need to be logged in.
-
-    Args:
-        db (Session): database session.
-        username (str): username.
-        password (str): password.
-        email (EmailStr): email.
-        full_name (str): full name.
-
-    Returns:
-        models.User: Created user.
-
-    Raises:
-        HTTPException: if user already exists.
-        HTTPException: if open registration is forbidden.
-    """
-    if not settings.USERS_OPEN_REGISTRATION:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Open user registration is forbidden on this server",
-        )
-    user = await crud.user.get_or_none(db, username=username)
-    if user:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="The user with this username already exists in the system",
-        )
-    user_in = models.UserCreateWithPassword(
-        username=username, password=password, email=email, full_name=full_name
-    )
-    user = await crud.user.create_with_password(db, in_obj=user_in)
-    return user
-
-
 @router.patch("/{user_id}", response_model=models.UserRead)
 async def update_user(
     *,

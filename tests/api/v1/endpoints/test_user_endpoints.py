@@ -198,7 +198,7 @@ def test_create_user_open(client: TestClient) -> None:
     # Assert HTTP_403_FORBIDDEN if users_open_registration is False
     settings.USERS_OPEN_REGISTRATION = False
     r = client.post(
-        f"{settings.API_V1_PREFIX}/user/open",
+        f"{settings.API_V1_PREFIX}/register",
         json={"username": "test_user", "password": "test_password", "email": "test@example.com"},
     )
     assert r.status_code == 403
@@ -207,7 +207,7 @@ def test_create_user_open(client: TestClient) -> None:
     settings.USERS_OPEN_REGISTRATION = True
 
     r = client.post(
-        f"{settings.API_V1_PREFIX}/user/open",
+        f"{settings.API_V1_PREFIX}/register",
         json={
             "username": "test_user9",
             "password": "test_password9",
@@ -218,7 +218,7 @@ def test_create_user_open(client: TestClient) -> None:
 
     # Assert HTTP_409_CONFLICT if username already exists
     r = client.post(
-        f"{settings.API_V1_PREFIX}/user/open",
+        f"{settings.API_V1_PREFIX}/register",
         json={
             "username": "test_user9",
             "password": "test_password9",
