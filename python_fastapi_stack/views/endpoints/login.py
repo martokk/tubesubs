@@ -14,21 +14,18 @@ router = APIRouter()
 
 
 @router.get("/login", response_class=HTMLResponse)
-async def login(request: Request, success: bool | None = None) -> Response:
+async def login(request: Request) -> Response:
     """
     Login Page.
 
     Args:
         request(Request): The request object
-        success(bool): Whether the user was created successfully
 
     Returns:
         Response: Login page
 
     """
-    alerts = models.Alerts()
-    if success:
-        alerts.success.append("User created successfully")
+    alerts = models.Alerts().from_cookies(request.cookies)
     return templates.TemplateResponse("login/login.html", {"request": request, "alerts": alerts})
 
 
@@ -73,10 +70,13 @@ async def logout(response: Response) -> Response:
     Returns:
         Response: Redirect to home page after logout
     """
+    alerts = models.Alerts()
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
+    alerts.success.append("You have been logged out.")
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = "/"
+    response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
     return response
 
 
@@ -91,10 +91,14 @@ async def register(
     Returns:
         Response: Registration page
     """
-
+    alerts = models.Alerts().from_cookies(request.cookies)
     return templates.TemplateResponse(
         "login/register.html",
-        {"request": request, "registration_enabled": settings.USERS_OPEN_REGISTRATION},
+        {
+            "request": request,
+            "registration_enabled": settings.USERS_OPEN_REGISTRATION,
+            "alerts": alerts,
+        },
     )
 
 
@@ -160,7 +164,12 @@ async def handle_registration(
 
         # Handle response
         if response.status_code == status.HTTP_201_CREATED:
-            return RedirectResponse("/login?success=true", status_code=status.HTTP_302_FOUND)
+            alerts.success.append("Registration successful")
+            redirect_response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+            redirect_response.set_cookie(
+                key="alerts", value=alerts.json(), httponly=True, max_age=5
+            )
+            return redirect_response
         elif response.status_code == status.HTTP_409_CONFLICT:
             alerts.danger.append("Username or email already exists")
         elif response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:

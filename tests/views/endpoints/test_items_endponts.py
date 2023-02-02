@@ -34,7 +34,7 @@ def test_handle_create_item(
         data=MOCKED_ITEM_1,
     )
     assert response.status_code == 200
-    assert response.template.name == "item/edit.html"  # type: ignore
+    assert response.template.name == "item/list.html"  # type: ignore
 
 
 @pytest.mark.filterwarnings("ignore::sqlalchemy.exc.SAWarning")
@@ -54,11 +54,11 @@ def test_create_duplicate_item(
     assert response.status_code == 200
 
     # Try to create a duplicate item
-    response = client.post(
-        "/items/create",
-        data=MOCKED_ITEM_1,
-    )
-    assert response.status_code == 400
+    with pytest.raises(Exception):
+        response = client.post(
+            "/items/create",
+            data=MOCKED_ITEM_1,
+        )
 
 
 def test_read_item(
@@ -80,7 +80,7 @@ def test_read_item(
 
     # Read the item
     response = client.get(
-        f"/item/{response.context['item'].id}",  # type: ignore
+        f"/item/{response.context['items'][0].id}",  # type: ignore
     )
     assert response.status_code == 200
     assert response.template.name == "item/view.html"  # type: ignore
@@ -98,7 +98,8 @@ def test_get_item_not_found(
 
     # Read the item
     response = client.get("/item/8675309")
-    assert response.status_code == 404
+    assert response.status_code == 200
+    assert response.url.path == "/items"
 
 
 def test_get_item_forbidden(
@@ -107,7 +108,7 @@ def test_get_item_forbidden(
     normal_user_cookie: Cookies,
 ) -> None:  # sourcery skip: extract-duplicate-method
     """
-    Test that a forbidden error is returned.
+    Test that a forbidden error is returned when a user tries to read an item
     """
     client.cookies = normal_user_cookie
 
@@ -117,7 +118,7 @@ def test_get_item_forbidden(
         data=MOCKED_ITEM_1,
     )
     assert response.status_code == 200
-    item_id = response.context["item"].id  # type: ignore
+    item_id = response.context["items"][0].id  # type: ignore
 
     # Read the item
     response = client.get(
@@ -201,7 +202,7 @@ def test_update_item(
 
     # Update the item
     response = client.post(
-        f"/item/{response.context['item'].id}/edit",  # type: ignore
+        f"/item/{response.context['items'][0].id}/edit",  # type: ignore
         data=MOCKED_ITEMS[1],
     )
     assert response.status_code == 200
@@ -234,16 +235,19 @@ def test_delete_item(
         data=MOCKED_ITEMS[0],
     )
     assert response.status_code == 200
-    item_id = response.context["item"].id  # type: ignore
+    item_id = response.context["items"][0].id  # type: ignore
 
     # Delete the item
-    response = client.post(
+    response = client.get(
         f"/item/{item_id}/delete",
     )
-    assert response.status_code == 204
+    assert response.status_code == 200
+    assert response.history[0].status_code == 303
+    assert response.url.path == "/items"
 
     # View the item
     response = client.get(
         f"/item/{item_id}",
     )
-    assert response.status_code == 404
+    assert response.status_code == 200
+    assert response.context["alerts"].danger == ["Item not found"]  # type: ignore

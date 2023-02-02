@@ -4,20 +4,21 @@
 
 {% block content %}
 <div class="container my-5 d-flex justify-content-center">
-    <form method="POST">
-        <div class="form-group p-2">
-            <label for="usernameInput">Username:</label>
-            <input type="text" class="form-control form-control-sm" id="usernameInput" name="username"
+    <form method="POST" class="p-5 bg-dark rounded b-bg-light">
+        <div class="form-group">
+            <label for="usernameInput" class="font-weight-bold">Username:</label>
+            <input type="text" class="form-control form-control" id="usernameInput" name="username"
                 placeholder="Enter username">
         </div>
-        <div class="form-group p-2">
-            <label for="passwordInput">Password:</label>
-            <input type="password" class="form-control form-control-sm" id="passwordInput" name="password"
+        <div class="form-group">
+            <label for="passwordInput" class="font-weight-bold">Password:</label>
+            <input type="password" class="form-control form-control" id="passwordInput" name="password"
                 placeholder="Enter password">
         </div>
-        <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary btn mt-3">Submit</button>
         </div>
     </form>
 </div>
+
 {% endblock content %}

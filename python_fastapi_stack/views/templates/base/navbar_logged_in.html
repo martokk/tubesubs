@@ -20,9 +20,14 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/items">List Items</a></li>
+                        <li><a class="dropdown-item" href="/items">My Items</a></li>
+                        {% if current_user.is_superuser %}
+                        <li><a class="dropdown-item" href="/items/all">All Items</a></li>
+                        {% endif %}
                     </ul>
                 </li>
+
+                {% if current_user.is_superuser %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
@@ -33,6 +38,8 @@
                         <li><a class="dropdown-item" href="/redoc">Redoc</a></li>
                     </ul>
                 </li>
+                {% endif %}
+
             </ul>
 
 

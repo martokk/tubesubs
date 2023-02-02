@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, Form, Request, status
-from fastapi.responses import HTMLResponse, Response
-from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models
@@ -28,8 +27,20 @@ async def view_user(
     Returns:
         Response: The users account page
     """
-    db_user = await crud.user.get(db=db, username=username)
-    context = {"request": request, "current_user": current_user, "db_user": db_user}
+    alerts = models.Alerts()
+    try:
+        db_user = await crud.user.get(db=db, username=username)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("User not found")
+        return templates.TemplateResponse(
+            "base/base.html", context={"request": request, "alerts": alerts}
+        )
+    context = {
+        "request": request,
+        "current_user": current_user,
+        "db_user": db_user,
+        "alerts": alerts,
+    }
     return templates.TemplateResponse("user/view.html", context=context)
 
 
@@ -52,8 +63,20 @@ async def edit_user_account(
     Returns:
         Response: The users account page
     """
-    db_user = await crud.user.get(db=db, username=username)
-    context = {"request": request, "current_user": current_user, "db_user": db_user}
+    alerts = models.Alerts()
+    try:
+        db_user = await crud.user.get(db=db, username=username)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("User not found")
+        response = RedirectResponse(url="/items", status_code=status.HTTP_302_FOUND)
+        response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+        return response
+    context = {
+        "request": request,
+        "current_user": current_user,
+        "db_user": db_user,
+        "alerts": alerts,
+    }
     return templates.TemplateResponse("user/edit.html", context=context)
 
 
@@ -84,7 +107,15 @@ async def update_user_account(
     Returns:
         Response: The users account page
     """
-    db_user = await crud.user.get(db=db, username=username)
+    alerts = models.Alerts()
+
+    try:
+        db_user = await crud.user.get(db=db, username=username)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("User not found")
+        response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+        response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+        return response
 
     if current_user.is_superuser:
         user_update = models.UserUpdate(
@@ -95,7 +126,12 @@ async def update_user_account(
 
     db_user = await crud.user.update(db=db, in_obj=user_update, id=db_user.id)
 
-    context = {"request": request, "current_user": current_user, "db_user": db_user}
+    context = {
+        "request": request,
+        "current_user": current_user,
+        "db_user": db_user,
+        "alerts": alerts,
+    }
     return templates.TemplateResponse(
         "user/edit.html", context=context, status_code=status.HTTP_200_OK
     )

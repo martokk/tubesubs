@@ -7,39 +7,45 @@
 
 {% block content %}
 <div class="container">
-    <form method="POST">
-
-        <div class="form-group">
-            <label for="idInput">Id:</label>
-            <input type="text" class="form-control" id="idInput" name="id" value="{{ item.id }}" disabled>
+    <div class="card">
+        <div class="card-header">
+            Item Details
         </div>
+        <div class="card-body p-4">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="idInput">Id:</label>
+                    <input type="text" class="form-control mb-3" id="idInput" name="id" value="{{ item.id }}" disabled>
+                </div>
 
-        <div class="form-group">
-            <label for="titleInput">Title:</label>
-            <input type="text" class="form-control" id="titleInput" name="title" value="{{ item.title }}">
+                <div class="form-group">
+                    <label for="titleInput">Title:</label>
+                    <input type="text" class="form-control mb-3" id="titleInput" name="title" value="{{ item.title }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="descriptionInput">Description:</label>
+                    <textarea class="form-control mb-3" id="descriptionInput" rows="3"
+                        name="description">{{ item.description }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="urlInput">URL:</label>
+                    <input type="text" class="form-control mb-3" id="urlInput" name="url" value="{{ item.url }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="ownerInput">Owner Id:</label>
+                    <input type="text" class="form-control mb-3" id="ownerInput" name="owner_id"
+                        value="{{ item.owner_id }}" disabled>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
         </div>
-
-        <div class="form-group mt-3">
-            <label for="descriptionInput">Description:</label>
-            <textarea class="form-control" id="descriptionInput" rows="3"
-                name="description">{{ item.description }}</textarea>
-        </div>
-
-        <div class="form-group mt-3">
-            <label for="urlInput">URL:</label>
-            <input type="text" class="form-control" id="urlInput" name="url" value="{{ item.url }}">
-        </div>
-
-        <div class="form-group">
-            <label for="ownerInput">Owner Id:</label>
-            <input type="text" class="form-control" id="ownerInput" name="owner_id" value="{{ item.owner_id }}"
-                disabled>
-        </div>
-
-        <div class="d-flex justify-content-end mt-3">
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-
-    </form>
+    </div>
 </div>
+
 {% endblock content %}
