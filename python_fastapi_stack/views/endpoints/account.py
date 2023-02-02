@@ -5,10 +5,9 @@ from sqlmodel import Session
 
 from python_fastapi_stack import crud, models
 from python_fastapi_stack.paths import TEMPLATES_PATH
-from python_fastapi_stack.views import deps
+from python_fastapi_stack.views import deps, templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory=TEMPLATES_PATH)
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -45,7 +44,13 @@ async def edit_user_account(
     Returns:
         Response: The users account page
     """
-    context = {"request": request, "current_user": current_user, "db_user": current_user}
+    alerts = models.Alerts().from_cookies(request.cookies)
+    context = {
+        "request": request,
+        "current_user": current_user,
+        "db_user": current_user,
+        "alerts": alerts,
+    }
     return templates.TemplateResponse("user/edit.html", context=context)
 
 
@@ -74,6 +79,7 @@ async def update_user_account(
     Returns:
         Response: The users account page
     """
+    alerts = models.Alerts()
     if current_user.is_superuser:
         user_update = models.UserUpdate(
             full_name=full_name, email=email, is_active=is_active, is_superuser=is_superuser
@@ -82,5 +88,7 @@ async def update_user_account(
         user_update = models.UserUpdate(full_name=full_name, email=email)
 
     db_user = await crud.user.update(db=db, in_obj=user_update, id=current_user.id)
-    context = {"request": request, "current_user": db_user, "db_user": db_user}
+
+    alerts.success.append("User updated successfully")
+    context = {"request": request, "current_user": db_user, "db_user": db_user, "alerts": alerts}
     return templates.TemplateResponse("user/edit.html", context=context)

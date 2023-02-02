@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
-from fastapi.templating import Jinja2Templates
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models
-from python_fastapi_stack.paths import TEMPLATES_PATH
-from python_fastapi_stack.views import deps
+from python_fastapi_stack.views import deps, templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory=TEMPLATES_PATH)
 
 
 @router.get("/items", response_class=HTMLResponse)
