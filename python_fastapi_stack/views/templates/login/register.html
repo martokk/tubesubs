@@ -12,7 +12,7 @@ Registration Closed.
 
 {% block content %}
 
-{% if registration_enabled %}
+{% if not registration_enabled %}
 <div class="container my-5">
     <p> Registration is currently closed.</p>
 </div>
@@ -31,9 +31,9 @@ Registration Closed.
                 placeholder="Enter password" {{"disabled" if not registration_enabled }}>
         </div>
         <div class="form-group">
-            <label for="passwordConfrimationInput">Password</label>
-            <input type="password_confrimation" class="form-control form-control-sm" id="passwordConfrimationInput"
-                name="password_confrimation" placeholder="Enter password confrimation" {{"disabled" if not
+            <label for="passwordConfrimationInput">Confrim Password</label>
+            <input type="password" class="form-control form-control-sm" id="passwordConfrimationInput"
+                name="password_confirmation" placeholder="Enter password confrimation" {{"disabled" if not
                 registration_enabled }}>
         </div>
         <div class="form-group">
