@@ -1,0 +1,176 @@
+{
+	"workbench.colorCustomizations": {
+		"activityBar.activeBackground": "#63cae0",
+		"activityBar.background": "#63cae0",
+		"activityBar.foreground": "#15202b",
+		"activityBar.inactiveForeground": "#15202b99",
+		"activityBarBadge.background": "#d52ab7",
+		"activityBarBadge.foreground": "#e7e7e7",
+		"commandCenter.border": "#15202b99",
+		"editorGroup.border": "#63cae0",
+		"panel.border": "#63cae0",
+		"sash.hoverBorder": "#63cae0",
+		"sideBar.border": "#63cae0",
+		"statusBar.background": "#38bcd8",
+		"statusBar.border": "#38bcd8",
+		"statusBar.debuggingBackground": "#d85438",
+		"statusBar.debuggingBorder": "#d85438",
+		"statusBar.debuggingForeground": "#e7e7e7",
+		"statusBar.foreground": "#15202b",
+		"statusBarItem.hoverBackground": "#249fb9",
+		"statusBarItem.remoteBackground": "#38bcd8",
+		"statusBarItem.remoteForeground": "#15202b",
+		"tab.activeBorder": "#63cae0",
+		"titleBar.activeBackground": "#38bcd8",
+		"titleBar.activeForeground": "#15202b",
+		"titleBar.border": "#38bcd8",
+		"titleBar.inactiveBackground": "#38bcd899",
+		"titleBar.inactiveForeground": "#15202b99"
+	},
+	"peacock.color": "#38bcd8",
+	"cSpell.ignorePaths": [
+		"node_modules", // this will ignore anything the node_modules directory
+		"**/node_modules", // the same for this one
+		"**/node_modules/**", // the same for this one
+		"node_modules/**", // Doesn't currently work due to how the current working directory is determined.
+		"vscode-extension", //
+		".git", // Ignore the .git directory
+		"*.dll", // Ignore all .dll files.
+		"**/*.dll", // Ignore all .dll files
+		"**/migrations/**", // Ignore all migrations
+		"htmlcov", // Ignore html coverage
+		".vscode", // Ignore vscode settings
+		"**/.vscode/**", // Ignore vscode settings
+		".venv", // Ignore virtual environment
+		"typings", // Ignore typings
+		"thunder-tests", // Ignore thunder tests
+		".mypy_cache", // Ignore mypy cache
+		"requirements.txt", // Ignore mypy cache
+		"poetry.lock", // Ignore mypy cache
+	],
+	"cSpell.words": [
+		"addopts",
+		"aiohttp",
+		"anyio",
+		"asyncpg",
+		"autoflush",
+		"basecrud",
+		"beautifulsoup",
+		"buildx",
+		"cookiecutter",
+		"cssselect",
+		"darglint",
+		"dateafter",
+		"dateutil",
+		"dbapi",
+		"DOCKERHUB",
+		"docstrings",
+		"dotenv",
+		"fakeuser",
+		"fastapi",
+		"feedgen",
+		"htmlcov",
+		"httpx",
+		"ipython",
+		"jsonable",
+		"logsdger",
+		"loguru",
+		"lxml",
+		"martokk",
+		"mkdocs",
+		"Mlfdx",
+		"mutablecopy",
+		"nocover",
+		"onupdate",
+		"optionflags",
+		"passlib",
+		"pktc",
+		"playlistend",
+		"playlistreverse",
+		"pydantic",
+		"pyjwt",
+		"pyqt",
+		"pyright",
+		"pysqlite's",
+		"pyup",
+		"pyupgrade",
+		"sessionmaker",
+		"setuptools",
+		"shortuuid",
+		"sqlalchemy",
+		"sqlmodel",
+		"starlette",
+		"Styxhexenhammer",
+		"tabmix",
+		"templating",
+		"tubecast",
+		"typehints",
+		"typer",
+		"tzutc",
+		"userdb",
+		"uvicorn",
+		"uvloop",
+		"WMAR",
+		"wrongpassword",
+		"ytdlp"
+	],
+	"cSpell.ignoreWords": [
+		"BLCKBX",
+		"CDYM",
+		"Cdthu",
+		"DVNR",
+		"FIRSTPARTY",
+		"LOCALFOLDER",
+		"Parens",
+		"Pwpc",
+		"STDLIB",
+		"THIRDPARTY",
+		"Ycso",
+		"amumr",
+		"buildx",
+		"eqxl",
+		"essrt",
+		"hyhcvz",
+		"lofi",
+		"naar",
+		"norecursedirs",
+		"plushuang",
+		"vslb",
+		"vunh",
+		"waarheid",
+		"zoek"
+	],
+	"[python]": {
+		"editor.defaultFormatter": "ms-python.black-formatter",
+		"editor.formatOnType": true
+	},
+	"python.venvFolders": [
+		".venv"
+	],
+	"python.linting.enabled": true,
+	"python.testing.pytestArgs": [
+		"tests"
+	],
+	"flake8.interpreter": [
+		"python3"
+	],
+	"python.testing.unittestEnabled": false,
+	"python.testing.pytestEnabled": true,
+	"thunder-client.saveToWorkspace": true,
+	"thunder-client.customLocation": "",
+	"thunder-client.workspaceRelativePath": "",
+	"files.associations": {
+		"*.html": "jinja-html",
+		"*.yml": "yaml"
+	},
+	"mypy.configFile": "pyproject.toml",
+	"pylint.args": [
+		"--pyproject"
+	],
+	"cSpell.spellCheckOnlyWorkspaceFiles": true,
+	"cSpell.showAutocompleteSuggestions": true,
+	"cSpell.suggestionMenuType": "quickFix",
+	"cSpell.enableFiletypes": [
+		"toml"
+	],
+}
