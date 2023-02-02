@@ -5,47 +5,33 @@
 {% block content_header %}{{ item.title }}{% endblock %}
 
 {% block content %}
-<div class="container text-left">
-    <div class="row">
-        <div class="col-4 text-right font-weight-bold">
-            Id:
+<div class="container my-5">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ item.title }}</h3>
         </div>
-        <div class="col-8">
-            {{ item.id }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4 text-right font-weight-bold">
-            Title:
-        </div>
-        <div class="col-8">
-            {{ item.title }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4 text-right font-weight-bold">
-            Description:
-        </div>
-        <div class="col-8">
-            {{ item.description }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4 text-right font-weight-bold">
-            Url:
-        </div>
-        <div class="col-8">
-            {{ item.url }}
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-4 text-right font-weight-bold">
-            Owner:
-        </div>
-        <div class="col-8">
-            {{ item.owner_id }}
+        <div class="card-body">
+            <div class="row">
+                <div class="col-4 font-weight-bold">Id:</div>
+                <div class="col-8">{{ item.id }}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 font-weight-bold">Title:</div>
+                <div class="col-8">{{ item.title }}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 font-weight-bold">Description:</div>
+                <div class="col-8">{{ item.description }}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 font-weight-bold">Url:</div>
+                <div class="col-8">{{ item.url }}</div>
+            </div>
+            <div class="row">
+                <div class="col-4 font-weight-bold">Owner:</div>
+                <div class="col-8">{{ item.owner_id }}</div>
+            </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}
