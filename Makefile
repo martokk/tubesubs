@@ -78,6 +78,8 @@ check-codestyle: ## Check Formatting via ISort, Black, darglint.
 	@poetry run black --diff --check --config pyproject.toml ./
 	@echo -e "\n### DARGLINT ###"
 	@poetry run darglint --verbosity 2 $(PROJECT) tests
+	@echo -e "\n### MYPY ###"
+	@poetry run mypy --config-file pyproject.toml ./
 
 .PHONY: check-safety
 check-safety: ## Check Securty & Safty via Bandit, Safety.
@@ -85,10 +87,20 @@ check-safety: ## Check Securty & Safty via Bandit, Safety.
 	poetry run safety check --full-report
 	poetry run bandit -ll --recursive $(PROJECT) tests
 
-.PHONY: mypy
-mypy: ## Typechecking via MyPy
+.PHONY: check-mypy
+check-mypy: ## Typechecking via MyPy
 	@echo -e "\n### MYPY ###"
 	@poetry run mypy --config-file pyproject.toml ./
+
+.PHONY: check-docstrings
+check-dockstrings: ## Check Docstrings via darglint.
+	@echo -e "\n### DARGLINT ###"
+	@poetry run darglint --verbosity 2 $(PROJECT) tests --ignore=DAR103,DAR203 --docstring_style=google
+
+.PHONY: check-pre-commit
+check-pre-commit: ## Run Pre-Commit Hooks
+	@printf "\n### PRE-COMMIT ###"
+	@poetry run pre-commit run --all-files --show-diff-on-failure --color always
 
 .PHONY: pre-commit
 pre-commit: ## Run Pre-Commit Hooks

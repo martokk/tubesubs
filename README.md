@@ -33,7 +33,7 @@ A project template stack for FastAPI projects.
 ## Installation
 
 ## Usage
-<!-- TODO: Update with Cookicutter Template -->
+<!-- TODO: Update with Cookiecutter Template -->
 See [cookiecutter_python_fastapi_stack]() page.
 
 
