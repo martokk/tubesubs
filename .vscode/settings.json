@@ -97,6 +97,7 @@
 		"sessionmaker",
 		"setuptools",
 		"shortuuid",
+		"sourcery",
 		"sqlalchemy",
 		"sqlmodel",
 		"starlette",

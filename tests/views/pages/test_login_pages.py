@@ -1,9 +1,11 @@
 from unittest.mock import Mock, patch
 
-from fastapi import status
+from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 from httpx import Cookies
 from sqlmodel import Session
+
+from python_fastapi_stack import crud
 
 
 def test_login_page(client: TestClient) -> None:
@@ -180,3 +182,72 @@ async def test_handle_register_failure(db_with_user: Session, client: TestClient
         assert response.status_code == status.HTTP_200_OK
         assert response.template.name == "login/register.html"  # type: ignore
         assert response.context["alerts"].danger[0] == "Error registering user"  # type: ignore
+
+
+async def test_get_tokens_from_refresh_token(
+    db_with_user: Session,  # pylint: disable=unused-argument
+    client: TestClient,
+    normal_user_cookies: Cookies,
+) -> None:
+    """
+    Test handling login with refresh token
+    """
+    normal_user_cookies.delete("access_token")
+    client.cookies = normal_user_cookies
+    response = client.get("/account", cookies=normal_user_cookies)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template.name == "user/view.html"  # type: ignore
+    assert response.url.path == "/account/"  # type: ignore
+
+
+async def test_get_tokens_from_invalid_refresh_token(
+    db_with_user: Session,  # pylint: disable=unused-argument
+    client: TestClient,
+    normal_user_cookies: Cookies,
+) -> None:
+    """
+    Test invalid refresh token
+    """
+    normal_user_cookies.delete("access_token")
+    normal_user_cookies.set("refresh_token", "invalid_refresh_token")
+    client.cookies = normal_user_cookies
+    response = client.get("/account", cookies=normal_user_cookies)
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template.name == "user/view.html"  # type: ignore
+    assert response.url.path == "/account/"  # type: ignore
+
+    # Test invalid refresh token
+    with patch(
+        "python_fastapi_stack.core.security.get_tokens_from_refresh_token",
+        side_effect=HTTPException(status_code=400),
+    ):
+        response = client.get("/account", cookies=normal_user_cookies)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.url.path == "/account/"  # type: ignore
+
+    # Test invalid refresh token
+    with (
+        patch(
+            "python_fastapi_stack.core.security.decode_token",
+            side_effect=HTTPException(status_code=400),
+        ),
+        patch(
+            "python_fastapi_stack.core.security.get_tokens_from_refresh_token",
+            side_effect=HTTPException(status_code=400),
+        ),
+    ):
+        response = client.get("/account", cookies=normal_user_cookies)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.url.path == "/account/"  # type: ignore
+
+    # Test invalid refresh token
+    with patch(
+        "python_fastapi_stack.views.deps.get_current_user_or_raise",
+        return_value=None,
+    ):
+        client.cookies.clear()
+        response = client.get("/account")
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.url.path == "/account/"

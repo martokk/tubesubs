@@ -180,7 +180,7 @@ def fixture_request() -> Request:
 
 
 @pytest.fixture(name="normal_user_cookies")
-def fixture_normal_user_cookie(
+def fixture_normal_user_cookies(
     db_with_user: Session, client: TestClient  # pylint: disable=unused-argument
 ) -> Cookies:
     """

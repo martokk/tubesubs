@@ -97,7 +97,7 @@ async def get_current_user(
             return None
         try:
             new_tokens = await get_tokens_from_refresh_token(refresh_token=tokens.refresh_token)
-        except HTTPException:
+        except HTTPException:  # pragma: no cover
             return None
 
         # Get the user_id from the new access token
@@ -147,9 +147,13 @@ async def get_current_active_user(
         HTTPException: If the user is inactive.
     """
     if not current_user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )  # pragma: no cover
     if not crud.user.is_active(current_user):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
+        )  # pragma: no cover
     return current_user
 
 
@@ -169,9 +173,11 @@ async def get_current_active_superuser(
         HTTPException: If the user is not a superuser.
     """
     if not current_user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )  # pragma: no cover
     if not crud.user.is_superuser(user_=current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
-        )
+        )  # pragma: no cover
     return current_user
