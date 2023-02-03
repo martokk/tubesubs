@@ -29,6 +29,10 @@ jobs:
           poetry config virtualenvs.in-project true
           poetry install
 
-      - name: Run All Makefile Checks
+      - name: Check Code
         run: |
-          make all
+          make check
+
+      - name: Run Tests
+        run: |
+          make test
