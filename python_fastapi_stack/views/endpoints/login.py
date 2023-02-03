@@ -160,7 +160,7 @@ async def handle_registration(
             "full_name": full_name,
         }
         async with httpx.AsyncClient() as client:
-            response = await client.post(url=endpoint, json=data, timeout=2)
+            response = await client.post(url=endpoint, json=data, timeout=10)
 
         # Handle response
         if response.status_code == status.HTTP_201_CREATED:

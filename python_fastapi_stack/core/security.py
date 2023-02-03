@@ -51,7 +51,7 @@ def encode_token(
         subject (str): subject to be encoded
         key (str): secret key
         expires_delta (timedelta): token expiration time.
-        fresh (bool, optional): whether the token is fresh or not. Defaults to False.
+        fresh (bool): whether the token is fresh or not. Defaults to False.
 
     Returns:
         token (str): encoded token
@@ -91,13 +91,13 @@ def decode_token(
     return payload["sub"]
 
 
-async def get_tokens(user_id: str, fresh=False) -> models.Tokens:
+async def get_tokens(user_id: str, fresh: bool = False) -> models.Tokens:
     """
     Get access and refresh tokens for a user.
 
     Args:
         user_id (str): The user id.
-        fresh (bool, optional): Whether the token is fresh or not. Defaults to False.
+        fresh (bool): Whether the token is fresh or not. Defaults to False.
 
     Returns:
         models.Tokens: The tokens.

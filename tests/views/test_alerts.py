@@ -1,9 +1,9 @@
 from unittest.mock import Mock
+
 from python_fastapi_stack import models
-from fastapi import Request
 
 
-def test_set_alerts_from_request(request: Request) -> None:
+def test_set_alerts_from_request() -> None:
     """
     Test setting alerts from request (cookies)
     """
