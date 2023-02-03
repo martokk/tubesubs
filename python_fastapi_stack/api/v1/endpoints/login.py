@@ -33,7 +33,7 @@ async def login_access_token(
 
 @router.post("/login/refresh-token", response_model=models.Tokens)
 async def login_refresh_token(
-    refresh_token: Any = Body(...),
+    refresh_token: str = Body(...),
     db: Session = Depends(deps.get_db),
 ) -> models.Tokens:
     """

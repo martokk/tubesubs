@@ -46,19 +46,3 @@ async def on_startup(db: Session = next(deps.get_db())) -> None:
 @repeat_every(seconds=120, wait_first=False)
 async def repeating_task() -> None:
     logger.debug("This is a repeating task example that runs every 120 seconds.")
-
-
-@app.get("/", response_model=models.HealthCheck, tags=["status"])
-@app.get(f"{settings.API_V1_PREFIX}/", response_model=models.HealthCheck, tags=["status"])
-async def health_check() -> dict[str, str]:
-    """
-    Health check endpoint.
-
-    Returns:
-        dict[str, str]: Health check response.
-    """
-    return {
-        "name": settings.PROJECT_NAME,
-        "version": version,
-        "description": settings.PROJECT_DESCRIPTION,
-    }

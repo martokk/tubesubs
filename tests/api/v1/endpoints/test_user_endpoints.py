@@ -1,12 +1,9 @@
-from typing import Dict
-
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models, settings
-from python_fastapi_stack.core import security
 
 
 def test_get_users_superuser_me(
