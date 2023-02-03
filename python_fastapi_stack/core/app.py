@@ -30,6 +30,9 @@ async def on_startup(db: Session = next(deps.get_db())) -> None:
     """
     Event handler that gets called when the application starts.
     Logs application start and creates database and tables if they do not exist.
+
+    Args:
+        db (Session): Database session.
     """
     logger.info("--- Start FastAPI ---")
     logger.debug("Starting FastAPI App...")

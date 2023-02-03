@@ -210,3 +210,6 @@ extraPaths = ["python_fastapi_stack"]
 py310-plus = true
 skip = ["typings", "migrations", "venv", "build", "dist", "docs", ".tox", ".git", "__pycache__"]
 exclude = [".venv/*", "typings/*", "migrations/*"]
+
+[tool.bandit]
+skips = ["B104"]

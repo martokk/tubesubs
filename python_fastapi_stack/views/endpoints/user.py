@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlmodel import Session
+
 from python_fastapi_stack import crud, models
 from python_fastapi_stack.views import deps, templates
 
