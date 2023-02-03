@@ -125,15 +125,10 @@ async def handle_registration(
 
     Returns:
         Response: Registration page
-
-    Raises:
-        HTTPException: Registration is disabled
     """
     alerts = models.Alerts()
     if not settings.USERS_OPEN_REGISTRATION:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="Registration is disabled"
-        )
+        alerts.danger.append("Registration is closed")
 
     # Check if all fields are filled
     if not all([username, password, password_confirmation, email, full_name]):
@@ -147,7 +142,7 @@ async def handle_registration(
     valid_email = None
     try:
         valid_email = EmailStr.validate(email)
-    except ValueError:
+    except (ValueError, TypeError):
         alerts.danger.append("Invalid email")
 
     # Post to the API if there are no errors
