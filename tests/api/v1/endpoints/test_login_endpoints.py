@@ -225,3 +225,31 @@ async def test_expired_token(
         )
     assert r.status_code == 401
     assert r.json() == {"detail": "Expired Token"}
+
+
+async def test_get_tokens_from_refresh_token(
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+) -> None:
+    """
+    Test that the refresh token endpoint returns new tokens
+    """
+
+    # Get tokens from login endpoint
+    login_data = {
+        "username": "test_user",
+        "password": "test_password",
+    }
+    login_response = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    login_tokens = login_response.json()
+    refresh_token = login_tokens["refresh_token"]
+
+    # Use the refresh token to get new tokens
+    refresh_response = client.post(
+        f"{settings.API_V1_PREFIX}/login/refresh-token", json=f"{refresh_token}"
+    )
+    assert refresh_response.status_code == 200
+    refreshed_tokens = refresh_response.json()
+
+    # Check that the new tokens are different from the old ones
+    assert refreshed_tokens["access_token"] != login_tokens["access_token"]

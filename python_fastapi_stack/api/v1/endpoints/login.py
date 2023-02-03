@@ -19,16 +19,34 @@ async def login_access_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> models.Tokens:
     """
-    OAuth2 compatible token login, get an access token for future requests
+    Get new access and refresh tokens from a username and password.
 
     Args:
         db (Session): The database session.
         form_data (OAuth2PasswordRequestForm): the username and password
 
     Returns:
-        dict[str, str]: a dictionary with the access token and refresh token
+        models.Tokens: a dictionary with the access token and refresh token
     """
     return await security.get_tokens_from_username_password(db=db, form_data=form_data)
+
+
+@router.post("/login/refresh-token", response_model=models.Tokens)
+async def login_refresh_token(
+    refresh_token: Any = Body(...),
+    db: Session = Depends(deps.get_db),
+) -> models.Tokens:
+    """
+    Get new access and refresh tokens from a refresh token.
+
+    Args:
+        db (Session): The database session.
+        refresh_token (str): the refresh token
+
+    Returns:
+        models.Tokens: a dictionary with the access token and refresh token
+    """
+    return await security.get_tokens_from_refresh_token(refresh_token=refresh_token)
 
 
 @router.post("/login/test-token", response_model=models.UserRead)
