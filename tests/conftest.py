@@ -195,7 +195,7 @@ def fixture_normal_user_cookie(
     """
     form_data = {"username": "test_user", "password": "test_password"}
 
-    with patch("python_fastapi_stack.views.endpoints.login.RedirectResponse") as mock:
+    with patch("python_fastapi_stack.views.pages.login.RedirectResponse") as mock:
         mock.return_value = Response(status_code=302)
         response = client.post("/login", data=form_data)
         print(response.cookies)
@@ -221,7 +221,7 @@ def fixture_superuser_cookies(
         "password": settings.FIRST_SUPERUSER_PASSWORD,
     }
 
-    with patch("python_fastapi_stack.views.endpoints.login.RedirectResponse") as mock:
+    with patch("python_fastapi_stack.views.pages.login.RedirectResponse") as mock:
         mock.return_value = Response(status_code=302)
         response = client.post("/login", data=form_data)
         print(response.cookies)

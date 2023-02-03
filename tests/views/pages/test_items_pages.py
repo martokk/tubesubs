@@ -144,7 +144,7 @@ def test_normal_user_get_all_items(
     db_with_user: Session,  # pylint: disable=unused-argument
     client: TestClient,
     normal_user_cookie: Cookies,
-    superuser_cookie: Cookies,
+    superuser_cookies: Cookies,
 ) -> None:  # sourcery skip: extract-duplicate-method
     """
     Test that a normal user can get all their own items.
@@ -164,7 +164,7 @@ def test_normal_user_get_all_items(
     assert response.status_code == 200
 
     # Create 1 item as superuser
-    client.cookies = superuser_cookie
+    client.cookies = superuser_cookies
     response = client.post(
         "/items/create",
         data=MOCKED_ITEMS[2],
