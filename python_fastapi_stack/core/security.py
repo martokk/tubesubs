@@ -41,7 +41,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bool(password_context.verify(secret=plain_password, hash=hashed_password))
 
 
-def encode_token(subject: str | Any, key: str, expires_delta: timedelta) -> str:
+def encode_token(
+    subject: str | Any, key: str, expires_delta: timedelta, fresh: bool = False
+) -> str:
     """
     Encode subject in token
 
@@ -49,6 +51,7 @@ def encode_token(subject: str | Any, key: str, expires_delta: timedelta) -> str:
         subject (str): subject to be encoded
         key (str): secret key
         expires_delta (timedelta): token expiration time.
+        fresh (bool, optional): whether the token is fresh or not. Defaults to False.
 
     Returns:
         token (str): encoded token
@@ -57,6 +60,7 @@ def encode_token(subject: str | Any, key: str, expires_delta: timedelta) -> str:
         "exp": datetime.utcnow() + expires_delta,
         "iat": datetime.utcnow(),
         "sub": str(subject),
+        "fresh": fresh,
     }
     return jwt.encode(payload=payload, key=key, algorithm=settings.ALGORITHM)
 
@@ -87,12 +91,13 @@ def decode_token(
     return payload["sub"]
 
 
-async def get_tokens(user_id: str) -> models.Tokens:
+async def get_tokens(user_id: str, fresh=False) -> models.Tokens:
     """
     Get access and refresh tokens for a user.
 
     Args:
         user_id (str): The user id.
+        fresh (bool, optional): Whether the token is fresh or not. Defaults to False.
 
     Returns:
         models.Tokens: The tokens.
@@ -101,11 +106,13 @@ async def get_tokens(user_id: str) -> models.Tokens:
         subject=user_id,
         key=settings.JWT_ACCESS_SECRET_KEY,
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        fresh=fresh,
     )
     refresh_token = encode_token(
         subject=user_id,
         key=settings.JWT_REFRESH_SECRET_KEY,
         expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_MINUTES),
+        fresh=fresh,
     )
     return models.Tokens(access_token=access_token, refresh_token=refresh_token)
 
@@ -160,4 +167,4 @@ async def get_tokens_from_refresh_token(refresh_token: str) -> models.Tokens:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Token") from e
 
     # Create the tokens
-    return await get_tokens(user_id=user_id)
+    return await get_tokens(user_id=user_id, fresh=True)

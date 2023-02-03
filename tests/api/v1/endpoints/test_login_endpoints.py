@@ -252,4 +252,21 @@ async def test_get_tokens_from_refresh_token(
     refreshed_tokens = refresh_response.json()
 
     # Check that the new tokens are different from the old ones
+    assert refreshed_tokens["refresh_token"] != login_tokens["refresh_token"]
     assert refreshed_tokens["access_token"] != login_tokens["access_token"]
+
+
+async def test_get_tokens_from_refresh_token_unauthorized(
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+) -> None:
+    """
+    Test that the refresh token endpoint returns a 401 if the token is invalid
+    """
+    with patch("jwt.decode") as mock_decode_token:
+        mock_decode_token.side_effect = jwt.InvalidTokenError
+        r = client.post(
+            f"{settings.API_V1_PREFIX}/login/refresh-token",
+            json="invalid_token",
+        )
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+    assert r.json() == {"detail": "Invalid Token"}

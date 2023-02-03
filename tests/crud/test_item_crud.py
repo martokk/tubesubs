@@ -95,3 +95,19 @@ async def test_delete_item_delete_error(db_with_user: Session, mocker: MagicMock
     mocker.patch("python_fastapi_stack.crud.item.get", return_value=None)
     with pytest.raises(crud.DeleteError):
         await crud.item.remove(db=db_with_user, id="00000001")
+
+
+async def test_get_all_items(db_with_user: Session) -> None:
+    """
+    Test getting all items.
+    """
+    # Create some items
+    for i, item in enumerate(MOCKED_ITEMS):
+        item_create = models.ItemCreate(**item)
+        await crud.item.create_with_owner_id(
+            db=db_with_user, obj_in=item_create, owner_id=f"0000000{i}"
+        )
+
+    # Get all items
+    items = await crud.item.get_all(db=db_with_user)
+    assert len(items) == len(MOCKED_ITEMS)
