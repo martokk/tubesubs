@@ -8,24 +8,24 @@ from .base import BaseCRUD
 
 class UserCRUD(BaseCRUD[models.User, models.UserCreate, models.UserUpdate]):
     async def create_with_password(
-        self, db: Session, *, in_obj: models.UserCreateWithPassword
+        self, db: Session, *, obj_in: models.UserCreateWithPassword
     ) -> models.User:
         """
         Create a new user by generating a hashed password from the provided password.
 
         Args:
             db (Session): The database session.
-            in_obj (models.UserCreateWithPassword): The user to create.
+            obj_in (models.UserCreateWithPassword): The user to create.
 
         Returns:
             models.User: The created user.
         """
-        in_obj_data = in_obj.dict(exclude_unset=True)
-        in_obj_data["hashed_password"] = security.get_password_hash(in_obj_data["password"])
-        del in_obj_data["password"]
+        obj_in_data = obj_in.dict(exclude_unset=True)
+        obj_in_data["hashed_password"] = security.get_password_hash(obj_in_data["password"])
+        del obj_in_data["password"]
 
-        out_obj = models.UserCreate(**in_obj_data)
-        return await self.create(db, in_obj=out_obj)
+        out_obj = models.UserCreate(**obj_in_data)
+        return await self.create(db, obj_in=out_obj)
 
     async def authenticate(
         self, db: Session, *, username: str, password: str

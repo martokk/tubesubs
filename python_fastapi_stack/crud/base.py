@@ -103,13 +103,13 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         statement = select(self.model).filter(*args).filter_by(**kwargs).offset(skip).limit(limit)
         return db.exec(statement).fetchmany()
 
-    async def create(self, db: Session, *, in_obj: ModelCreateType) -> ModelType:
+    async def create(self, db: Session, *, obj_in: ModelCreateType) -> ModelType:
         """
         Create a new record.
 
         Args:
             db (Session): The database session.
-            in_obj: The object to create.
+            obj_in: The object to create.
 
         Returns:
             The created object.
@@ -117,14 +117,14 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         Raises:
             RecordAlreadyExistsError: If the record already exists.
         """
-        out_obj = self.model(**in_obj.dict())
+        out_obj = self.model(**obj_in.dict())
 
         db.add(out_obj)
         try:
             db.commit()
         except IntegrityError as exc:
             raise RecordAlreadyExistsError(
-                f"{self.model.__name__}({in_obj=}) already exists in database"
+                f"{self.model.__name__}({obj_in=}) already exists in database"
             ) from exc
         db.refresh(out_obj)
         return out_obj
@@ -133,14 +133,14 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         self,
         db: Session,
         *args: BinaryExpression[Any],
-        in_obj: ModelUpdateType,
+        obj_in: ModelUpdateType,
         **kwargs: Any,
     ) -> ModelType:
         """
         Update an existing record.
 
         Args:
-            in_obj: The updated object.
+            obj_in: The updated object.
             args: Binary expressions to filter by.
             db (Session): The database session.
             kwargs: Keyword arguments to filter by.
@@ -155,11 +155,11 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
             raise ValueError("crud.base.update() Must provide at least one filter")
         db_obj = await self.get(db=db, *args, **kwargs)
 
-        in_obj_values = in_obj.dict(exclude_unset=True, exclude_none=True)
+        obj_in_values = obj_in.dict(exclude_unset=True, exclude_none=True)
         db_obj_values = db_obj.dict()
-        for in_obj_key, in_obj_value in in_obj_values.items():
-            if in_obj_value != db_obj_values[in_obj_key]:
-                setattr(db_obj, in_obj_key, in_obj_value)
+        for obj_in_key, obj_in_value in obj_in_values.items():
+            if obj_in_value != db_obj_values[obj_in_key]:
+                setattr(db_obj, obj_in_key, obj_in_value)
 
         db.commit()
         db.refresh(db_obj)

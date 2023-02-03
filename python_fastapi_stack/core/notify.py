@@ -33,7 +33,7 @@ async def notify(
             email_to=settings.NOTIFY_EMAIL_TO,
             subject_template="Server Notification",
             html_template=text,
-            environment={"name": "Python FastAPI Stack"},
+            environment={"name": f"{settings.PROJECT_NAME}"},
         )
     return response
 
@@ -125,7 +125,7 @@ def send_test_email(email_to: str) -> None:
     send_email(
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - Test email",
-        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_DIR / "test_email.html"),
+        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "test_email.html"),
         environment={"project_name": settings.PROJECT_NAME, "email": email_to},
     )
 
@@ -134,7 +134,9 @@ def send_reset_password_email(email_to: str, username: str, token: str) -> None:
     send_email(
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - Password recovery for user {username}",
-        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_DIR / "reset_password.html"),
+        html_template=get_html_template(
+            template=paths.EMAIL_TEMPLATES_PATH / "reset_password.html"
+        ),
         environment={
             "project_name": settings.PROJECT_NAME,
             "username": username,
@@ -149,7 +151,7 @@ def send_new_account_email(email_to: str, username: str, password: str) -> None:
     send_email(
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - New account for user {username}",
-        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_DIR / "new_account.html"),
+        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "new_account.html"),
         environment={
             "project_name": settings.PROJECT_NAME,
             "username": username,

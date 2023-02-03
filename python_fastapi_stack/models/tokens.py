@@ -2,8 +2,8 @@ from sqlmodel import SQLModel
 
 
 class Tokens(SQLModel):
-    access_token: str
-    refresh_token: str
+    access_token: str | None = None
+    refresh_token: str | None = None
 
 
 class TokenPayload(SQLModel):

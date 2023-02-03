@@ -9,9 +9,6 @@ PROJECT_TITLE := Python Fastapi Stack
 VERSION := latest
 PYINSTALLER_ENTRY := $(PROJECT)/__main__.py
 
-# poetry show black2 &> /dev/null && echo "true" || echo "false"
-
-
 #-----------------------------------------------------------------------------------------
 # DEV INSTALLATION
 #-----------------------------------------------------------------------------------------
@@ -31,7 +28,6 @@ install-pre-commit-hooks: ## Install Pre-Commit Git Hooks
 #-----------------------------------------------------------------------------------------
 # INSTALL/UPDATE DEPENDENCIES/REQUIREMENTS
 #-----------------------------------------------------------------------------------------
-
 .PHONY: install
 install: ## Install Project Dependecies/Requirements from Poetry
 	poetry lock -n && poetry export --without-hashes > requirements.txt
@@ -43,6 +39,7 @@ update-dev-deps: ## Update dev dependecies to @latest version
 	poetry add --group dev  bandit@latest darglint@latest "isort[colors]@latest" mypy@latest pre-commit@latest pydocstyle@latest pylint@latest pytest@latest pyupgrade@latest safety@latest coverage@latest coverage-badge@latest pytest-html@latest pytest-cov@latest
 	poetry add --group dev  --allow-prereleases black@latest
 
+
 #-----------------------------------------------------------------------------------------
 # ORIGINAL INSTALLATION HOOKS
 #-----------------------------------------------------------------------------------------
@@ -52,63 +49,131 @@ poetry-download: install-poetry ## Download and install Poetry
 .PHONY: pre-commit-install
 pre-commit-install: install-pre-commit-hooks ## Install Pre-Commit Git Hooks
 
+
 #-----------------------------------------------------------------------------------------
-# Linting, Formatting, TypeCheck
+# COMMAND SCRIPTS
 #-----------------------------------------------------------------------------------------
+.PHONY: format
+format:  format-isort format-black format-pyupgrade format-pre-commit ## Format Code
+
+.PHONY: check
+check: check-poetry check-isort check-black check-mypy check-dockstrings check-security check-pre-commit ## Check Code Formatting
+
+.PHONY: check-dockstrings
+check-dockstrings: check-darglint check-darglint-tests ## Check Code Docstrings
+
+.PHONY: check-security
+check: check-safety check-bandit ## Check Code Security
+
 .PHONY: lint
-lint: test check-codestyle mypy pre-commit ## Lint, Format, Check Types, Check Safety
+lint: format check ## Lint Code by Formatting and Checking
 
-.PHONY: formatting
-formatting: codestyle ## Apply Formatting via PyUpgrade, ISort, Black.
+.PHONY: tests
+tests: test ## Run Tests
 
+.PHONY: test
+test: test-pytest-coverage ## Check Tests
+
+.PHONY: all
+all: clear format check test
+
+.PHONY: clear
+clear:
+	@clear
+#-----------------------------------------------------------------------------------------
+# FORMATTING
+#-----------------------------------------------------------------------------------------
 .PHONY: codestyle
-codestyle: ## Apply Formatting via PyUpgrade, ISort, Black.
-	@echo -e "\n### PYUPGRADE ###"
-	poetry run pyupgrade --exit-zero-even-if-changed --py310-plus **/*.py
-	@echo -e "\n### ISORT ###"
-	poetry run isort --settings-path pyproject.toml ./
-	@echo -e "\n### BLACK ###"
-	poetry run black --config pyproject.toml ./
+codestyle: format ## Alias for format
 
-.PHONY: check-codestyle
-check-codestyle: ## Check Formatting via ISort, Black, darglint.
-	@echo -e "\n### ISORT ###"
-	@poetry run isort --diff --check-only --settings-path pyproject.toml ./
-	@echo -e "\n### BLACK ###"
-	@poetry run black --diff --check --config pyproject.toml ./
-	@echo -e "\n### DARGLINT ###"
-	@poetry run darglint --verbosity 2 $(PROJECT) tests
+.PHONY: format-pyupgrade
+format-pyupgrade: ## Apply Formatting via PyUpgrade.
+	@echo -e "\n\033[35m### PYUPGRADE ###\033[0m"
+	@poetry run pyupgrade
+
+.PHONY: format-isort
+format-isort: ## Apply Formatting via ISort.
+	@echo -e "\n\033[35m### ISORT ###\033[0m"
+	@poetry run isort --settings-path pyproject.toml ./
+
+.PHONY: format-black
+format-black: ## Apply Formatting via Black.
+	@echo -e "\n\033[35m### BLACK ###\033[0m"
+	@poetry run black --config pyproject.toml ./
+
+.PHONY: format-pre-commit
+format-pre-commit: ## Run Pre-Commit Hooks
+	@echo -e "\n\033[35m### PRE-COMMIT ###\033[0m"
+	@poetry run pre-commit run --all-files
+
+
+#-----------------------------------------------------------------------------------------
+# CHECKS & LINTING
+#-----------------------------------------------------------------------------------------
+.PHONY: check-poetry
+check-poetry: ## Check Poetry Configuration.
+	@echo -e "\n\033[1m\033[36m### POETRY ###\033[0m"
+	@poetry check
 
 .PHONY: check-safety
-check-safety: ## Check Securty & Safty via Bandit, Safety.
-	poetry check
-	poetry run safety check --full-report
-	poetry run bandit -ll --recursive $(PROJECT) tests
+check-safety: ## Check Safty via Safety.
+	@echo -e "\n\033[1m\033[36m### SAFETY ###\033[0m"
+	poetry run safety check --short-report
 
-.PHONY: mypy
-mypy: ## Typechecking via MyPy
-	@echo -e "\n### MYPY ###"
+.PHONY: check-bandit
+check-bandit: ## Check Securty via Bandit.
+	@echo -e "\n\033[1m\033[36m### BANDIT ###\033[0m"
+	@poetry run bandit -c ./pyproject.toml -ll --recursive $(PROJECT) tests
+
+.PHONY: check-isort
+check-isort: ## Check Formatting via ISort.
+	@echo -e "\n\033[1m\033[36m### ISORT ###\033[0m"
+	@poetry run isort --diff --check-only --settings-path pyproject.toml ./
+
+.PHONY: check-black
+check-black: ## Check Formatting via Black.
+	@echo -e "\n\033[1m\033[36m### BLACK ###\033[0m"
+	@poetry run black --diff --check --config pyproject.toml ./
+
+.PHONY: check-darglint
+check-darglint: ## Check Docstrings via Darglint.
+	@echo -e "\n\033[1m\033[36m### DARGLINT: PROJECT ###\033[0m"
+	@poetry run darglint --verbosity 2 -z full $(PROJECT)
+
+.PHONY: check-darglint-tests
+check-darglint-tests: ## Check Tests Docstrings via Darglint.
+	@echo -e "\n\033[1m\033[36m### DARGLINT: TESTS ###\033[0m"
+	@poetry run darglint --verbosity 2 -z long tests
+
+.PHONY: check-mypy
+check-mypy: ## Check Types via Mypy.
+	@echo -e "\n\033[1m\033[36m### MYPY ###\033[0m"
 	@poetry run mypy --config-file pyproject.toml ./
 
-.PHONY: pre-commit
-pre-commit: ## Run Pre-Commit Hooks
-	@printf "\n### PRE-COMMIT ###"
+.PHONY: check-pre-commit
+check-pre-commit: ## Check Pre-Commit Hooks
+	@echo -e "\n\033[1m\033[36m### PRE-COMMIT ###\033[0m"
 	@poetry run pre-commit run --all-files
 
 
 #-----------------------------------------------------------------------------------------
 # TESTS
 #-----------------------------------------------------------------------------------------
-.PHONY: tests
-tests: test ## Run Tests & Coverage
-
-.PHONY: test
-test: ## Run Tests & Coverage
-	@printf "\n### PYTEST ###\n"
-	@PWD=$(PWD) poetry run pytest -c pyproject.toml --cov-report=html --cov-report=xml  --cov=$(PROJECT) tests/
-	@# poetry run pytest --cov=$(PROJECT) tests/ --cov-fail-under=100
+.PHONY: test-pytest-coverage
+test-pytest-coverage: ## Check Coverage via PyTest. Fails if coverage is below 90%.
+	@echo -e "\n\033[1m\033[33m### PYTEST: COVERAGE ###\033[0m"
+	@PWD=$(PWD) poetry run pytest -c pyproject.toml --cov-fail-under=90 --cov-report=html --cov-report=xml  --cov=$(PROJECT) tests/
 	@poetry run coverage-badge -o assets/images/coverage.svg -f
 	@printf "\n"
+
+.PHONY: test-pytest
+test-pytest: ## Run Tests via PyTest.
+	@echo -e "\n\033[1m\033[33m### PYTEST ###\033[0m"
+	@PWD=$(PWD) poetry run pytest -c pyproject.toml --no-cov-on-fail --cov-report=html --cov-report=xml  --cov=$(PROJECT) tests/
+	@poetry run coverage-badge -o assets/images/coverage.svg -f
+	@printf "\n"
+
+
 #-----------------------------------------------------------------------------------------
 # BUILD PACKAGE
 #-----------------------------------------------------------------------------------------
@@ -175,6 +240,7 @@ build-remove: ## Clean Builds
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
 	find . -name '*.egg' -exec rm -f {} +
+
 
 #-----------------------------------------------------------------------------------------
 # HELP

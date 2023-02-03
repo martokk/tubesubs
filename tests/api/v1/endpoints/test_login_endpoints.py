@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import jwt
-from fastapi import HTTPException, status
+from fastapi import status
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
@@ -47,7 +47,7 @@ async def test_get_access_token_bad_username(client: TestClient) -> None:
 
 async def test_get_access_token_inactive_user(db_with_user: Session, client: TestClient) -> None:
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
     login_data = {
         "username": "test_user",
@@ -144,7 +144,7 @@ async def test_password_recovery_for_inactive_user(
     Test that the reset password endpoint returns a 400 if the user is inactive
     """
     await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.core.notify.send_reset_password_email") as mock_send_email:
@@ -160,7 +160,7 @@ async def test_reset_password_for_inactive_user(db_with_user: Session, client: T
     Test that the reset password endpoint returns a 400 if the user is inactive
     """
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.core.security.decode_token") as mock_decode_token:
@@ -198,7 +198,7 @@ async def test_get_current_active_user_inactive_user(
     Test that the current user endpoint returns a 400 if the user is inactive
     """
     db_user = await crud.user.update(
-        db=db_with_user, username="test_user", in_obj=models.UserUpdate(is_active=False)
+        db=db_with_user, username="test_user", obj_in=models.UserUpdate(is_active=False)
     )
 
     with patch("python_fastapi_stack.api.deps.get_current_user_id") as mock_get_current_user_id:
@@ -225,3 +225,48 @@ async def test_expired_token(
         )
     assert r.status_code == 401
     assert r.json() == {"detail": "Expired Token"}
+
+
+async def test_get_tokens_from_refresh_token(
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+) -> None:
+    """
+    Test that the refresh token endpoint returns new tokens
+    """
+
+    # Get tokens from login endpoint
+    login_data = {
+        "username": "test_user",
+        "password": "test_password",
+    }
+    login_response = client.post(f"{settings.API_V1_PREFIX}/login/access-token", data=login_data)
+    assert login_response.status_code == status.HTTP_200_OK
+    login_tokens = login_response.json()
+    refresh_token = login_tokens["refresh_token"]
+
+    # Use the refresh token to get new tokens
+    refresh_response = client.post(
+        f"{settings.API_V1_PREFIX}/login/refresh-token", json=f"{refresh_token}"
+    )
+    assert refresh_response.status_code == 200
+    refreshed_tokens = refresh_response.json()
+
+    # Check that the new tokens are different from the old ones
+    assert refreshed_tokens["refresh_token"] != login_tokens["refresh_token"]
+    assert refreshed_tokens["access_token"] != login_tokens["access_token"]
+
+
+async def test_get_tokens_from_refresh_token_unauthorized(
+    db_with_user: Session, client: TestClient, normal_user_token_headers: dict[str, str]
+) -> None:
+    """
+    Test that the refresh token endpoint returns a 401 if the token is invalid
+    """
+    with patch("jwt.decode") as mock_decode_token:
+        mock_decode_token.side_effect = jwt.InvalidTokenError
+        r = client.post(
+            f"{settings.API_V1_PREFIX}/login/refresh-token",
+            json="invalid_token",
+        )
+    assert r.status_code == status.HTTP_401_UNAUTHORIZED
+    assert r.json() == {"detail": "Invalid Token"}

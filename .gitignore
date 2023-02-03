@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/osx,python,pycharm,windows,visualstudio,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=osx,python,pycharm,windows,visualstudio,visualstudiocode
 
@@ -238,6 +237,7 @@ dmypy.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/settings.json
 
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
@@ -535,8 +535,6 @@ ServiceFabricBackup/
 *.bim_*.settings
 *.rptproj.rsuser
 *- [Bb]ackup.rdl
-*- [Bb]ackup ([0-9]).rdl
-*- [Bb]ackup ([0-9][0-9]).rdl
 
 # Microsoft Fakes
 FakesAssemblies/
@@ -655,3 +653,7 @@ build_win/
 dist_linux/
 dist_win/
 python_fastapi_stack/data/database.sqlite3
+
+thunder-tests/thunderEnvironment.json
+
+python_fastapi_stack/data/.env
