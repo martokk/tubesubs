@@ -6,12 +6,12 @@ from sqlmodel import Session
 def test_root_index_authenticated(
     db_with_user: Session,  # pylint: disable=unused-argument
     client: TestClient,
-    normal_user_cookie: Cookies,
+    normal_user_cookies: Cookies,
 ) -> None:
     """
     Test root index authenticated
     """
-    client.cookies = normal_user_cookie
+    client.cookies = normal_user_cookies
     response = client.get("/")
     assert response.status_code == 200
     assert response.template.name == "root/home.html"  # type: ignore

@@ -179,7 +179,7 @@ def fixture_request() -> Request:
     return Request(scope={"type": "http", "method": "GET", "path": "/"})
 
 
-@pytest.fixture(name="normal_user_cookie")
+@pytest.fixture(name="normal_user_cookies")
 def fixture_normal_user_cookie(
     db_with_user: Session, client: TestClient  # pylint: disable=unused-argument
 ) -> Cookies:

@@ -14,12 +14,12 @@ def test_login_page(client: TestClient) -> None:
 def test_handle_login_success(
     db_with_user: Session,  # pylint: disable=unused-argument
     client: TestClient,
-    normal_user_cookie: Cookies,
+    normal_user_cookies: Cookies,
 ) -> None:
     """
     Test handling login
     """
-    client.cookies = normal_user_cookie
+    client.cookies = normal_user_cookies
     response = client.get("/")
     assert response.status_code == 200
     assert response.template.name == "root/home.html"  # type: ignore
@@ -45,12 +45,12 @@ def test_handle_login_exception(db_with_user: Session, client: TestClient) -> No
     assert response.template.name == "login/login.html"  # type: ignore
 
 
-def test_logout(db_with_user: Session, client: TestClient, normal_user_cookie: Cookies) -> None:
+def test_logout(db_with_user: Session, client: TestClient, normal_user_cookies: Cookies) -> None:
     """
     Test logout
     """
     # Test that the user is logged in
-    client.cookies = normal_user_cookie
+    client.cookies = normal_user_cookies
     response = client.get("/")
     assert response.status_code == 200
     assert response.template.name == "root/home.html"  # type: ignore

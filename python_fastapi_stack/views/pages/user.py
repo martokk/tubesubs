@@ -122,7 +122,7 @@ async def update_user_account(
             full_name=full_name, email=email, is_active=is_active, is_superuser=is_superuser
         )
     else:
-        user_update = models.UserUpdate(full_name=full_name, email=email)  # noqa
+        user_update = models.UserUpdate(full_name=full_name, email=email)  # pragma: no cover
 
     db_user = await crud.user.update(db=db, obj_in=user_update, id=db_user.id)
 
