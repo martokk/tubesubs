@@ -202,8 +202,8 @@ def fixture_normal_user_cookie(
         return response.cookies
 
 
-@pytest.fixture(name="superuser_cookie")
-def fixture_superuser_cookie(
+@pytest.fixture(name="superuser_cookies")
+def fixture_superuser_cookies(
     db_with_user: Session, client: TestClient  # pylint: disable=unused-argument
 ) -> Cookies:
     """
