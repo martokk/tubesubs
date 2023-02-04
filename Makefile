@@ -57,10 +57,10 @@ pre-commit-install: install-pre-commit-hooks ## Install Pre-Commit Git Hooks
 format:  format-isort format-black format-pyupgrade format-pre-commit ## Format Code
 
 .PHONY: check
-check: check-poetry check-isort check-black check-mypy check-dockstrings check-security check-pre-commit ## Check Code Formatting
+check: check-poetry check-isort check-black check-mypy check-docstrings check-security check-pre-commit ## Check Code Formatting
 
-.PHONY: check-dockstrings
-check-dockstrings: check-darglint check-darglint-tests ## Check Code Docstrings
+.PHONY: check-docstrings
+check-docstrings: check-darglint check-darglint-tests ## Check Code Docstrings
 
 .PHONY: check-security
 check: check-safety check-bandit ## Check Code Security
@@ -196,7 +196,9 @@ build-package: ## Build as Package
 
 .PHONY: bump-version
 bump-version: ## Bump Version
-	poetry version patch
+	VERSION=`poetry version patch -s`
+	@git add ./pyproject.toml
+	@git commit -m "Bump to version v$(VERSION)"
 
 #-----------------------------------------------------------------------------------------
 # DOCKER
