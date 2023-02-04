@@ -7,107 +7,107 @@ from python_fastapi_stack import crud, models
 from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
 
 
-async def get_mocked_item(db: Session) -> models.Item:
+async def get_mocked_video(db: Session) -> models.Video:
     """
-    Create a mocked item.
+    Create a mocked video.
     """
-    # Create an item with an owner
+    # Create an video with an owner
     owner = await crud.user.get(db=db, username="test_user")
-    item_create = models.ItemCreate(**MOCKED_ITEM_1)
+    video_create = models.VideoCreate(**MOCKED_ITEM_1)
 
-    return await crud.item.create_with_owner_id(db=db, obj_in=item_create, owner_id=owner.id)
+    return await crud.video.create_with_owner_id(db=db, obj_in=video_create, owner_id=owner.id)
 
 
-async def test_create_item(db_with_user: Session) -> None:
+async def test_create_video(db_with_user: Session) -> None:
     """
-    Test creating a new item with an owner.
+    Test creating a new video with an owner.
     """
-    created_item = await get_mocked_item(db=db_with_user)
+    created_video = await get_mocked_video(db=db_with_user)
 
-    # Check the item was created
-    assert created_item.title == MOCKED_ITEM_1["title"]
-    assert created_item.description == MOCKED_ITEM_1["description"]
-    assert created_item.owner_id is not None
+    # Check the video was created
+    assert created_video.title == MOCKED_ITEM_1["title"]
+    assert created_video.description == MOCKED_ITEM_1["description"]
+    assert created_video.owner_id is not None
 
 
-async def test_get_item(db_with_user: Session) -> None:
+async def test_get_video(db_with_user: Session) -> None:
     """
-    Test getting an item by id.
+    Test getting an video by id.
     """
-    created_item = await get_mocked_item(db=db_with_user)
+    created_video = await get_mocked_video(db=db_with_user)
 
-    # Get the item
-    db_item = await crud.item.get(db=db_with_user, id=created_item.id)
-    assert db_item
-    assert db_item.id == created_item.id
-    assert db_item.title == created_item.title
-    assert db_item.description == created_item.description
-    assert db_item.owner_id == created_item.owner_id
+    # Get the video
+    db_video = await crud.video.get(db=db_with_user, id=created_video.id)
+    assert db_video
+    assert db_video.id == created_video.id
+    assert db_video.title == created_video.title
+    assert db_video.description == created_video.description
+    assert db_video.owner_id == created_video.owner_id
 
 
-async def test_update_item(db_with_user: Session) -> None:
+async def test_update_video(db_with_user: Session) -> None:
     """
-    Test updating an item.
+    Test updating an video.
     """
-    created_item = await get_mocked_item(db=db_with_user)
+    created_video = await get_mocked_video(db=db_with_user)
 
-    # Update the item
-    db_item = await crud.item.get(db=db_with_user, id=created_item.id)
-    db_item_update = models.ItemUpdate(description="New Description")
-    updated_item = await crud.item.update(
-        db=db_with_user, id=created_item.id, obj_in=db_item_update
+    # Update the video
+    db_video = await crud.video.get(db=db_with_user, id=created_video.id)
+    db_video_update = models.VideoUpdate(description="New Description")
+    updated_video = await crud.video.update(
+        db=db_with_user, id=created_video.id, obj_in=db_video_update
     )
-    assert db_item.id == updated_item.id
-    assert db_item.title == updated_item.title
-    assert updated_item.description == "New Description"
-    assert db_item.owner_id == updated_item.owner_id
+    assert db_video.id == updated_video.id
+    assert db_video.title == updated_video.title
+    assert updated_video.description == "New Description"
+    assert db_video.owner_id == updated_video.owner_id
 
 
-async def test_update_item_without_filter(db_with_user: Session) -> None:
+async def test_update_video_without_filter(db_with_user: Session) -> None:
     """
-    Test updating an item without a filter.
+    Test updating an video without a filter.
     """
-    created_item = await get_mocked_item(db=db_with_user)
+    created_video = await get_mocked_video(db=db_with_user)
 
-    # Update the item (without a filter)
-    await crud.item.get(db=db_with_user, id=created_item.id)
-    db_item_update = models.ItemUpdate(description="New Description")
+    # Update the video (without a filter)
+    await crud.video.get(db=db_with_user, id=created_video.id)
+    db_video_update = models.VideoUpdate(description="New Description")
     with pytest.raises(ValueError):
-        await crud.item.update(db=db_with_user, obj_in=db_item_update)
+        await crud.video.update(db=db_with_user, obj_in=db_video_update)
 
 
-async def test_delete_item(db_with_user: Session) -> None:
+async def test_delete_video(db_with_user: Session) -> None:
     """
-    Test deleting an item.
+    Test deleting an video.
     """
-    created_item = await get_mocked_item(db=db_with_user)
+    created_video = await get_mocked_video(db=db_with_user)
 
-    # Delete the item
-    await crud.item.remove(db=db_with_user, id=created_item.id)
+    # Delete the video
+    await crud.video.remove(db=db_with_user, id=created_video.id)
     with pytest.raises(crud.RecordNotFoundError):
-        await crud.item.get(db=db_with_user, id=created_item.id)
+        await crud.video.get(db=db_with_user, id=created_video.id)
 
 
-async def test_delete_item_delete_error(db_with_user: Session, mocker: MagicMock) -> None:
+async def test_delete_video_delete_error(db_with_user: Session, mocker: MagicMock) -> None:
     """
-    Test deleting an item with a delete error.
+    Test deleting an video with a delete error.
     """
-    mocker.patch("python_fastapi_stack.crud.item.get", return_value=None)
+    mocker.patch("python_fastapi_stack.crud.video.get", return_value=None)
     with pytest.raises(crud.DeleteError):
-        await crud.item.remove(db=db_with_user, id="00000001")
+        await crud.video.remove(db=db_with_user, id="00000001")
 
 
-async def test_get_all_items(db_with_user: Session) -> None:
+async def test_get_all_videos(db_with_user: Session) -> None:
     """
-    Test getting all items.
+    Test getting all videos.
     """
-    # Create some items
-    for i, item in enumerate(MOCKED_ITEMS):
-        item_create = models.ItemCreate(**item)
-        await crud.item.create_with_owner_id(
-            db=db_with_user, obj_in=item_create, owner_id=f"0000000{i}"
+    # Create some videos
+    for i, video in enumerate(MOCKED_ITEMS):
+        video_create = models.VideoCreate(**video)
+        await crud.video.create_with_owner_id(
+            db=db_with_user, obj_in=video_create, owner_id=f"0000000{i}"
         )
 
-    # Get all items
-    items = await crud.item.get_all(db=db_with_user)
-    assert len(items) == len(MOCKED_ITEMS)
+    # Get all videos
+    videos = await crud.video.get_all(db=db_with_user)
+    assert len(videos) == len(MOCKED_ITEMS)
