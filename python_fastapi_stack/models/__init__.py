@@ -1,5 +1,5 @@
 from .alerts import *
-from .item import *
+from .video import *
 from .msg import *
 from .server import *
 from .settings import *
