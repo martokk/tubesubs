@@ -652,8 +652,8 @@ build_linux/
 build_win/
 dist_linux/
 dist_win/
-python_fastapi_stack/data/database.sqlite3
+**/data/database.sqlite3
 
 thunder-tests/thunderEnvironment.json
 
-python_fastapi_stack/data/.env
+**/data/.env
