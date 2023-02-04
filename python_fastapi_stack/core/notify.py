@@ -125,7 +125,7 @@ def send_test_email(email_to: str) -> None:
     send_email(
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - Test email",
-        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "test_email.html"),
+        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "test_email.mjml"),
         environment={"project_name": settings.PROJECT_NAME, "email": email_to},
     )
 
@@ -135,7 +135,7 @@ def send_reset_password_email(email_to: str, username: str, token: str) -> None:
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - Password recovery for user {username}",
         html_template=get_html_template(
-            template=paths.EMAIL_TEMPLATES_PATH / "reset_password.html"
+            template=paths.EMAIL_TEMPLATES_PATH / "reset_password.mjml"
         ),
         environment={
             "project_name": settings.PROJECT_NAME,
@@ -151,7 +151,7 @@ def send_new_account_email(email_to: str, username: str, password: str) -> None:
     send_email(
         email_to=email_to,
         subject_template=f"{settings.PROJECT_NAME} - New account for user {username}",
-        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "new_account.html"),
+        html_template=get_html_template(template=paths.EMAIL_TEMPLATES_PATH / "new_account.mjml"),
         environment={
             "project_name": settings.PROJECT_NAME,
             "username": username,
