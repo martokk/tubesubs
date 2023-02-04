@@ -11,7 +11,7 @@ VIEWS_PATH = BASE_PATH / "views"
 
 # Views Folder
 STATIC_PATH = VIEWS_PATH / "static"
-EMAIL_TEMPLATES_PATH = VIEWS_PATH / "email-templates" / "build"
+EMAIL_TEMPLATES_PATH = VIEWS_PATH / "email-templates" / "src"
 TEMPLATES_PATH = VIEWS_PATH / "templates"
 
 # Data Folder
