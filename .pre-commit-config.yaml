@@ -15,6 +15,7 @@ repos:
       - id: detect-private-key
       - id: debug-statements
         language_version: python3
+    exclude: "**/migrations/**"
 
   # - repo: local
   #   hooks:
