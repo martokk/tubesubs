@@ -28,8 +28,8 @@ async def get_users(
 
     Args:
         db (Session): database session.
-        skip (int): Number of items to skip. Defaults to 0.
-        limit (int): Number of items to return. Defaults to 100.
+        skip (int): Number of videos to skip. Defaults to 0.
+        limit (int): Number of videos to return. Defaults to 100.
         _ (models.User): Current active user.
 
     Returns:
@@ -64,7 +64,7 @@ async def get_by_id(
     Get user by id.
 
     Args:
-        id (str): id of the item.
+        id (str): id of the video.
         db (Session): database session.
         current_user (Any): authenticated user.
 
@@ -198,10 +198,10 @@ async def delete(
     _: models.User = Depends(deps.get_current_active_superuser),
 ) -> None:
     """
-    Delete an item. Only superusers can delete items.
+    Delete an video. Only superusers can delete videos.
 
     Args:
-        id (str): ID of the item to delete.
+        id (str): ID of the video to delete.
         db (Session): database session.
         _ (models.User): Current active superuser.
 
@@ -209,7 +209,7 @@ async def delete(
         None
 
     Raises:
-        HTTPException: if item not found.
+        HTTPException: if video not found.
     """
     try:
         return await model_crud.remove(id=id, db=db)
