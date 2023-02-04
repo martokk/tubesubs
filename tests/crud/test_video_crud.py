@@ -4,7 +4,7 @@ import pytest
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models
-from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
+from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
 async def get_mocked_video(db: Session) -> models.Video:
@@ -13,7 +13,7 @@ async def get_mocked_video(db: Session) -> models.Video:
     """
     # Create an video with an owner
     owner = await crud.user.get(db=db, username="test_user")
-    video_create = models.VideoCreate(**MOCKED_ITEM_1)
+    video_create = models.VideoCreate(**MOCKED_VIDEO_1)
 
     return await crud.video.create_with_owner_id(db=db, obj_in=video_create, owner_id=owner.id)
 
@@ -25,8 +25,8 @@ async def test_create_video(db_with_user: Session) -> None:
     created_video = await get_mocked_video(db=db_with_user)
 
     # Check the video was created
-    assert created_video.title == MOCKED_ITEM_1["title"]
-    assert created_video.description == MOCKED_ITEM_1["description"]
+    assert created_video.title == MOCKED_VIDEO_1["title"]
+    assert created_video.description == MOCKED_VIDEO_1["description"]
     assert created_video.owner_id is not None
 
 
@@ -102,7 +102,7 @@ async def test_get_all_videos(db_with_user: Session) -> None:
     Test getting all videos.
     """
     # Create some videos
-    for i, video in enumerate(MOCKED_ITEMS):
+    for i, video in enumerate(MOCKED_VIDEOS):
         video_create = models.VideoCreate(**video)
         await crud.video.create_with_owner_id(
             db=db_with_user, obj_in=video_create, owner_id=f"0000000{i}"
@@ -110,4 +110,4 @@ async def test_get_all_videos(db_with_user: Session) -> None:
 
     # Get all videos
     videos = await crud.video.get_all(db=db_with_user)
-    assert len(videos) == len(MOCKED_ITEMS)
+    assert len(videos) == len(MOCKED_VIDEOS)

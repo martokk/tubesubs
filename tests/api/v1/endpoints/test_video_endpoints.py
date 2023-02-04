@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session
 
 from python_fastapi_stack import settings
-from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
+from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
 def test_create_video(client: TestClient, superuser_token_headers: dict[str, str]) -> None:
@@ -12,13 +12,13 @@ def test_create_video(client: TestClient, superuser_token_headers: dict[str, str
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 201
     video = response.json()
-    assert video["title"] == MOCKED_ITEM_1["title"]
-    assert video["description"] == MOCKED_ITEM_1["description"]
-    assert video["url"] == MOCKED_ITEM_1["url"]
+    assert video["title"] == MOCKED_VIDEO_1["title"]
+    assert video["description"] == MOCKED_VIDEO_1["description"]
+    assert video["url"] == MOCKED_VIDEO_1["url"]
     assert video["owner_id"] is not None
     assert video["id"] is not None
 
@@ -32,7 +32,7 @@ def test_create_duplicate_video(
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 201
 
@@ -40,7 +40,7 @@ def test_create_duplicate_video(
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 200
     duplicate = response.json()
@@ -54,7 +54,7 @@ def test_read_video(client: TestClient, superuser_token_headers: dict[str, str])
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 201
     created_video = response.json()
@@ -67,9 +67,9 @@ def test_read_video(client: TestClient, superuser_token_headers: dict[str, str])
     assert response.status_code == 200
     read_video = response.json()
 
-    assert read_video["title"] == MOCKED_ITEM_1["title"]
-    assert read_video["description"] == MOCKED_ITEM_1["description"]
-    assert read_video["url"] == MOCKED_ITEM_1["url"]
+    assert read_video["title"] == MOCKED_VIDEO_1["title"]
+    assert read_video["description"] == MOCKED_VIDEO_1["description"]
+    assert read_video["url"] == MOCKED_VIDEO_1["url"]
     assert read_video["owner_id"] is not None
     assert read_video["id"] is not None
 
@@ -112,7 +112,7 @@ def test_superuser_get_all_videos(
     """
 
     # Create 3 videos
-    for video in MOCKED_ITEMS:
+    for video in MOCKED_VIDEOS:
         response = client.post(
             f"{settings.API_V1_PREFIX}/video/",
             headers=superuser_token_headers,
@@ -143,13 +143,13 @@ def test_normal_user_get_all_videos(
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=normal_user_token_headers,
-        json=MOCKED_ITEMS[0],
+        json=MOCKED_VIDEOS[0],
     )
     assert response.status_code == 201
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=normal_user_token_headers,
-        json=MOCKED_ITEMS[1],
+        json=MOCKED_VIDEOS[1],
     )
     assert response.status_code == 201
 
@@ -157,7 +157,7 @@ def test_normal_user_get_all_videos(
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEMS[2],
+        json=MOCKED_VIDEOS[2],
     )
     assert response.status_code == 201
 
@@ -178,13 +178,13 @@ def test_update_video(client: TestClient, superuser_token_headers: dict[str, str
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 201
     created_video = response.json()
 
     # Update Video
-    update_data = MOCKED_ITEM_1.copy()
+    update_data = MOCKED_VIDEO_1.copy()
     update_data["title"] = "Updated Title"
     response = client.patch(
         f"{settings.API_V1_PREFIX}/video/{created_video['id']}",
@@ -213,7 +213,7 @@ def test_update_video_forbidden(
     response = client.patch(
         f"{settings.API_V1_PREFIX}/video/5kwf8hFn",
         headers=normal_user_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 403
     content = response.json()
@@ -227,7 +227,7 @@ def test_delete_video(client: TestClient, superuser_token_headers: dict[str, str
     response = client.post(
         f"{settings.API_V1_PREFIX}/video/",
         headers=superuser_token_headers,
-        json=MOCKED_ITEM_1,
+        json=MOCKED_VIDEO_1,
     )
     assert response.status_code == 201
     created_video = response.json()
