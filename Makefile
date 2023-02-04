@@ -178,8 +178,8 @@ test-pytest: ## Run Tests via PyTest.
 #-----------------------------------------------------------------------------------------
 # ALEMBIC
 #-----------------------------------------------------------------------------------------
-.PHONY: init-alembic
-alembic-revision: ## Create Alembic Revision
+.PHONY: alembic-init
+alembic-init: ## Create Alembic Revision
 	@echo -e "\n\033[1m\033[33m### INIT ALEMBIC ###\033[0m"
 	poetry run alembic revision --autogenerate -m "init"
 
