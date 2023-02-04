@@ -37,6 +37,7 @@ class UserCreate(UserBase):
     hashed_password: str = Field(nullable=False)
 
     @root_validator(pre=True)
+    @classmethod
     def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["id"] = values.get("id", generate_uuid_from_string(string=values["username"]))
         return values

@@ -30,7 +30,7 @@ async def fixture_videos(db_with_user: Session) -> list[models.Video]:
     # Create 1 as a superuser
     user = await crud.user.get(db=db_with_user, username=settings.FIRST_SUPERUSER_USERNAME)
     videos = []
-    video_create = models.VideoCreate(**MOCKED_VIDEO_1)
+    video_create = models.VideoCreate(**MOCKED_VIDEOS[0])
     videos.append(
         await crud.video.create_with_owner_id(
             db=db_with_user, obj_in=video_create, owner_id=user.id
@@ -91,11 +91,13 @@ def test_create_duplicate_video(
     Test a duplicate video cannot be created.
     """
     # Try to create a duplicate video
-    with pytest.raises(Exception):
-        response = client.post(
-            "/videos/create",
-            data=MOCKED_VIDEO_1,
-        )
+    response = client.post(
+        "/videos/create",
+        data=MOCKED_VIDEO_1,
+    )
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template.name == "video/create.html"  # type: ignore
+    assert response.context["alerts"].danger[0] == "Video already exists"  # type: ignore
 
 
 def test_read_video(
