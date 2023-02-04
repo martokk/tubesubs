@@ -5,7 +5,7 @@ PWD := `pwd`
 
 #* Docker variables
 PROJECT := python_fastapi_stack
-PROJECT_TITLE := Python Fastapi Stack
+PROJECT_TITLE := Python FastAPI Stack
 VERSION := latest
 PYINSTALLER_ENTRY := $(PROJECT)/__main__.py
 
@@ -174,6 +174,16 @@ test-pytest: ## Run Tests via PyTest.
 	@printf "\n"
 
 
+
+#-----------------------------------------------------------------------------------------
+# ALEMBIC
+#-----------------------------------------------------------------------------------------
+.PHONY: init-alembic
+alembic-revision: ## Create Alembic Revision
+	@echo -e "\n\033[1m\033[33m### INIT ALEMBIC ###\033[0m"
+	poetry run alembic revision --autogenerate -m "init"
+
+
 #-----------------------------------------------------------------------------------------
 # BUILD PACKAGE
 #-----------------------------------------------------------------------------------------
@@ -181,6 +191,9 @@ test-pytest: ## Run Tests via PyTest.
 build-package: ## Build as Package
 	poetry build
 
+.PHONY: bump-version
+bump-version: ## Bump Version
+	poetry version patch
 
 #-----------------------------------------------------------------------------------------
 # DOCKER

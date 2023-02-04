@@ -1,4 +1,4 @@
-# Python Fastapi Stack
+# Python FastAPI Stack
 
 ---
 
