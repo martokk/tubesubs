@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from python_fastapi_stack import models, settings, version
-from python_fastapi_stack.api.v1.endpoints import video, login, users
+from python_fastapi_stack.api.v1.endpoints import login, users, video
 
 api_router = APIRouter()
 

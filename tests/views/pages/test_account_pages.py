@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from httpx import Cookies
 from sqlmodel import Session
 
-from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
+from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
 async def test_display_user_account(

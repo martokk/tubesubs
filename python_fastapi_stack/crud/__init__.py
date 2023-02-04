@@ -4,8 +4,8 @@ from .exceptions import (
     RecordAlreadyExistsError,
     RecordNotFoundError,
 )
-from .video import video
 from .user import user
+from .video import video
 
 __all__ = [
     "user",

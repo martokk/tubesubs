@@ -7,7 +7,7 @@ from httpx import Cookies
 from sqlmodel import Session
 
 from python_fastapi_stack import crud, models, settings
-from tests.mock_objects import MOCKED_ITEM_1, MOCKED_ITEMS
+from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
 @pytest.fixture(name="video_1")
@@ -16,7 +16,7 @@ async def fixture_video_1(db_with_user: Session) -> models.Video:
     Create an video for testing.
     """
     user = await crud.user.get(db=db_with_user, username="test_user")
-    video_create = models.VideoCreate(**MOCKED_ITEM_1)
+    video_create = models.VideoCreate(**MOCKED_VIDEO_1)
     return await crud.video.create_with_owner_id(
         db=db_with_user, obj_in=video_create, owner_id=user.id
     )
@@ -30,7 +30,7 @@ async def fixture_videos(db_with_user: Session) -> list[models.Video]:
     # Create 1 as a superuser
     user = await crud.user.get(db=db_with_user, username=settings.FIRST_SUPERUSER_USERNAME)
     videos = []
-    video_create = models.VideoCreate(**MOCKED_ITEM_1)
+    video_create = models.VideoCreate(**MOCKED_VIDEO_1)
     videos.append(
         await crud.video.create_with_owner_id(
             db=db_with_user, obj_in=video_create, owner_id=user.id
@@ -39,7 +39,7 @@ async def fixture_videos(db_with_user: Session) -> list[models.Video]:
 
     # Create 2 as a normal user
     user = await crud.user.get(db=db_with_user, username="test_user")
-    for mocked_video in [MOCKED_ITEMS[1], MOCKED_ITEMS[2]]:
+    for mocked_video in [MOCKED_VIDEOS[1], MOCKED_VIDEOS[2]]:
         video_create = models.VideoCreate(**mocked_video)
         videos.append(
             await crud.video.create_with_owner_id(
@@ -74,7 +74,7 @@ def test_handle_create_video(
     client.cookies = normal_user_cookies
     response = client.post(
         "/videos/create",
-        data=MOCKED_ITEM_1,
+        data=MOCKED_VIDEO_1,
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.template.name == "video/list.html"  # type: ignore
@@ -94,7 +94,7 @@ def test_create_duplicate_video(
     with pytest.raises(Exception):
         response = client.post(
             "/videos/create",
-            data=MOCKED_ITEM_1,
+            data=MOCKED_VIDEO_1,
         )
 
 
@@ -225,7 +225,7 @@ def test_update_video(
     # Update the video
     response = client.post(
         f"/video/{video_1.id}/edit",  # type: ignore
-        data=MOCKED_ITEMS[1],
+        data=MOCKED_VIDEOS[1],
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.template.name == "video/edit.html"  # type: ignore
@@ -236,14 +236,14 @@ def test_update_video(
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.template.name == "video/view.html"  # type: ignore
-    assert response.context["video"].title == MOCKED_ITEMS[1]["title"]  # type: ignore
-    assert response.context["video"].description == MOCKED_ITEMS[1]["description"]  # type: ignore
-    assert response.context["video"].url == MOCKED_ITEMS[1]["url"]  # type: ignore
+    assert response.context["video"].title == MOCKED_VIDEOS[1]["title"]  # type: ignore
+    assert response.context["video"].description == MOCKED_VIDEOS[1]["description"]  # type: ignore
+    assert response.context["video"].url == MOCKED_VIDEOS[1]["url"]  # type: ignore
 
     # Test invalid video id
     response = client.post(
         f"/video/invalid_user_id/edit",  # type: ignore
-        data=MOCKED_ITEMS[1],
+        data=MOCKED_VIDEOS[1],
     )
     assert response.status_code == status.HTTP_200_OK
     assert response.history[0].status_code == status.HTTP_303_SEE_OTHER
