@@ -174,4 +174,5 @@
 	"cSpell.enableFiletypes": [
 		"toml"
 	],
+	"files.insertFinalNewline": true,
 }
