@@ -70,6 +70,7 @@ def test_register_page(client: TestClient) -> None:
     assert response.status_code == 200
 
 
+@patch("python_fastapi_stack.settings.USERS_OPEN_REGISTRATION", True)
 async def test_handle_register_success(db_with_user: Session, client: TestClient) -> None:
     """
     Test handling register
@@ -108,6 +109,7 @@ async def test_handle_registration_closed(db_with_user: Session, client: TestCli
     assert response.context["alerts"].danger[0] == "Registration is closed"  # type: ignore
 
 
+@patch("python_fastapi_stack.settings.USERS_OPEN_REGISTRATION", True)
 async def test_handle_register_failure(db_with_user: Session, client: TestClient) -> None:
     """
     Test handling register
