@@ -7,6 +7,6 @@ services:
     restart: unless-stopped
     volumes:
       # - /home/ubuntu/volumes/python_fastapi_stack/data:/python_fastapi_stack/data
-      - ./python_fastapi_stack:/python_fastapi_stack
+      - ./app:/app
     ports:
       - "5000:5000"

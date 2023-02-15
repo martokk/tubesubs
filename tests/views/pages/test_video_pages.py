@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from httpx import Cookies
 from sqlmodel import Session
 
-from python_fastapi_stack import crud, models, settings
+from app import crud, models, settings
 from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
@@ -290,7 +290,7 @@ def test_delete_video(
     assert response.url.path == "/videos"
 
     # Test DeleteError
-    with patch("python_fastapi_stack.crud.video.remove", side_effect=crud.DeleteError):
+    with patch("app.crud.video.remove", side_effect=crud.DeleteError):
         response = client.get(
             f"/video/123/delete",
         )
