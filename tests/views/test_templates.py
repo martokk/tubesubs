@@ -1,7 +1,7 @@
 import pytest
 
-from python_fastapi_stack import settings
-from python_fastapi_stack.views import get_templates
+from app import settings
+from app.views import get_templates
 
 
 def test_templates_obj_env_globals() -> None:

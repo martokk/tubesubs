@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from sqlmodel import Session
 
-from python_fastapi_stack import crud, models
+from app import crud, models
 from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 
@@ -92,7 +92,7 @@ async def test_delete_video_delete_error(db_with_user: Session, mocker: MagicMoc
     """
     Test deleting an video with a delete error.
     """
-    mocker.patch("python_fastapi_stack.crud.video.get", return_value=None)
+    mocker.patch("app.crud.video.get", return_value=None)
     with pytest.raises(crud.DeleteError):
         await crud.video.remove(db=db_with_user, id="00000001")
 

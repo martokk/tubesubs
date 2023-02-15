@@ -1,7 +1,7 @@
 from sqlmodel import Session
 
-from python_fastapi_stack import models
-from python_fastapi_stack.views import deps
+from app import models
+from app.views import deps
 
 
 async def test_get_db() -> None:
