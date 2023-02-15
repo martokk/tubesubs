@@ -28,8 +28,8 @@ async def get_users(
 
     Args:
         db (Session): database session.
-        skip (int): Number of videos to skip. Defaults to 0.
-        limit (int): Number of videos to return. Defaults to 100.
+        skip (int): Number of users to skip. Defaults to 0.
+        limit (int): Number of users to return. Defaults to 100.
         _ (models.User): Current active user.
 
     Returns:
