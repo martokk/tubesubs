@@ -196,9 +196,10 @@ build-package: ## Build as Package
 
 .PHONY: bump-version
 bump-version: ## Bump Version
-	VERSION=`poetry version patch -s`
-	@git add ./pyproject.toml
-	@git commit -m "Bump to version v$(VERSION)"
+	@echo -e "\n\033[1m\033[33m### BUMP VERSION ###\033[0m"
+	@poetry version patch
+	@git add pyproject.toml
+	@git commit -m "Bump version"
 
 #-----------------------------------------------------------------------------------------
 # DOCKER
