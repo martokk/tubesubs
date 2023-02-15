@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 from sqlmodel import Session
 
-from python_fastapi_stack import settings
+from app import settings
 from tests.mock_objects import MOCKED_VIDEO_1, MOCKED_VIDEOS
 
 

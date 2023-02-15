@@ -6,13 +6,13 @@ import uvicorn
 from fastapi.testclient import TestClient
 from typer import Exit
 
-from python_fastapi_stack import get_version, settings
-from python_fastapi_stack.core.cli import version_callback
-from python_fastapi_stack.core.server import start_server
+from app import get_version, settings
+from app.core.cli import version_callback
+from app.core.server import start_server
 
 
 def test_version_callback(mocker: MagicMock) -> None:
-    mock_console = mocker.patch("python_fastapi_stack.core.cli.console")
+    mock_console = mocker.patch("app.core.cli.console")
 
     try:
         version_callback(print_version=True)
