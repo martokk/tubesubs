@@ -14,6 +14,6 @@ def start_server() -> None:
         port=settings.SERVER_PORT,
         log_level=settings.LOG_LEVEL.lower(),
         reload=settings.UVICORN_RELOAD,
-        workers=3,  # 2 * CPU cores + 1
+        workers=settings.UVICORN_WORKERS,
         app_dir="",
     )
