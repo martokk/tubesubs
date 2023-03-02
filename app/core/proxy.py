@@ -1,3 +1,5 @@
+from typing import Any
+
 import re
 
 import httpx
@@ -6,7 +8,7 @@ from fastapi.requests import Request
 from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 
-from app import logger
+from app import logger, settings
 
 client = httpx.AsyncClient()
 
@@ -36,9 +38,12 @@ async def reverse_proxy(url: str, request: Request) -> StreamingResponse:
     except httpx.ConnectError as e:
         raise ValueError("Invalid URL") from e
 
-    if rp_response.status_code != status.HTTP_200_OK:
+    if (
+        rp_response.status_code != status.HTTP_200_OK
+        and rp_response.status_code != status.HTTP_302_FOUND
+    ):
         logger.error(
-            f"Reverse proxy request failed with status code {rp_response.status_code} {rp_response=} {rp_request=}"
+            f"Reverse proxy request failed for url ('{url}') with status code {rp_response.status_code}. {settings.PROXY_HOST=} {rp_response=} {rp_request=}"
         )
         raise HTTPException(status_code=rp_response.status_code)
 
