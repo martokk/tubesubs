@@ -6,6 +6,7 @@ from loguru import logger as _logger
 
 from app.models.settings import Settings as _Settings
 from app.paths import ENV_FILE as _ENV_FILE
+from app.paths import ERROR_LOG_FILE as _ERROR_LOG_FILE
 from app.paths import LOG_FILE as _LOG_FILE
 
 
@@ -24,7 +25,20 @@ _load_dotenv(dotenv_path=_env_file)
 version: str = get_version()
 settings = _Settings(VERSION=version)  # type: ignore
 
-# Configure logger
-_logger.add(_LOG_FILE, level=settings.LOG_LEVEL, rotation="10 MB")
-_logger.info(f"Log level set by .env to '{settings.LOG_LEVEL}'")
-logger = _logger
+# Configure loggers
+_logger.add(
+    _LOG_FILE,
+    filter=lambda record: record["extra"].get("name") == "logger",
+    level=settings.LOG_LEVEL,
+    rotation="10 MB",
+)
+_logger.add(
+    _ERROR_LOG_FILE,
+    filter=lambda record: record["extra"].get("name") == "logger",
+    level="ERROR",
+    rotation="10 MB",
+)
+
+# Expose logger
+logger = _logger.bind(name="logger")
+logger.info(f"Log level set by .env to '{settings.LOG_LEVEL}'")
