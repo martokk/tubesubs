@@ -3,13 +3,14 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from sqlmodel import Session
 
-from app import logger, models, settings, version
+from app import logger, settings, version
 from app.api import deps
 from app.api.v1.api import api_router
 from app.core import notify
 from app.db.init_db import init_initial_data
 from app.paths import STATIC_PATH
 from app.views.router import views_router
+from app.services.fetch import fetch_all_subscriptions
 
 # Initialize FastAPI App
 app = FastAPI(
@@ -43,6 +44,12 @@ async def on_startup(db: Session = next(deps.get_db())) -> None:
 
 
 @app.on_event("startup")  # type: ignore
-@repeat_every(seconds=120, wait_first=False)
-async def repeating_task() -> None:
-    logger.debug("This is a repeating task example that runs every 120 seconds.")
+@repeat_every(seconds=settings.REFRESH_SUBSCRIPTIONS_INTERVAL_MINUTES * 60, wait_first=True)
+async def repeating_fetch_all_sources() -> None:  # pragma: no cover
+    """
+    Fetches all Sources from yt-dlp.
+    """
+    logger.debug("Repeating fetch of All Subscriptions...")
+    db: Session = next(deps.get_db())
+    fetch_results = await fetch_all_subscriptions(db=db)
+    logger.success(f"Completed refreshing {fetch_results.subscriptions} Subscriptions from yt-dlp.")

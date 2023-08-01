@@ -1,5 +1,6 @@
 from sqlmodel import Session
 
+import asyncio
 from app import crud, logger
 from app.models import FetchResults
 from app.services.channel import check_and_update_null_channel_logos
@@ -22,6 +23,43 @@ class FetchCanceledError(FetchError):
     """
     Raised when a fetch is cancelled.
     """
+
+
+async def fetch_all_subscriptions(db: Session) -> FetchResults:
+    """
+    Fetch all subscriptions.
+
+    Args:
+        db (Session): The database session.
+
+    Returns:
+        models.FetchResults: The results of the fetch.
+    """
+    logger.info("Fetching ALL Subscriptions...")
+    subscriptions = await crud.subscription.get_all(db=db) or []
+    results = FetchResults()
+
+    for _subscription in subscriptions:
+        # if _subscription.is_deleted or _subscription.is_active is False:
+        #     continue
+        try:
+            subscription_fetch_results = await fetch_subscription(id=_subscription.id, db=db)
+        except FetchCanceledError:
+            continue
+
+        results += subscription_fetch_results
+
+        # Allow other tasks to run
+        await asyncio.sleep(0)
+
+    success_message = (
+        f"Completed fetching All ({results.subscriptions}) Subscriptions. "
+        f"Added {results.added_videos} new videos. "
+        f"Deleted {results.deleted_videos} orphaned videos. "
+    )
+    logger.success(success_message)
+
+    return results
 
 
 async def fetch_subscription(
