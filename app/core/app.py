@@ -9,8 +9,8 @@ from app.api.v1.api import api_router
 from app.core import notify
 from app.db.init_db import init_initial_data
 from app.paths import STATIC_PATH
-from app.views.router import views_router
 from app.services.fetch import fetch_all_subscriptions
+from app.views.router import views_router
 
 # Initialize FastAPI App
 app = FastAPI(

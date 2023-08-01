@@ -1,6 +1,7 @@
+import asyncio
+
 from sqlmodel import Session
 
-import asyncio
 from app import crud, logger
 from app.models import FetchResults
 from app.services.channel import check_and_update_null_channel_logos
