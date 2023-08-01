@@ -1,3 +1,20 @@
+/* Theme Colors */
+.bg-user {
+    background-color: rgb(203, 0, 0) !important;
+}
+
+.bg-user-dev {
+    background-color: rgb(49, 0, 0) !important;
+}
+
+.bg-admin {
+    background-color: rgb(12, 185, 0) !important;
+}
+
+.bg-admin-dev {
+    background-color: rgb(7, 45, 0) !important;
+}
+
 /* Default styles */
 .container-fluid {
     max-width: 768px;

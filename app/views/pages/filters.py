@@ -243,7 +243,7 @@ async def view_filter(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
-    videos = db_filter.get_videos(max_videos=5)
+    videos = db_filter.get_videos(max_videos=20)
     playlists = await crud.playlist.get_all(db=db)
 
     return templates.TemplateResponse(

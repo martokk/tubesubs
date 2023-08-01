@@ -61,3 +61,6 @@ class Settings(BaseSettings):
     PACKAGE_NAME: str = PROJECT_NAME.lower().replace("-", "_").replace(" ", "_")
     PROJECT_DESCRIPTION: str = f"{PROJECT_NAME}"
     VERSION: str = ""
+
+    # Refresh Settings
+    REFRESH_SUBSCRIPTIONS_INTERVAL_MINUTES: int = 120
