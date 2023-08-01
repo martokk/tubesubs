@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+
+{% block title %}Edit Subscription{% endblock %}
+
+{% block content_header %}Edit Subscription{% endblock %}
+
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Subscription Details
+        </div>
+        <div class="card-body p-4">
+            <form method="POST">
+                <div class="form-group">
+                    <label for="id">Id:</label>
+                    <input type="text" class="form-control mb-3" id="id" name="id" value="{{ subscription.id }}" disabled>
+                </div>
+
+                <div class="form-group">
+                    <label for="service_handler">Service Handler:</label>
+                    <input type="text" class="form-control mb-3" id="service_handler" name="service_handler"
+                        value="{{ subscription.service_handler }}">
+                </div>
+                <div class="form-group">
+                    <label for="subscription_handler">Subscription Handler:</label>
+                    <input type="text" class="form-control mb-3" id="subscription_handler" name="subscription_handler"
+                        value="{{ subscription.subscription_handler }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="created_by">Created By:</label>
+                    <input type="text" class="form-control mb-3" id="created_by" name="created_by"
+                        value="{{ subscription.created_by }}" disabled>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

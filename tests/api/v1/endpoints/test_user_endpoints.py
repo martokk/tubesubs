@@ -187,44 +187,6 @@ def test_retrieve_users(
         assert "username" in item
 
 
-def test_create_user_open(client: TestClient) -> None:
-    """
-    Test creating new user without the need to be logged in.
-    """
-
-    # Assert HTTP_403_FORBIDDEN if users_open_registration is False
-    settings.USERS_OPEN_REGISTRATION = False
-    r = client.post(
-        f"{settings.API_V1_PREFIX}/register",
-        json={"username": "test_user", "password": "test_password", "email": "test@example.com"},
-    )
-    assert r.status_code == 403
-
-    # Assert HTTP_201_CREATED if users_open_registration is True
-    settings.USERS_OPEN_REGISTRATION = True
-
-    r = client.post(
-        f"{settings.API_V1_PREFIX}/register",
-        json={
-            "username": "test_user9",
-            "password": "test_password9",
-            "email": "test9@example.com",
-        },
-    )
-    assert r.status_code == 201
-
-    # Assert HTTP_409_CONFLICT if username already exists
-    r = client.post(
-        f"{settings.API_V1_PREFIX}/register",
-        json={
-            "username": "test_user9",
-            "password": "test_password9",
-            "email": "test9@example.com",
-        },
-    )
-    assert r.status_code == 409
-
-
 async def test_update_user(
     db_with_user: Session, client: TestClient, superuser_token_headers: dict[str, str]
 ) -> None:

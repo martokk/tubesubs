@@ -657,3 +657,7 @@ dist_win/
 thunder-tests/thunderEnvironment.json
 
 **/data/.env
+
+app/data/cookies/
+
+app/data/feed/

@@ -38,3 +38,13 @@ body {
 .container-fluid.mt-3.mb-5 {
     flex: 1;
 }
+
+.opacity-85 {
+    opacity: 0.85;
+    /* Adjust the value between 0 and 1 for the desired opacity */
+}
+
+.dimmed {
+    opacity: 0.25;
+    /* Adjust the opacity as per your requirement */
+}

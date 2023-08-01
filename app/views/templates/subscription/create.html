@@ -1,0 +1,44 @@
+{% extends "base/base.html" %}
+
+{% block title %}Create a New Subscription{% endblock %}
+
+{% block content_header %}Create a New Subscription{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+            <form method="POST" onsubmit="return validateForm()">
+
+                <div class="form-group"">
+                    <select class="form-control" id="subscription_handler" name="subscription_handler">
+                        {% for subscription_handler in subscription_handlers %}
+                        <option value="{{ subscription_handler }}">{{ subscription_handler }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    function validateForm() {
+        let subscription_handler = document.getElementById("subscription_handler").value;
+
+        if (service_handler === "" || subscription_handler === "") {
+            alert("Please enter a value for Subscription Handler.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock content %}

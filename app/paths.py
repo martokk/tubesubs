@@ -17,9 +17,11 @@ TEMPLATES_PATH = VIEWS_PATH / "templates"
 # Data Folder
 LOGS_PATH = DATA_PATH / "logs"
 CACHE_PATH = DATA_PATH / "cache"
+COOKIES_PATH = DATA_PATH / "cookies"
+FEEDS_PATH = DATA_PATH / "feed"
 
-# Cache Folders
-# VIDEO_INFO_CACHE_PATH = CACHE_PATH / "video_info"
+# COOKIE FILES
+YOUTUBE_COOKIES_FILE = COOKIES_PATH / "youtube_cookies.txt"
 
 # Files
 ENV_FILE = DATA_PATH / ".env"

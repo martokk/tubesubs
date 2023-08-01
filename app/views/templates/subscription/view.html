@@ -1,0 +1,91 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ subscription.title }}{% endblock %}
+
+
+{% block content %}
+
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+        <h4 class="col-auto py-1">
+            <a href="{{ subscription.url }}" class="text-decoration-none text-white">
+                {{ subscription.title }}
+                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                </span>
+            </a>
+        </h4>
+        <div class="col-auto small p-1 ms-auto">
+            <a href="/subscription/{{ subscription.id }}/edit" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>Edit</a>
+            {% if current_user.is_superuser %}
+            <a href="/subscription/{{ subscription.id }}/fetch" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
+            {% endif %}
+            <a href="#" class="text-decoration-none text-muted me-3"
+                onclick="confirmDelete('/subscription/{{ subscription.id }}/delete', '{{ subscription.name }}')"><i
+                    class="fas fa-trash me-2"></i>
+                Delete</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- List Videos -->
+<div class="container py-3 px-0">
+    <div class="small fw-bold w-auto d-flex justify-content-start">
+        Videos ({{ subscription.videos|length }})
+        {# Videos ({{ source.videos_sorted()|length }}) #}
+    </div>
+    {% for video in subscription.videos_sorted(sort_by="created_at", reverse=True) %}
+    <div class="row px-0 py-3">
+        <div class="col-12 position-relative">
+            <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
+            <div class="small opacity-85 bg-dark text-white fw-bold position-absolute bottom-0 end-0 mx-3 my-1 p-1 rounded">
+                {% set hours = (video.duration // 3600) %}
+                {% set minutes = (video.duration // 60) % 60 %}
+                {% set seconds = video.duration % 60 %}
+                {% if hours > 0 %}
+                {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
+                {% else %}
+                {{ '%2d:%02d'|format(minutes, seconds) }}
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-12 pt-2">
+            <div class="row align-items-top">
+                <div class="col-auto px-1 ms-3 pt-1">
+                    <img src="{{ video.channel.logo }}"
+                        alt="Logo" class="img-fluid rounded-circle" style="max-height: 40px;" />
+                </div>
+                <div class="col ps-1 pe-0">
+                    <h5 class="mb-0 text-smaller">
+                        <a href="/subscription/{{ subscription.id }}/video/{{ video.id }}" class="text-decoration-none text-white">{{
+                            video.title }}</a>
+                    </h5>
+                    <small class="text-muted font-weight-bold">{{ video.channel.name }} - {{ video.released_at }}</small>
+                </div>
+                <div class="col-auto ps-0">
+                    <div class="dropdown">
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v text-muted py-3 px-3"></i>
+                        </a>
+
+                        <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+                            <li><a class="dropdown-item p-3 text-white" href="#">Action 1</a></li>
+                            <li><a class="dropdown-item p-3 text-white" href="#">Action 2</a></li>
+                            <li><a class="dropdown-item p-3 text-white" href="#">Action 3</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<!-- Include Font Awesome for the vertical dots icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+{% endblock content %}

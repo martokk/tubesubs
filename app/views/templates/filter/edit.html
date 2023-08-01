@@ -1,0 +1,325 @@
+{% extends "base/base.html" %}
+
+{% block title %}Edit Filter: {{ filter.name }} {% endblock %}
+
+
+
+{% block content %}
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+        <h4 class="col-auto py-1">
+            <a href="/filter/{{ filter.id }}" class="text-decoration-none text-white">
+                {{ filter.name }}
+                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                </span>
+            </a>
+        </h4>
+        <div class="col-auto small p-1 ms-auto">
+            <a href="/filter/{{ filter.id }}" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>View</a>
+            {% if current_user.is_superuser %}
+            <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
+            {% endif %}
+            <a href="#" class="text-decoration-none text-muted me-3"
+                onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
+                    class="fas fa-trash me-2"></i>
+                Delete</a>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+
+    <!-- Edit Filter Card -->
+    <div class="card">
+
+        <div class="card-header">
+            Edit Filter
+        </div>
+
+        <div class="card-body p-4">
+
+            <!-- Form -->
+            <form method="POST">
+
+                <!-- Name -->
+                <div class="form-group my-2">
+                    <label for="name">Filter Name:</label>
+                    <input type="text" class="form-control mb-3" id="name" name="name" value="{{ filter.name }}">
+                </div>
+
+                <!-- Subscriptions -->
+                <div class="form-group my-2">
+                    <label for="subscription_handlers">Edit Subscriptions:</label>
+                    <select class="form-control" id="subscription_handlers" name="subscription_handlers" size="4" multiple>
+                        {% for option_subscription_handler in options_subscription_handlers %}
+                            <option value="{{ option_subscription_handler }}" {% if option_subscription_handler in filter.subscriptions_as_strings %}selected{% endif %}>{{ option_subscription_handler }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Read Status -->
+                <div class="form-group my-2">
+                    <label for="read_status">Read Status:</label>
+                    <select class="form-control mb-3" id="read_status" name="read_status">
+                        {% for option in options_read_status %}
+                        <option value="{{ option }}" {% if option == filter.read_status %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ordered By -->
+                <div class="form-group my-2">
+                    <label for="ordered_by">Ordered By:</label>
+                    <select class="form-control mb-3" id="ordered_by" name="ordered_by">
+                        {% for option in options_ordered_by %}
+                        <option value="{{ option }}" {% if option==filter.ordered_by %}selected{% endif %}>{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ordered By -->
+                <div class="form-group my-2">
+                    <label for="ordered_by">Ordered By:</label>
+                    <div class="row">
+                        <div class="col-8"> <!-- Adjust the column size as needed -->
+                            <select class="form-control mb-3" id="ordered_by" name="ordered_by">
+                                {% for option in options_ordered_by %}
+                                <option value="{{ option }}" {% if option==filter.ordered_by %}selected{% endif %}>{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-4 order-md-last"> <!-- Adjust the column size as needed -->
+                            <div class="form-check">
+                                <input class="form-check-input mb-3" type="checkbox" id="reverse_order" name="reverse_order" {% if filter.reverse_order == True %}checked{% endif %}>
+                                <label class="form-check-label mb-3" for="reverse_order">Reverse</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Criteria Card -->
+    <div class="col-12 col-lg-6 my-3">
+        <div class="card h-100">
+
+            {% if filter.criterias %}
+            <div class="card-header">
+                <strong>Criterias</strong>
+            </div>
+
+            <div class="card-body p-4">
+
+                <ul class="list-unstyled">
+                    {% for criteria in filter.criterias %}
+                    <li>
+                        <div class="row my-2">
+                            <div class="col-auto col-sm-auto">
+                                <span class="badge bg-secondary">{{ criteria.field }}</span>
+                                <span class="badge bg-secondary">{{ criteria.operator }}</span>
+                                <span class="badge bg-primary">{{ criteria.value }}</span>
+                                {% if criteria.unit_of_measure %}
+                                <span class="badge bg-secondary">{{ criteria.unit_of_measure }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-auto align-items-center mt-1 ms-auto text-end">
+                                <div class="col small">
+                                    <a href="/filter/{{ filter.id }}/criteria/{{ criteria.id }}/edit"
+                                        class="text-decoration-none text-muted me-2">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </a>
+                                    <a href="#" class="text-decoration-none text-muted me-2"
+                                        onclick="confirmDelete('/filter/{{ filter.id }}/criteria/{{ criteria.id }}/delete',
+                                                '{{ criteria.field }} {{ criteria.operator }} {{ criteria.value }}{% if criteria.unit_of_measure %} {{ criteria.unit_of_measure }} {% endif %}')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- New Criteria Card -->
+            <div class="card {% if not filter.criterias %} border-warning{% endif %}">
+                <div class="card-header {% if not filter.criterias %} text-warning{% endif %}">
+                    <strong>New Criteria</strong>
+                </div>
+
+                <div class="card-body p-4">
+
+                    {% if not filter.criterias %}
+                    <div class="alert alert-warning d-flex align-items-center justify-content-center" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>No criteria found. Add a new criteria below:</div>
+                    </div>
+                    {% endif %}
+
+
+                    <div class="row">
+
+                        <!-- Form -->
+                        <form method="POST" class="form-group" action="/filter/{{ filter.id }}/criteria/create">
+                            <div class="d-flex">
+
+                                <!-- Field -->
+                                <div class=" col-3 form-group pe-1">
+                                    <select class="form-control" id="fieldInput" name="field">
+                                        {% for option in options_criteria_fields %}
+                                        <option value="{{ option }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <!-- Operator -->
+                                <div class="col-3 form-group pe-1">
+                                    <select class="form-control" id="operatorInput" name="operator">
+                                        <option value="">Criteria</option>
+                                    </select>
+                                </div>
+
+                                <!-- Value -->
+                                <div class="col-2 form-group pe-1">
+                                    {% if fieldInput == 'read_status' %}
+                                    <select class="form-control" id="valueInput" name="value">
+                                        {% for option in options_read_status_values %}
+                                        <option value="{{ option }}">{{ option }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    {% else %}
+                                    <input type="text" class="form-control" id="valueInput" name="value" placeholder="Value">
+                                    {% endif %}
+                                </div>
+
+                                <!-- UOM -->
+                                <div class="col-2 form-group pe-1">
+                                    <select class="form-control" id="uomInput" name="unit_of_measure">
+                                        <option value="">Unit</option>
+                                    </select>
+                                </div>
+
+                                <!-- Submit -->
+                                <div class="col-2 form-group text-end ">
+                                    <button type="submit"
+                                        class="btn {% if not filter.criterias %} btn-warning{% else %}btn-primary{% endif %} w-100">Add</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- jinja-js -->
+<script type="text/javascript">
+    // Define the options for each field
+    const fieldOperatorOptions = {
+        "created": {{ options_created_at_operators | tojson }},
+        "duration": {{ options_duration_operators | tojson }},
+        "keyword": {{ options_keyword_operators | tojson }},
+        "read_status": {{ options_read_status_operators | tojson }},
+        "channel_id": {{ options_channel_id_operators | tojson }},
+        "channel": {{ options_channel_operators | tojson }},
+        "priority": {{ options_priority_operators | tojson }}
+    };
+    const fieldUOMOptions = {
+        "created": ["hours", "days"],
+        "duration": ["seconds", "minutes"],
+        "keyword": ["keyword"],
+        "read_status": ["status"],
+        "channel_id": ["channel_id"],
+        "channel": ["tag"],
+        "priority": ["priority"]
+    };
+
+    const fieldValueOptions = {
+        "read_status": {{ options_read_status_values | tojson }},
+    };
+
+    function updateOperatorAndUOM() {
+        // Get the selected field value
+        const field = $("#fieldInput").val();
+        const operator = $("#operatorInput").val();
+        const value = $("#valueInput").val();
+        const uom = $("#uomInput").val();
+
+        // Get the corresponding operator options
+        const operatorOptions = fieldOperatorOptions[field];
+        const valueOptions = fieldValueOptions[field];
+        const uOMOptions = fieldUOMOptions[field];
+
+        // Add the Operator options
+        $("#operatorInput").empty();
+        for (const option of operatorOptions) {
+            const isSelected = (option === operator) ? 'selected' : '';
+            $("#operatorInput").append(`<option value="${option}" ${isSelected}>${option}</option>`);
+        }
+
+        // Update the ValueInput based on the selected field
+        if (field === 'read_status') {
+            // Replace the ValueInput with the select dropdown
+            $("#valueInput").replaceWith(`
+                <select class="form-control" id="valueInput" name="value">
+                </select>
+            `);
+
+            // Add the Operator options
+            $("#valueInput").empty();
+            for (const option of valueOptions) {
+                const isSelected = (option === value) ? 'selected' : '';
+                $("#valueInput").append(`<option value="${option}" ${isSelected}>${option}</option>`);
+            }
+        } else {
+            // Replace the ValueInput with the text input
+            $("#valueInput").replaceWith(`
+                <input type="text" class="form-control" id="valueInput" name="value" placeholder="Value">
+            `);
+        }
+
+
+
+        // Add the UOM options
+        $("#uomInput").empty();
+        for (const option of uOMOptions) {
+            const isSelected = (option === uom) ? 'selected' : '';
+            $("#uomInput").append(`<option value="${option}" ${isSelected}>${option}</option>`);
+        }
+    }
+
+    // Call the updateOperatorAndUOM function on load
+    $(document).ready(function () {
+        updateOperatorAndUOM();
+    });
+
+    // When the field select is changed, call the updateOperatorAndUOM function
+    $("#fieldInput").on("change", function () {
+        updateOperatorAndUOM();
+    });
+</script>
+
+{% endblock content %}
