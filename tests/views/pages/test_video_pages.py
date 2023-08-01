@@ -162,7 +162,8 @@ def test_get_video_forbidden(
     response = client.get(
         f"/video/{video_1.id}",  # type: ignore
     )
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.status_code == status.HTTP_200_OK
+    assert response.url.path == "/login"  # type: ignore
 
 
 def test_normal_user_get_all_videos(
