@@ -6,7 +6,7 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.core.uuid import generate_uuid_from_string
 
 if TYPE_CHECKING:
-    from app.models.video import Video  # pragma: no cover
+    from app.models.subscription import Subscription  # pragma: no cover
 
 
 class UserBase(SQLModel):
@@ -25,8 +25,8 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     hashed_password: str = Field(nullable=False)
-    videos: list["Video"] = Relationship(
-        back_populates="owner",
+    subscriptions: list["Subscription"] = Relationship(
+        back_populates="created_user",
         sa_relationship_kwargs={
             "cascade": "all, delete",
         },

@@ -9,26 +9,58 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <!-- Home -->
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
+
+                <!-- Subscription Dropdown -->
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                         aria-expanded="false">
-                        Videos
+                        Subscriptions
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/videos/create">New Video</a></li>
+                        <li><a class="dropdown-item" href="/subscription/create">New Subscription</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="/videos">My Videos</a></li>
-                        {% if current_user.is_superuser %}
-                        <li><a class="dropdown-item" href="/videos/all">All Videos</a></li>
-                        {% endif %}
+                        <li><a class="dropdown-item" href="/subscriptions">My Subscriptions</a></li>
+
                     </ul>
                 </li>
 
+                <!-- Filters Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Filters
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/filter/create">New Filter</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/filters">My Filters</a></li>
+                    </ul>
+                </li>
+
+                <!-- Playlists Dropdown -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Playlists
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/playlist/create">New Playlist</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/playlists">My Playlist</a></li>
+
+                    </ul>
+                </li>
+
+                <!-- Docs Dropdown -->
                 {% if current_user.is_superuser %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"

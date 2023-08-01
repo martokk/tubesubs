@@ -1,0 +1,90 @@
+{% extends "base/base.html" %}
+
+{% block title %}Create a New Filter{% endblock %}
+
+{% block content_header %}Create a New Filter{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- Form -->
+            <form method="POST" onsubmit="return validateForm()">
+
+                <!-- Name -->
+                <div class="form-group my-2">
+                    <label for="name">Filter Name:</label>
+                    <input type="text" class="form-control mb-3" id="name" name="name" value="New Filter">
+                </div>
+
+                <!-- Subscriptions -->
+                <div class="form-group my-2">
+                    <label for="subscription_handlers">Edit Subscriptions:</label>
+                    <select class="form-control" id="subscription_handlers" name="subscription_handlers" size="4" multiple>
+                        {% for option_subscription_handler in options_subscription_handlers %}
+                        <option value="{{ option_subscription_handler }}" >{{ option_subscription_handler }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Read Status -->
+                <div class="form-group my-2">
+                    <label for="read_status">Read Status:</label>
+                    <select class="form-control mb-3" id="read_status" name="read_status">
+                        {% for option in options_read_status %}
+                        <option value="{{ option }}" >{{ option }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Ordered By -->
+                <div class="form-group my-2">
+                    <label for="ordered_by">Ordered By:</label>
+                    <div class="row">
+                        <div class="col-8"> <!-- Adjust the column size as needed -->
+                            <select class="form-control mb-3" id="ordered_by" name="ordered_by">
+                                {% for option in options_ordered_by %}
+                                <option value="{{ option }}">{{ option }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-4 order-md-last"> <!-- Adjust the column size as needed -->
+                            <div class="form-check">
+                                <input class="form-check-input mb-3" type="checkbox" id="reverse_order" name="reverse_order">
+                                <label class="form-check-label mb-3" for="reverse_order">Reverse</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function validateForm() {
+        let subscription_handler = document.getElementById("subscription_handlers").value;
+
+        if (service_handler === "" || subscription_handler === "") {
+            alert("Please enter a value for Subscription Handler.");
+            return false;
+        }
+
+        return true;
+    }
+</script>
+
+{% endblock content %}

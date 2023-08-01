@@ -1,0 +1,108 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ playlist.name }}{% endblock %}
+
+
+{% block content %}
+
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+        <h4 class="col-auto py-1">
+            {{ playlist.name }}
+        </h4>
+        <div class="col-auto small p-1 ms-auto">
+
+            <a href="/playlist/{{ playlist.id }}/edit" class="text-decoration-none text-muted me-3">
+                <i class="fas fa-pencil-alt me-2"></i>
+                Edit
+            </a>
+
+            <a href="#" class="text-decoration-none text-muted me-3"
+                onclick="confirmDelete('/playlist/{{ playlist.id }}/delete', '{{ playlist.name }}')">
+                <i class="fas fa-trash me-2"></i>
+                Delete
+            </a>
+
+            <a href="{{ playlist.feed_url }}" class="text-decoration-none text-muted me-3">
+                <i class="fas fa-rss me-2"></i>
+                Feed
+            </a>
+
+            <a href="pktc://subscribe/{{ BASE_DOMAIN }}{{ playlist.id }}" class="text-decoration-none text-muted me-3">
+                <i class="fas fa-plus-circle me-2"></i>
+                PocketCast
+            </a>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- List Playlist Items -->
+<div class="container py-3 px-0">
+
+    <!-- Header -->
+    <div class="small fw-bold w-auto d-flex justify-content-start">
+        Playlist Items ({{ playlist.playlist_items |length }})
+        {# Videos ({{ source.videos_sorted()|length }}) #}
+    </div>
+
+
+    <!-- Videos List -->
+    {% for item in playlist.playlist_items %}
+    <div class="row border-top py-1">
+        <div class="d-flex align-items-top">
+
+            <!-- Thumbnail -->
+            <div class="me-3 d-flex align-items-center">
+                <img src="{{ item.thumbnail }}" class="cropped-image" alt="" height="90" width="125">
+            </div>
+
+            <!-- Details -->
+            <div class="col">
+
+                <div class="col-12 small text-muted fw-bold">{{ item.created_at.strftime('%d %b %Y') | upper }}
+                    <small><em>({{ item.created_at | humanize }})</em></small>
+                </div>
+
+                <!-- Title -->
+                <h5 class="mb-0">
+                    <a href="#" class="text-decoration-none text-muted">
+                        {{ item.title }}
+                    </a>
+                </h5>
+
+            </div>
+
+            <!-- Dropdown Menu -->
+            <div class="col-auto ps-0">
+                <div class="dropdown">
+
+                    <!-- Vertical Ellipsis -->
+                    <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v text-muted py-3 px-3"></i>
+                    </a>
+
+                    <!-- Menu -->
+                    <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+                        <li>
+                            <a class="dropdown-item p-3 text-white" href="/playlist/{{ playlist.id }}/playlist_item/{{ item.id }}/delete">
+                                Delete
+                            </a>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+<!-- Include Font Awesome for the vertical dots icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+{% endblock content %}

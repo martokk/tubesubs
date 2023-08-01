@@ -1,0 +1,201 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ filter.name }}{% endblock %}
+
+
+{% block content %}
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+        <h4 class="col-auto py-1">
+            <a href="/filter/{{ filter.id }}" class="text-decoration-none text-white">
+                {{ filter.name }}
+                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                </span>
+            </a>
+        </h4>
+        <div class="col-auto small p-1 ms-auto">
+            <a href="/filter/{{ filter.id }}/edit" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>Edit</a>
+            {% if current_user.is_superuser %}
+            <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
+            {% endif %}
+            <a href="#" class="text-decoration-none text-muted me-3"
+                onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
+                    class="fas fa-trash me-2"></i>
+                Delete</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- List Videos -->
+<div class="container py-3 px-0">
+    <div class="small fw-bold w-auto d-flex justify-content-start">
+        Videos ({{ videos|length }})
+        {# Videos ({{ source.videos_sorted()|length }}) #}
+    </div>
+    {% for video in videos %}
+
+    <!-- Video Container -->
+    <div class="row px-0 py-3 video-container" style="position: relative;">
+
+        <div class="video-details-container">
+
+            <!-- Thumbnail & Duration Overlay -->
+            <div class="col-12 position-relative">
+                <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
+                <div
+                    class="small opacity-85 bg-dark text-white fw-bold position-absolute bottom-0 end-0 mx-3 my-1 p-1 rounded">
+                    {% set hours = (video.duration // 3600) %}
+                    {% set minutes = (video.duration // 60) % 60 %}
+                    {% set seconds = video.duration % 60 %}
+                    {% if hours > 0 %}
+                    {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
+                    {% else %}
+                    {{ '%2d:%02d'|format(minutes, seconds) }}
+                    {% endif %}
+                </div>
+            </div>
+
+
+            <div class="col-12 pt-2">
+                <div class="row align-items-top">
+
+                    <!-- Channel Logo -->
+                    <div class="col-auto px-1 ms-3 pt-1">
+                        <img src="{{ video.channel.logo }}" alt="Logo" class="img-fluid rounded-circle"
+                            style="max-height: 40px;" />
+                    </div>
+
+                    <!-- Video Title & Created At -->
+                    <div class="col ps-1 pe-0">
+                        <h5 class="mb-0 text-smaller">
+                            <a href="/filter/{{ filter.id }}/video/{{ video.id }}"
+                                class="text-decoration-none text-white">{{
+                                video.title }}</a>
+                        </h5>
+                        <small class="text-muted font-weight-bold">{{ video.channel.name }} - {{ video.created_at
+                            }}</small>
+                    </div>
+
+                    <!-- Dropdown Menu -->
+                    <div class="col-auto ps-0">
+                        <div class="dropdown">
+
+                            <!-- Vertical Ellipsis Icon -->
+                            <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false" >
+                                <i class="fas fa-ellipsis-v text-muted py-3 px-3"></i>
+                            </a>
+
+                            <!-- Menu -->
+                            <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+                                {% for playlist in playlists %}
+                                <li>
+                                    <a class="dropdown-item p-3 text-white add-to-playlist-link" href="#" data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}" data-video-id="{{ video.id }}"" data-video-url="{{ video.url }}" data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
+                                        Add to '{{ playlist.name }}' playlist.
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+
+
+<!-- Mark as read -->
+<!-- Form -->
+<form method="POST" class="form-group" action="/filter/{{ filter.id }}/mark_as_read">
+    <div class="d-flex flex-column">
+
+        <!-- Hidden input fields for video IDs -->
+        {% for video in videos %}
+        <input type="hidden" name="video_ids" value="{{ video.id }}">
+        {% endfor %}
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary w-100">Mark as Read</button>
+    </div>
+</form>
+
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+
+<!-- Add to Playlist Event Listener -->
+<script>
+    $(document).ready(function () {
+        $(".add-to-playlist-link").click(function (event) {
+            event.preventDefault();
+            var videoId = $(this).data("video-id");
+            var videoUrl = $(this).data("video-url");
+            var videoThumbnail = $(this).data("video-thumbnail");
+            var videoTitle = $(this).data("video-title");
+            var playlistId = $(this).data("playlist-id");
+            var playlistName = $(this).data("playlist-name");
+            var videoContainer = $(this).closest(".video-container");
+            var videoDetailsContainer = $(this).closest(".video-details-container");
+
+            // AJAX POST request to the API endpoint
+            data = {
+                "video_id": videoId,
+                "title": videoTitle,
+                "url": videoUrl,
+                "thumbnail": videoThumbnail,
+                "playlist_id": playlistId
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/v1/playlist-item",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    // Handle success
+                    // alert("Video successfully added to '" + playlistName + "' playlist.");
+
+                    // Add the "dimmed" class to the video container
+                    videoDetailsContainer.addClass("dimmed");
+
+                    // Add the "Added to playlist" overlay
+                    var overlay = $("<div>", {
+                        class: "added-to-playlist-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white",
+                        text: "Added to '" + playlistName + "' playlist.",
+                        style: "pointer-events: none; display: none;" // Initially hide the overlay
+                    });
+                    videoContainer.append(overlay);
+
+                    // Show the overlay when the video is added to the playlist
+                    overlay.fadeIn();
+
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    var errorMessage = "Failed to add video to '" + playlistName + "' playlist.";
+                    errorMessage += "\nStatus Code: " + xhr.status;
+                    errorMessage += "\nStatus Text: " + xhr.statusText;
+                    errorMessage += "\nResponse Text: " + xhr.responseText;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
+
+
+
+
+{% endblock content %}
