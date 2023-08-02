@@ -60,19 +60,15 @@
                     </ul>
                 </li>
 
-                <!-- Docs Dropdown -->
-                {% if current_user.is_superuser %}
+                <!-- Channels Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Docs
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Channels
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="/docs">Swagger</a></li>
-                        <li><a class="dropdown-item" href="/redoc">Redoc</a></li>
+                        <li><a class="dropdown-item" href="/channels">All Channels</a></li>
                     </ul>
                 </li>
-                {% endif %}
 
             </ul>
 

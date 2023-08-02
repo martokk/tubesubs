@@ -19,8 +19,9 @@ class ChannelBase(TimestampModel, SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
     service_handler: str = Field(default=None, nullable=False)
     remote_channel_id: str = Field(default=None, nullable=False)
-    name: str | None = Field(default=None)
+    name: str = Field(default=None)
     logo: str | None = Field(default=None)
+    is_hidden: bool = Field(default=False)
 
 
 class Channel(ChannelBase, table=True):
