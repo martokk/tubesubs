@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlmodel import Session
 
@@ -122,4 +122,134 @@ async def handle_unhide_channel(
 
     response = RedirectResponse(url="/channels", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+    return response
+
+
+@router.get("/channel/{channel_id}", response_class=HTMLResponse)
+async def view_channel(
+    request: Request,
+    channel_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    View channel.
+
+    Args:
+        request(Request): The request object
+        channel_id(str): The channel id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Response: View of the channel
+    """
+    alerts = models.Alerts().from_cookies(request.cookies)
+    try:
+        db_channel = await crud.channel.get(db=db, id=channel_id)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("Channel not found")
+        response = RedirectResponse("/channels", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
+        return response
+
+    return templates.TemplateResponse(
+        "channel/view.html",
+        {
+            "request": request,
+            "channel": db_channel,
+            "current_user": current_user,
+            "alerts": alerts,
+        },
+    )
+
+
+@router.get("/channel/{channel_id}/edit", response_class=HTMLResponse)
+async def edit_channel(
+    request: Request,
+    channel_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Edit channel form.
+
+    Args:
+        request(Request): The request object
+        channel_id(str): The channel id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Response: Form to edit a channel
+    """
+    alerts = models.Alerts().from_cookies(request.cookies)
+    try:
+        db_channel = await crud.channel.get(db=db, id=channel_id)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("Channel not found")
+        response = RedirectResponse("/channels", status_code=status.HTTP_302_FOUND)
+        response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
+        return response
+
+    return templates.TemplateResponse(
+        "channel/edit.html",
+        {
+            "request": request,
+            "channel": db_channel,
+            "current_user": current_user,
+            "alerts": alerts,
+        },
+    )
+
+
+@router.post("/channel/{channel_id}/edit", response_class=HTMLResponse)
+async def handle_edit_channel(
+    request: Request,
+    channel_id: str,
+    is_hidden: bool = Form(False),
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Handles the edit of a channel.
+
+    Args:
+        request(Request): The request object
+        channel_id(str): The channel id
+        is_hidden(bool):
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Response: View of the edited channel
+    """
+    alerts = models.Alerts()
+    channel_update = models.ChannelUpdate(
+        is_hidden=is_hidden,
+    )
+
+    try:
+        db_channel = await crud.channel.update(db=db, obj_in=channel_update, id=channel_id)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("Channel not found")
+        response = RedirectResponse(url="/channels", status_code=status.HTTP_303_SEE_OTHER)
+        response.headers["Method"] = "GET"
+        response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
+        return response
+
+    db_channel = await crud.channel.update(db=db, id=db_channel.id, obj_in=channel_update)
+
+    alerts.success.append("Channel updated")
+
+    response = RedirectResponse(
+        f"/channel/{channel_id}/edit", status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
     return response

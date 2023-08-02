@@ -1,0 +1,114 @@
+{% extends "base/base.html" %}
+
+{% block title %}{{ channel.name }}{% endblock %}
+
+
+{% block content %}
+
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+
+        <!-- Header -->
+
+        <div class="d-flex align-items-center">
+            <img src="{{ channel.logo }}" alt="Logo" class="img-fluid rounded-circle px-3" style="max-height: 40px;" />
+
+            <h4 class="col-auto py-1">
+                <a href="/channel/{{ channel.id }}" class="text-decoration-none text-white">
+                    {{ channel.name }}
+                    <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                    </span>
+                </a>
+            </h4>
+
+        </div>
+
+
+
+        <!-- Header Menu -->
+        <div class="col-auto small p-1 ms-auto">
+
+            <!-- Edit -->
+            <a href="/channel/{{ channel.id }}/edit" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>Edit</a>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Channel Details -->
+<div class="container text-left">
+    <div class="card">
+        <div class="card-body">
+
+            <!-- Channel ID -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Id
+                </div>
+                <div class="col-8">
+                    {{ channel.id }}
+                </div>
+            </div>
+
+            <!-- Name -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Channel Name
+                </div>
+                <div class="col-8">
+                    {{ channel.name }}
+                </div>
+            </div>
+
+            <!-- Service Handler -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Service Handler
+                </div>
+                <div class="col-8">
+                    {{ channel.service_handler }}
+                </div>
+            </div>
+
+            <!-- remote_channel_id -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Remote Channel ID
+                </div>
+                <div class="col-8">
+                    {{ channel.remote_channel_id }}
+                </div>
+            </div>
+
+            <!-- Logo -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Logo URL
+                </div>
+                <div class="col-8">
+                    {{ channel.logo }}
+                </div>
+            </div>
+
+            <!-- is_hidden -->
+            <div class="row"></div>
+                <div class="form-check">
+                    <label class="form-check-label mb-3" for="reverse_order">Is Hidden</label>
+                    <input class="form-check-input mb-3" type="checkbox" id="is_hidden" name="is_hidden" {% if
+                        channel.is_hidden==True %}checked{% endif %} disabled>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Include Font Awesome for the vertical dots icon -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+{% endblock content %}
