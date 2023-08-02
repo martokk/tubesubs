@@ -8,9 +8,10 @@ from app.models.criteria import (
 from app.models.filter import Filter, FilterOrderedBy, FilterReadStatus
 from app.models.subscription import Subscription
 from app.models.video import Video
+from app.models.filtered_videos import FilteredVideos
 
 
-async def get_filtered_videos(filter_: "Filter", max_videos: int) -> list[Video]:
+async def get_filtered_videos(filter_: "Filter", max_videos: int) -> FilteredVideos:
     """
     Filter videos based on the filter criteria.
     """
@@ -32,9 +33,20 @@ async def get_filtered_videos(filter_: "Filter", max_videos: int) -> list[Video]
     )
 
     # Limit Videos
+    videos_not_limited_count = len(videos)
     videos = await limit_videos(videos=videos, max_videos=max_videos)
 
-    return videos
+    return FilteredVideos(
+        videos=videos,
+        videos_limited_count=len(videos),
+        videos_not_limited_count=videos_not_limited_count,
+        read_status=filter_.read_status,
+        show_hidden_channels=filter_.show_hidden_channels,
+        criterias=filter_.criterias,
+        ordered_by=filter_.ordered_by,
+        reverse_order=filter_.reverse_order,
+        limit=max_videos,
+    )
 
 
 async def get_videos_from_subscriptions(subscriptions: list[Subscription]) -> list[Video]:

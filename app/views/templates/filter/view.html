@@ -17,10 +17,8 @@
         <div class="col-auto small p-1 ms-auto">
             <a href="/filter/{{ filter.id }}/edit" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>Edit</a>
-            {% if current_user.is_superuser %}
             <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            {% endif %}
             <a href="#" class="text-decoration-none text-muted me-3"
                 onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
                     class="fas fa-trash me-2"></i>
@@ -33,12 +31,14 @@
 <!-- List Videos -->
 <div class="container py-3 px-0">
     <div class="small fw-bold w-auto d-flex justify-content-start">
-        Videos ({{ videos|length }})
+        Videos ({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})
         {# Videos ({{ source.videos_sorted()|length }}) #}
     </div>
-    {% for video in videos %}
+
+
 
     <!-- Video Container -->
+    {% for video in filtered_videos.videos %}
     <div class="row px-0 py-3 video-container" style="position: relative;">
 
         <div class="video-details-container">
@@ -125,7 +125,7 @@
     <div class="d-flex flex-column">
 
         <!-- Hidden input fields for video IDs -->
-        {% for video in videos %}
+        {% for video in filtered_videos.videos %}
         <input type="hidden" name="video_ids" value="{{ video.id }}">
         {% endfor %}
 

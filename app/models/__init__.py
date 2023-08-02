@@ -14,3 +14,4 @@ from .subscription_video_link import *
 from .tokens import *
 from .user import *
 from .video import *
+from .filtered_videos import *

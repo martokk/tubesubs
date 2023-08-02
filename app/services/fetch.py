@@ -63,6 +63,43 @@ async def fetch_all_subscriptions(db: Session) -> FetchResults:
     return results
 
 
+async def fetch_filter(db: Session, id: str) -> FetchResults:
+    """
+    Fetch new data from yt-dlp for the filter and update the filter in the database.
+
+    Args:
+        db (Session): The database session.
+        id: The id of the filter to fetch and update.
+
+    Returns:
+        models.FetchResult: The result of the fetch.
+    """
+
+    db_filter = await crud.filter.get(id=id, db=db)
+
+    info_message = f"Fetching {db_filter.__repr__()}"
+    logger.info(info_message)
+
+    results = FetchResults()
+    for subscription in db_filter.subscriptions:
+        try:
+            subscription_fetch_results = await fetch_subscription(id=subscription.id, db=db)
+        except FetchCanceledError:
+            continue
+
+        results += subscription_fetch_results
+
+        # Allow other tasks to run
+        await asyncio.sleep(0)
+
+    success_message = (
+        f"Completed fetching {db_filter.__repr__()}. Added {results.added_videos} new videos. "
+    )
+    logger.success(success_message)
+
+    return results
+
+
 async def fetch_subscription(
     db: Session, id: str, ignore_video_refresh: bool = False
 ) -> FetchResults:
