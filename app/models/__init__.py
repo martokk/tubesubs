@@ -3,6 +3,7 @@ from .channel import *
 from .criteria import *
 from .fetch import *
 from .filter import *
+from .filtered_videos import *
 from .msg import *
 from .playlist import *
 from .playlist_item import *
@@ -14,4 +15,3 @@ from .subscription_video_link import *
 from .tokens import *
 from .user import *
 from .video import *
-from .filtered_videos import *

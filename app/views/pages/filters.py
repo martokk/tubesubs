@@ -4,9 +4,9 @@ from sqlmodel import Session
 
 from app import crud, models
 from app.handlers import get_registered_subscription_handlers
+from app.services.fetch import fetch_filter
 from app.services.filter_videos import get_filtered_videos
 from app.views import deps, templates
-from app.services.fetch import fetch_filter
 
 # from app.services.fetch import fetch_filter
 

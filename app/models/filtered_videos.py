@@ -1,9 +1,10 @@
-from sqlmodel import SQLModel
 from typing import TYPE_CHECKING
 
+from sqlmodel import SQLModel
+
 if TYPE_CHECKING:
-    from app.models.video import Video
     from app.models.criteria import Criteria
+    from app.models.video import Video
 
 
 class FilteredVideos(SQLModel):

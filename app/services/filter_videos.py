@@ -6,9 +6,9 @@ from app.models.criteria import (
     CriteriaValue,
 )
 from app.models.filter import Filter, FilterOrderedBy, FilterReadStatus
+from app.models.filtered_videos import FilteredVideos
 from app.models.subscription import Subscription
 from app.models.video import Video
-from app.models.filtered_videos import FilteredVideos
 
 
 async def get_filtered_videos(filter_: "Filter", max_videos: int) -> FilteredVideos:
