@@ -93,11 +93,17 @@
                             <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
                                 {% for playlist in playlists %}
                                 <li>
-                                    <a class="dropdown-item p-3 text-white add-to-playlist-link" href="#" data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}" data-video-id="{{ video.id }}"" data-video-url="{{ video.url }}" data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
+                                    <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#" data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}" data-video-id="{{ video.id }}"" data-video-url="{{ video.url }}" data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
                                         Add to '{{ playlist.name }}' playlist.
                                     </a>
                                 </li>
                                 {% endfor %}
+                                <hr class="dropdown-divider">
+                                <li>
+                                    <a class="dropdown-item p-2 text-white hide-channel-link" href="#" data-channel-id="{{ video.channel.id }}">
+                                        Hide Channel.
+                                    </a>
+                                </li>
                             </ul>
 
                         </div>
@@ -195,7 +201,56 @@
     });
 </script>
 
+<!-- Hide Channel Event Listener -->
+<script>
+    $(document).ready(function () {
+        $(".hide-channel-link").click(function (event) {
+            event.preventDefault();
+            var channelId = $(this).data("channel-id");
+            var videoContainer = $(this).closest(".video-container");
+            var videoDetailsContainer = $(this).closest(".video-details-container");
 
+            // AJAX POST request to the API endpoint
+            data = {
+                "channel_id": channelId,
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/v1/channel/hide",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    // Handle success
+                    // alert("Video successfully added to '" + playlistName + "' playlist.");
+
+                    // Add the "dimmed" class to the video container
+                    videoDetailsContainer.addClass("dimmed");
+
+                    // Add the "Added to playlist" overlay
+                    var overlay = $("<div>", {
+                        class: "channel-hidden-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white",
+                        text: "Channel Hidden",
+                        style: "pointer-events: none; display: none;" // Initially hide the overlay
+                    });
+                    videoContainer.append(overlay);
+
+                    // Show the overlay when the video is added to the playlist
+                    overlay.fadeIn();
+
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    var errorMessage = "Failed to hide channel";
+                    errorMessage += "\nStatus Code: " + xhr.status;
+                    errorMessage += "\nStatus Text: " + xhr.statusText;
+                    errorMessage += "\nResponse Text: " + xhr.responseText;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
 
 
 {% endblock content %}

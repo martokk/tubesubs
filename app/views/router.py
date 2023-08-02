@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.views.pages import (
     account,
+    channels,
     filters,
     login,
     playlist,
@@ -19,6 +20,7 @@ views_router.include_router(subscriptions.router, tags=["Subscriptions"])
 views_router.include_router(filters.router, tags=["Filters"])
 views_router.include_router(playlist.router, tags=["Playlists"])
 views_router.include_router(playlist_item.router, tags=["Playlist Items"])
+views_router.include_router(channels.router, tags=["Channels"])
 views_router.include_router(login.router, tags=["Logins"])
 views_router.include_router(account.router, prefix="/account", tags=["Account"])
 views_router.include_router(user.router, prefix="/user", tags=["Users"])

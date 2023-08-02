@@ -4,6 +4,7 @@ from sqlmodel import Session
 
 from app import crud, models
 from app.handlers import get_registered_subscription_handlers, get_subscription_handler_from_string
+from app.services.filter_videos import get_filtered_videos
 from app.views import deps, templates
 
 # from app.services.fetch import fetch_filter
@@ -123,6 +124,7 @@ async def handle_create_filter(
     read_status: str = Form(...),
     ordered_by: str = Form(...),
     reverse_order: bool = Form(...),
+    show_hidden_channels: bool = Form(...),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -147,7 +149,11 @@ async def handle_create_filter(
     # Create Filter and Save in Database
     try:
         filter_create = models.FilterCreate(
-            name=name, ordered_by=ordered_by, read_status=read_status, reverse_order=reverse_order
+            name=name,
+            ordered_by=ordered_by,
+            read_status=read_status,
+            reverse_order=reverse_order,
+            show_hidden_channels=show_hidden_channels,
         )
     except ValueError as e:
         alerts.danger.append(e.args[0][0].exc.args[0])
@@ -243,7 +249,7 @@ async def view_filter(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
-    videos = db_filter.get_videos(max_videos=20)
+    videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
     playlists = await crud.playlist.get_all(db=db)
 
     return templates.TemplateResponse(
@@ -362,6 +368,7 @@ async def handle_edit_filter(
     read_status: str = Form(...),
     ordered_by: str = Form(...),
     reverse_order: bool = Form(False),
+    show_hidden_channels: bool = Form(False),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -383,7 +390,11 @@ async def handle_edit_filter(
     """
     alerts = models.Alerts()
     filter_update = models.FilterUpdate(
-        name=name, ordered_by=ordered_by, read_status=read_status, reverse_order=reverse_order
+        name=name,
+        ordered_by=ordered_by,
+        read_status=read_status,
+        reverse_order=reverse_order,
+        show_hidden_channels=show_hidden_channels,
     )
 
     try:

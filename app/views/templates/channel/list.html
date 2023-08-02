@@ -1,0 +1,109 @@
+{% extends "base/base.html" %}
+
+{% block title %} Channels ({{ channels |length }}){% endblock %}
+
+{% block content_header %}Channels ({{ channels |length }}){% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <!-- Visible Channels -->
+    <h4>Visible Channels</h4>
+
+    <table class="table table-hover table-sm">
+
+        <!-- Table Headers -->
+        <thead>
+            <tr>
+                <th scope="col" class="w-75">Channel</th>
+                <th scope="col" class="d-none d-md-table-cell w-25"></th>
+                <th scope="col" class="w-auto"></th>
+            </tr>
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+            {% for channel in visible_channels %}
+            <tr class="py-3">
+
+                <!-- Channel Logo & Channel Name -->
+                <td class="">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ channel.logo }}" alt="Logo" class="img-fluid rounded-circle px-3" style="max-height: 40px;" />
+                        <a href="/channel/{{ channel.id }}" class="text-decoration-none text-white">{{ channel.name }}</a>
+                    </div>
+                </td>
+
+                <td class="">
+                </td>
+
+                <!-- Dropdown Menu -->
+                <td class="">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-dark btn-transparent dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right p-1">
+                            <a class="dropdown-item p-2" href="/channel/{{ channel.id }}/hide">Hide Channel</a>
+                            <a class="dropdown-item p-2" href="/channel/{{ channel.id }}/edit">Edit</a>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <!-- Hidden Channels -->
+    <h4>Hidden Channels</h4>
+
+    <table class="table table-hover table-sm">
+
+        <!-- Table Headers -->
+        <thead>
+            <tr>
+                <th scope="col" class="w-75">Channel</th>
+                <th scope="col" class="d-none d-md-table-cell w-25"></th>
+                <th scope="col" class="w-auto"></th>
+            </tr>
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+            {% for channel in hidden_channels %}
+            <tr>
+
+                <!-- Channel Logo & Channel Name -->
+                <td class="">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ channel.logo }}" alt="Logo" class="img-fluid rounded-circle px-3" style="max-height: 40px;" />
+                        <a href="/channel/{{ channel.id }}" class="text-decoration-none text-white">{{ channel.name }}</a>
+                    </div>
+                </td>
+
+                <td class="">
+                </td>
+
+                <!-- Dropdown Menu -->
+                <td class="">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-sm btn-dark btn-transparent dropdown-toggle"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right p-1">
+                            <a class="dropdown-item p-2" href="/channel/{{ channel.id }}/unhide">Unhide Channel</a>
+                            <a class="dropdown-item p-2" href="/channel/{{ channel.id }}/edit">Edit</a>
+                        </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+
+</div>
+
+{% endblock %}

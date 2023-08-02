@@ -72,33 +72,36 @@
                     </select>
                 </div>
 
-                <!-- Ordered By -->
+                <!-- Show Hidden Channels -->
                 <div class="form-group my-2">
-                    <label for="ordered_by">Ordered By:</label>
-                    <select class="form-control mb-3" id="ordered_by" name="ordered_by">
-                        {% for option in options_ordered_by %}
-                        <option value="{{ option }}" {% if option==filter.ordered_by %}selected{% endif %}>{{ option }}</option>
-                        {% endfor %}
-                    </select>
+                    <div class="form-check">
+                        <label class="form-check-label mb-3" for="show_hidden_channels">Show Hidden Channels:</label>
+                        <input class="form-check-input mb-3" type="checkbox" id="show_hidden_channels" name="show_hidden_channels" {% if filter.show_hidden_channels == True %}checked{% endif %}>
+                    </div>
                 </div>
 
                 <!-- Ordered By -->
                 <div class="form-group my-2">
                     <label for="ordered_by">Ordered By:</label>
                     <div class="row">
-                        <div class="col-8"> <!-- Adjust the column size as needed -->
+
+                        <!-- Ordered By Dropdown-->
+                        <div class="col-8">
                             <select class="form-control mb-3" id="ordered_by" name="ordered_by">
                                 {% for option in options_ordered_by %}
                                 <option value="{{ option }}" {% if option==filter.ordered_by %}selected{% endif %}>{{ option }}</option>
                                 {% endfor %}
                             </select>
                         </div>
-                        <div class="col-4 order-md-last"> <!-- Adjust the column size as needed -->
+
+                        <!-- Reverse order-->
+                        <div class="col-4 order-md-last">
                             <div class="form-check">
                                 <input class="form-check-input mb-3" type="checkbox" id="reverse_order" name="reverse_order" {% if filter.reverse_order == True %}checked{% endif %}>
                                 <label class="form-check-label mb-3" for="reverse_order">Reverse</label>
                             </div>
                         </div>
+
                     </div>
                 </div>
 

@@ -35,6 +35,7 @@ class FilterBase(TimestampModel, SQLModel):
     read_status: str = Field(
         default=FilterReadStatus.ALL.value,
     )
+    show_hidden_channels: bool = Field(default=False)
 
 
 class Filter(FilterBase, table=True):
@@ -46,39 +47,6 @@ class Filter(FilterBase, table=True):
         back_populates="filters",
         link_model=SubscriptionFilterLink,
     )
-
-    def get_videos(self, max_videos: int) -> list[Video]:
-        def sort_order_by(
-            videos: list[Video],
-            order_by: str = FilterOrderedBy.CREATED_AT.value,
-            reverse: bool = False,
-        ) -> list[Video]:
-            return sorted(videos, key=lambda video: getattr(video, order_by), reverse=reverse)
-
-        # Get videos
-        videos = self._get_videos_from_subscriptions()
-
-        # Filter
-        if self.read_status == FilterReadStatus.READ.value:
-            videos = [video for video in videos if video.is_read is True]
-        if self.read_status == FilterReadStatus.UNREAD.value:
-            videos = [video for video in videos if video.is_read is False]
-
-        # Order By sort
-        videos = sort_order_by(
-            videos=videos, order_by=FilterOrderedBy.CREATED_AT.value, reverse=self.reverse_order
-        )
-
-        # Limit Videos
-        videos = videos[:max_videos]
-
-        return videos
-
-    def _get_videos_from_subscriptions(self) -> list[Video]:
-        videos = []
-        for subscription in self.subscriptions:
-            videos.extend(subscription.videos)
-        return videos
 
     @property
     def subscriptions_as_strings(self) -> list[str]:
