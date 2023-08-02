@@ -18,10 +18,8 @@
         <div class="col-auto small p-1 ms-auto">
             <a href="/subscription/{{ subscription.id }}/edit" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>Edit</a>
-            {% if current_user.is_superuser %}
             <a href="/subscription/{{ subscription.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            {% endif %}
             <a href="#" class="text-decoration-none text-muted me-3"
                 onclick="confirmDelete('/subscription/{{ subscription.id }}/delete', '{{ subscription.name }}')"><i
                     class="fas fa-trash me-2"></i>
