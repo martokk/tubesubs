@@ -35,7 +35,7 @@ class Channel(ChannelBase, table=True):
     def __repr__(self) -> str:
         return f"Channel(id={self.id}, name={self.name if self.name else ''}, remote_channel_id={self.remote_channel_id}, service_handler={self.service_handler})"
 
-    def __hash__(self) -> int:  # pyright: reportIncompatibleVariableOverride=false
+    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:

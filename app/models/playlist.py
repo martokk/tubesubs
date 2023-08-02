@@ -29,7 +29,7 @@ class Playlist(PlaylistBase, table=True):
     def __repr__(self) -> str:
         return f"Playlist(id={self.id}, name={self.name if self.name else ''}"
 
-    def __hash__(self) -> int:  # pyright: reportIncompatibleVariableOverride=false
+    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:
