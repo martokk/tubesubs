@@ -35,7 +35,7 @@
         Videos ({{ subscription.videos|length }})
         {# Videos ({{ source.videos_sorted()|length }}) #}
     </div>
-    {% for video in subscription.videos_sorted(sort_by="created_at", reverse=True) %}
+    {% for video in subscription.videos %}
     <div class="row px-0 py-3">
         <div class="col-12 position-relative">
             <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />

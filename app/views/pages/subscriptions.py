@@ -33,7 +33,7 @@ async def list_subscriptions(
     # Get alerts dict from cookies
     alerts = models.Alerts().from_cookies(request.cookies)
 
-    subscriptions = await crud.subscription.get_multi_by_user_id(db=db, user_id=current_user.id)
+    subscriptions = await crud.subscription.get_all(db=db)
     return templates.TemplateResponse(
         "subscription/list.html",
         {
