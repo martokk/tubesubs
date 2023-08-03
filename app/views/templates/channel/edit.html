@@ -80,12 +80,14 @@
                 </div>
 
                 <!-- is_hidden -->
-                <div class="row"></div>
+                <div class="form-group">
+                    <label for="is_hidden">Visibility:</label>
                     <div class="form-check">
-                        <label class="form-check-label mb-3" for="reverse_order">Is Hidden</label>
+                        <label class="form-check-label mb-3" for="is_hidden">Is Hidden</label>
                         <input class="form-check-input mb-3" type="checkbox" id="is_hidden" name="is_hidden" {% if channel.is_hidden==True
                             %}checked{% endif %}>
                     </div>
+
                 </div>
 
                 <!-- Tags -->

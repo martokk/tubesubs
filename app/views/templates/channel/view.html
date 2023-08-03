@@ -95,11 +95,16 @@
             </div>
 
             <!-- is_hidden -->
-            <div class="row"></div>
-                <div class="form-check">
-                    <label class="form-check-label mb-3" for="reverse_order">Is Hidden</label>
-                    <input class="form-check-input mb-3" type="checkbox" id="is_hidden" name="is_hidden" {% if
-                        channel.is_hidden==True %}checked{% endif %} disabled>
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Visablility
+                </div>
+                <div class="col-8">
+                    {% if channel.is_hidden==True %}
+                        Hidden
+                    {% else %}
+                        Visible
+                    {% endif %}
                 </div>
             </div>
 
