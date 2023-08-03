@@ -124,8 +124,8 @@ async def handle_create_filter(
     subscription_handlers: list[str] = Form(...),
     read_status: str = Form(...),
     ordered_by: str = Form(...),
-    reverse_order: bool = Form(...),
-    show_hidden_channels: bool = Form(...),
+    reverse_order: bool = Form(False),
+    show_hidden_channels: bool = Form(False),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -251,7 +251,10 @@ async def view_filter(
         return response
 
     filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
+
     playlists = await crud.playlist.get_all(db=db)
+    playlists.sort(key=lambda x: x.name)
+
     tags = await crud.tag.get_all(db=db)
     tags.sort(key=lambda x: x.name)
 

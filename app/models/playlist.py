@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class PlaylistBase(TimestampModel, SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
-    name: str | None = Field(default=None)
+    name: str = Field(default=None)
 
 
 class Playlist(PlaylistBase, table=True):
