@@ -103,6 +103,24 @@
                 </div>
             </div>
 
+            <!-- Tags -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Tags
+                </div>
+                <div class="col-8">
+                    {% if channel.tags %}
+                    <ul>
+                        {% for tag in channel.tags %}
+                        <li>{{ tag.name }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    No tags associated with this channel.
+                    {% endif %}
+                </div>
+            </div>
+
         </div>
     </div>
 </div>

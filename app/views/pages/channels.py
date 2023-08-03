@@ -196,11 +196,15 @@ async def edit_channel(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    options_tags = await crud.tag.get_all(db=db)
+    options_tags.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "channel/edit.html",
         {
             "request": request,
             "channel": db_channel,
+            "options_tags": options_tags,
             "current_user": current_user,
             "alerts": alerts,
         },
@@ -212,6 +216,7 @@ async def handle_edit_channel(
     request: Request,
     channel_id: str,
     is_hidden: bool = Form(False),
+    tags: list[str] = Form(...),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -223,6 +228,7 @@ async def handle_edit_channel(
     Args:
         request(Request): The request object
         channel_id(str): The channel id
+        tags(list[str]): List of selected tags
         is_hidden(bool):
         db(Session): The database session.
         current_user(User): The authenticated user.
@@ -235,6 +241,7 @@ async def handle_edit_channel(
         is_hidden=is_hidden,
     )
 
+    # Update Channel Details
     try:
         db_channel = await crud.channel.update(db=db, obj_in=channel_update, id=channel_id)
     except crud.RecordNotFoundError:
@@ -244,9 +251,10 @@ async def handle_edit_channel(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
-    db_channel = await crud.channel.update(db=db, id=db_channel.id, obj_in=channel_update)
+    # Update Channel Tags
+    db_channel = await crud.channel.update_tags(db=db, channel_id=channel_id, tag_ids=tags)
 
-    alerts.success.append("Channel updated")
+    alerts.success.append(f"Channel '{db_channel.name}' updated")
 
     response = RedirectResponse(
         f"/channel/{channel_id}/edit", status_code=status.HTTP_303_SEE_OTHER

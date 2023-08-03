@@ -88,6 +88,16 @@
                     </div>
                 </div>
 
+                <!-- Tags -->
+                <div class="form-group">
+                    <label for="tags">Tags:</label>
+                    <select class="form-control" id="tags" name="tags" multiple>
+                        {% for option in options_tags %}
+                        <option value="{{ option.id }}" {% if option in channel.tags %}selected{% endif %}>{{ option.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
                 <!--Submit -->
                 <div class="d-flex justify-content-end mt-3">
                     <button type="submit" class="btn btn-primary">Submit</button>

@@ -1,0 +1,41 @@
+{% extends "base/base.html" %}
+
+{% block title %}Create a New Tag{% endblock %}
+
+{% block content_header %}Create a New Tag{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+
+            <form method="POST">
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name">
+                </div>
+
+                <!-- Channels -->
+                <div class="form-group">
+                    <label for="tags">Channels:</label>
+                    <select class="form-control custom-select overflow-auto" id="channels" name="channels" multiple size="20">
+                        {% for option in options_channels %}
+                        <option value="{{ option.id }}" >{{ option.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

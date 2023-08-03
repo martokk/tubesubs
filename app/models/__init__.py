@@ -1,5 +1,6 @@
 from .alerts import *
 from .channel import *
+from .channel_tag_link import *
 from .criteria import *
 from .fetch import *
 from .filter import *
@@ -12,6 +13,7 @@ from .settings import *
 from .subscription import *
 from .subscription_filter_link import *
 from .subscription_video_link import *
+from .tag import *
 from .tokens import *
 from .user import *
 from .video import *

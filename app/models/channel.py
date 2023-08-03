@@ -8,10 +8,12 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.core.uuid import generate_uuid_from_string
 from app.handlers import get_service_handler_from_string
 from app.handlers.base import ServiceHandler
+from app.models.channel_tag_link import ChannelTagLink
 
 from .common import TimestampModel
 
 if TYPE_CHECKING:
+    from .tag import Tag  # pragma: no cover
     from .video import Video  # pragma: no cover
 
 
@@ -30,6 +32,11 @@ class Channel(ChannelBase, table=True):
         sa_relationship_kwargs={
             "cascade": "all, delete",
         },
+    )
+
+    tags: list["Tag"] = Relationship(
+        back_populates="channels",
+        link_model=ChannelTagLink,
     )
 
     def __repr__(self) -> str:
