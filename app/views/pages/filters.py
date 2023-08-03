@@ -252,6 +252,8 @@ async def view_filter(
 
     filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
     playlists = await crud.playlist.get_all(db=db)
+    tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
 
     return templates.TemplateResponse(
         "filter/view.html",
@@ -260,6 +262,7 @@ async def view_filter(
             "filter": db_filter,
             "filtered_videos": filtered_videos,
             "playlists": playlists,
+            "tags": tags,
             "current_user": current_user,
             "alerts": alerts,
         },
@@ -337,6 +340,10 @@ async def edit_filter(
         models.CriteriaValue.READ.value,
     ]
 
+    all_tags = await crud.tag.get_all(db=db)
+    options_tag_values = [tag.name for tag in all_tags]
+    options_tag_values.append("ANY")
+
     return templates.TemplateResponse(
         "filter/edit.html",
         {
@@ -356,6 +363,7 @@ async def edit_filter(
             "options_channel_operators": options_channel_operators,
             "options_priority_operators": options_priority_operators,
             "options_read_status_values": options_read_status_values,
+            "options_tag_values": options_tag_values,
         },
     )
 

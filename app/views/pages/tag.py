@@ -71,6 +71,7 @@ async def list_all_tags(
 @router.get("/tag/create", response_class=HTMLResponse)
 async def create_tag(
     request: Request,
+    db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
     ),
@@ -86,16 +87,25 @@ async def create_tag(
         Response: Form to create a new tag
     """
     alerts = models.Alerts().from_cookies(request.cookies)
+
+    options_channels = await crud.channel.get_all(db=db)
+    options_channels.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "tag/create.html",
-        {"request": request, "current_user": current_user, "alerts": alerts},
+        {
+            "request": request,
+            "options_channels": options_channels,
+            "current_user": current_user,
+            "alerts": alerts,
+        },
     )
 
 
 @router.post("/tag/create", response_class=HTMLResponse, status_code=status.HTTP_201_CREATED)
 async def handle_create_tag(
     name: str = Form(...),
-    channels: list[str] = Form(...),
+    channels: list[str] = Form(None),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -126,7 +136,10 @@ async def handle_create_tag(
         return response
 
     # Update Channel Tags
-    db_tag = await crud.tag.update_channels(db=db, tag_id=tag_id, channel_ids=channels)
+    if channels:
+        db_tag = await crud.channel.update_tag_of_channels(
+            db=db, tag_id=db_tag.id, channel_ids=channels
+        )
 
     alerts.success.append(f"Tag '{db_tag.name}' successfully created")
     response = RedirectResponse(url="/tags", status_code=status.HTTP_303_SEE_OTHER)

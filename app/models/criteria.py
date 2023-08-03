@@ -259,6 +259,19 @@ class CriteriaCreate(CriteriaBase):
             ]:
                 raise ValueError("Unit of measure must be 'keyword'")
 
+        elif field == CriteriaField.CHANNEL.value:
+            if values["operator"] not in [
+                CriteriaOperator.MUST_CONTAIN.value,
+                CriteriaOperator.MUST_NOT_CONTAIN.value,
+            ]:
+                raise ValueError(
+                    "Operator for 'channel' field must be 'must_contain' or 'must_not_contain'"
+                )
+            if values["unit_of_measure"] not in [
+                CriteriaUnitOfMeasure.TAG.value,
+            ]:
+                raise ValueError("Unit of measure must be 'tag'")
+
         else:
             raise ValueError("Field must be 'released', 'created', 'duration' or 'keyword'")
 

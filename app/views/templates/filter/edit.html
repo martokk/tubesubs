@@ -260,6 +260,7 @@
 
     const fieldValueOptions = {
         "read_status": {{ options_read_status_values | tojson }},
+        "channel": {{ options_tag_values |tojson }},
     };
 
     function updateOperatorAndUOM() {
@@ -282,7 +283,7 @@
         }
 
         // Update the ValueInput based on the selected field
-        if (field === 'read_status') {
+        if (field === 'read_status' || field === 'channel') {
             // Replace the ValueInput with the select dropdown
             $("#valueInput").replaceWith(`
                 <select class="form-control" id="valueInput" name="value">

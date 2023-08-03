@@ -11,9 +11,9 @@ from app.handlers.base import ServiceHandler
 from app.models.channel_tag_link import ChannelTagLink
 
 from .common import TimestampModel
+from .tag import Tag  # pragma: no cover
 
 if TYPE_CHECKING:
-    from .tag import Tag  # pragma: no cover
     from .video import Video  # pragma: no cover
 
 
@@ -34,7 +34,7 @@ class Channel(ChannelBase, table=True):
         },
     )
 
-    tags: list["Tag"] = Relationship(
+    tags: list[Tag] = Relationship(
         back_populates="channels",
         link_model=ChannelTagLink,
     )
