@@ -14,6 +14,7 @@ def get_templates() -> Jinja2Templates:
     Returns:
         Jinja2Templates: Jinja2Templates object.
     """
+
     # Create Jinja2Templates object
     templates = Jinja2Templates(directory=paths.TEMPLATES_PATH)
 

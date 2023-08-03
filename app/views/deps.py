@@ -155,6 +155,7 @@ async def get_current_active_user(
         raise RedirectException(url="/login")
     if not crud.user.is_active(current_user):
         raise RedirectException(url="/login")
+
     return current_user
 
 
