@@ -11,8 +11,7 @@
         <!-- Table Headers -->
         <thead>
             <tr>
-                <th scope="col" class="w-75">Tags</th>
-                <th scope="col" class="d-none d-md-table-cell w-25"></th>
+                <th scope="col" class="w-100">Tags</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
@@ -22,27 +21,42 @@
             {% for tag in tags %}
             <tr class="py-3">
 
-                <!-- Name -->
-                <td class="">
+                <!-- Tag -->
+                <td class="py-3">
                     <div class="d-flex align-items-center">
+
+                        <!-- Color Preview Square -->
+                        <div class="d-inline-block me-3" style="width: 20px; height: 20px; background-color: {{ tag.color }};"></div>
+
+                        <!-- Tag Name -->
                         <a href="/tag/{{ tag.id }}" class="text-decoration-none text-white">{{ tag.name }}</a>
+
                     </div>
                 </td>
 
-                <td class="">
-                </td>
 
                 <!-- Dropdown Menu -->
-                <td class="">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-dark btn-transparent dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right p-1">
-                            <a class="dropdown-item p-2" href="/tag/{{ tag.id }}/edit">Edit</a>
-                            <a class="dropdown-item p-2" href="#"
-                                onclick="confirmDelete('/tag/{{ tag.id }}/delete')">Delete</a>
-                        </div>
+                <td class=" py-3">
+                    <div class="dropdown">
+
+                        <!-- Vertical Ellipsis Icon -->
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="fas fa-ellipsis-v text-muted  px-3"></i>
+                        </a>
+
+                        <!-- Menu -->
+                        <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+
+                            <li><a class="dropdown-item p-2" href="/tag/{{ tag.id }}/edit">Edit</a></li>
+
+                            <hr class="dropdown-divider">
+
+                            <li><a class="dropdown-item p-2" href="#"
+                                    onclick="confirmDelete('/tag/{{ tag.id }}/delete')">Delete</a></li>
+
+                        </ul>
+                    </div>
                 </td>
 
             </tr>

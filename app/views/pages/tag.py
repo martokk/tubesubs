@@ -32,6 +32,8 @@ async def list_tags(
     alerts = models.Alerts().from_cookies(request.cookies)
 
     tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "tag/list.html",
         {"request": request, "tags": tags, "current_user": current_user, "alerts": alerts},
@@ -62,6 +64,8 @@ async def list_all_tags(
     alerts = models.Alerts().from_cookies(request.cookies)
 
     tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "tag/list.html",
         {"request": request, "tags": tags, "current_user": current_user, "alerts": alerts},
@@ -106,6 +110,7 @@ async def create_tag(
 async def handle_create_tag(
     name: str = Form(...),
     channels: list[str] = Form(None),
+    color: str = Form(None),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -124,9 +129,7 @@ async def handle_create_tag(
         Response: List of tags view
     """
     alerts = models.Alerts()
-    tag_create = models.TagCreate(
-        name=name,
-    )
+    tag_create = models.TagCreate(name=name, color=color)
     try:
         db_tag = await crud.tag.create(db=db, obj_in=tag_create)
     except crud.RecordAlreadyExistsError:
@@ -234,6 +237,7 @@ async def handle_edit_tag(
     request: Request,
     tag_id: str,
     name: str = Form(...),
+    color: str = Form(...),
     channels: list[str] = Form(...),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
@@ -255,7 +259,7 @@ async def handle_edit_tag(
         Response: View of the newly created tag
     """
     alerts = models.Alerts()
-    tag_update = models.TagUpdate(name=name)
+    tag_update = models.TagUpdate(name=name, color=color)
 
     # Update Tag Details
     try:

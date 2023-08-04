@@ -5,6 +5,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app.core.uuid import generate_uuid_from_string
 from app.models.channel_tag_link import ChannelTagLink
+from app.services.color_hex import get_color_from_string
 
 from .common import TimestampModel
 
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
 class TagBase(TimestampModel, SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
     name: str = Field(default=None)
+    color: str = Field(default=None)
 
 
 class Tag(TagBase, table=True):
@@ -41,10 +43,12 @@ class TagCreate(TagBase):
     def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:
         name = values["name"].lower()
         tag_id = generate_uuid_from_string(string=name)
+        color = values.get("color", get_color_from_string(string=name))
         return {
             **values,
             "id": tag_id,
             "name": name,
+            "color": color,
         }
 
 

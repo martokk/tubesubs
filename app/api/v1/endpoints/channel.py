@@ -47,7 +47,7 @@ async def handle_add_tag(
     tag_id: str = Body(..., embed=True),
 ) -> None:
     """
-    Handles 'hide channel' call
+    Handles 'add tag' call
 
     Args:
         channel_id (str): channel_id of the channel to hide.
@@ -78,6 +78,48 @@ async def handle_add_tag(
 
     try:
         await crud.channel.add_tag(db=db, channel_id=channel_id, tag_id=tag_id)
+    except crud.RecordNotFoundError:
+        raise HTTPException(detail="Channel does not exist", status_code=status.HTTP_404_NOT_FOUND)
+
+
+@router.post("/remove_tag", status_code=status.HTTP_201_CREATED)
+async def handle_remove_tag(
+    db: Session = Depends(deps.get_db),
+    channel_id: str = Body(..., embed=True),
+    tag_id: str = Body(..., embed=True),
+) -> None:
+    """
+    Handles 'remove tag' call
+
+    Args:
+        channel_id (str): channel_id of the channel to hide.
+        db (Session): Database session.
+
+    Returns:
+        HTTP 201 Created
+
+    Raises:
+        HTTPException: if object already exists.
+    """
+
+    # Check if tag already exists for channel
+    try:
+        db_channel = await crud.channel.get(db=db, id=channel_id)
+    except crud.RecordNotFoundError:
+        raise HTTPException(detail="Channel does not exist", status_code=status.HTTP_404_NOT_FOUND)
+
+    try:
+        db_tag = await crud.tag.get(db=db, id=tag_id)
+    except crud.RecordNotFoundError:
+        raise HTTPException(detail="Tag does not exist", status_code=status.HTTP_404_NOT_FOUND)
+
+    if db_tag not in db_channel.tags:
+        raise HTTPException(
+            detail="Tag does not exist for channel", status_code=status.HTTP_409_CONFLICT
+        )
+
+    try:
+        await crud.channel.delete_tag(db=db, channel_id=channel_id, tag_id=tag_id)
     except crud.RecordNotFoundError:
         raise HTTPException(detail="Channel does not exist", status_code=status.HTTP_404_NOT_FOUND)
 
