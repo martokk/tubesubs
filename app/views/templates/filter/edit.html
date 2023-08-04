@@ -18,10 +18,8 @@
         <div class="col-auto small p-1 ms-auto">
             <a href="/filter/{{ filter.id }}" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>View</a>
-            {% if current_user.is_superuser %}
             <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            {% endif %}
             <a href="#" class="text-decoration-none text-muted me-3"
                 onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
                     class="fas fa-trash me-2"></i>
@@ -262,6 +260,7 @@
 
     const fieldValueOptions = {
         "read_status": {{ options_read_status_values | tojson }},
+        "channel": {{ options_tag_values |tojson }},
     };
 
     function updateOperatorAndUOM() {
@@ -284,7 +283,7 @@
         }
 
         // Update the ValueInput based on the selected field
-        if (field === 'read_status') {
+        if (field === 'read_status' || field === 'channel') {
             // Replace the ValueInput with the select dropdown
             $("#valueInput").replaceWith(`
                 <select class="form-control" id="valueInput" name="value">

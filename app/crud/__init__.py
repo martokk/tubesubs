@@ -5,5 +5,6 @@ from .filter import *
 from .playlist import *
 from .playlist_item import *
 from .subscription import *
+from .tag import *
 from .user import *
 from .video import *

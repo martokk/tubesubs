@@ -8,8 +8,10 @@ from sqlmodel import Field, Relationship, SQLModel
 from app.core.uuid import generate_uuid_from_string
 from app.handlers import get_service_handler_from_string
 from app.handlers.base import ServiceHandler
+from app.models.channel_tag_link import ChannelTagLink
 
 from .common import TimestampModel
+from .tag import Tag  # pragma: no cover
 
 if TYPE_CHECKING:
     from .video import Video  # pragma: no cover
@@ -32,10 +34,15 @@ class Channel(ChannelBase, table=True):
         },
     )
 
+    tags: list[Tag] = Relationship(
+        back_populates="channels",
+        link_model=ChannelTagLink,
+    )
+
     def __repr__(self) -> str:
         return f"Channel(id={self.id}, name={self.name if self.name else ''}, remote_channel_id={self.remote_channel_id}, service_handler={self.service_handler})"
 
-    def __hash__(self) -> int:  # pyright: reportIncompatibleVariableOverride=false
+    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:

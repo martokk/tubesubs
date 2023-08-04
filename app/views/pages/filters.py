@@ -3,7 +3,8 @@ from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlmodel import Session
 
 from app import crud, models
-from app.handlers import get_registered_subscription_handlers, get_subscription_handler_from_string
+from app.handlers import get_registered_subscription_handlers
+from app.services.fetch import fetch_filter
 from app.services.filter_videos import get_filtered_videos
 from app.views import deps, templates
 
@@ -123,8 +124,8 @@ async def handle_create_filter(
     subscription_handlers: list[str] = Form(...),
     read_status: str = Form(...),
     ordered_by: str = Form(...),
-    reverse_order: bool = Form(...),
-    show_hidden_channels: bool = Form(...),
+    reverse_order: bool = Form(False),
+    show_hidden_channels: bool = Form(False),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -240,7 +241,7 @@ async def view_filter(
     Returns:
         Response: View of the filter
     """
-    alerts = models.Alerts()
+    alerts = models.Alerts().from_cookies(request.cookies)
     try:
         db_filter = await crud.filter.get(db=db, id=filter_id)
     except crud.RecordNotFoundError:
@@ -249,16 +250,22 @@ async def view_filter(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
-    videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
+    filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
+
     playlists = await crud.playlist.get_all(db=db)
+    playlists.sort(key=lambda x: x.name)
+
+    tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
 
     return templates.TemplateResponse(
         "filter/view.html",
         {
             "request": request,
             "filter": db_filter,
-            "videos": videos,
+            "filtered_videos": filtered_videos,
             "playlists": playlists,
+            "tags": tags,
             "current_user": current_user,
             "alerts": alerts,
         },
@@ -336,6 +343,10 @@ async def edit_filter(
         models.CriteriaValue.READ.value,
     ]
 
+    all_tags = await crud.tag.get_all(db=db)
+    options_tag_values = [tag.name for tag in all_tags]
+    options_tag_values.append("ANY")
+
     return templates.TemplateResponse(
         "filter/edit.html",
         {
@@ -355,6 +366,7 @@ async def edit_filter(
             "options_channel_operators": options_channel_operators,
             "options_priority_operators": options_priority_operators,
             "options_read_status_values": options_read_status_values,
+            "options_tag_values": options_tag_values,
         },
     )
 
@@ -465,33 +477,43 @@ async def delete_filter(
 #         deps.get_current_active_user
 #     ),
 # ) -> Response:
-#     """
-#     Fetch Filter Videos
 
-#     Args:
-#         filter_id(str): The filter id
-#         db(Session): The database session.
-#         current_user(User): The authenticated user.
 
-#     Returns:
-#         Fetches videos and redirects back to /filters.
-#     """
-#     alerts = models.Alerts()
-#     try:
-#         filter = await crud.filter.get(db=db, id=filter_id)
-#     except crud.RecordNotFoundError:
-#         alerts.danger.append("Filter not found")
-#         response = RedirectResponse("/filters", status_code=status.HTTP_302_FOUND)
-#         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
-#         return response
+@router.get("/filter/{filter_id}/fetch", response_class=HTMLResponse)
+async def fetch_filter_page(
+    background_tasks: BackgroundTasks,
+    filter_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Fetch filter Videos
 
-#     background_tasks.add_task(
-#         fetch_filter,
-#         id=filter.id,
-#         db=db,
-#     )
-#     alerts.success.append(f"Filter '{filter.title}' was fetched.")
+    Args:
+        filter_id(str): The filter id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
 
-#     response = RedirectResponse(url=f"/filter/{filter.id}", status_code=status.HTTP_303_SEE_OTHER)
-#     response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
-#     return response
+    Returns:
+        Fetches videos and redirects back to /filter/filter_id.
+    """
+    alerts = models.Alerts()
+    try:
+        db_filter = await crud.filter.get(db=db, id=filter_id)
+    except crud.RecordNotFoundError:
+        alerts.danger.append("Filter not found")
+        response = RedirectResponse("/filters", status_code=status.HTTP_302_FOUND)
+        response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
+        return response
+
+    fetch_results = await fetch_filter(db=db, id=filter_id)
+
+    alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
+
+    response = RedirectResponse(
+        url=f"/filter/{db_filter.id}", status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+    return response

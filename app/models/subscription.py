@@ -48,7 +48,7 @@ class Subscription(SubscriptionBase, table=True):
     def __repr__(self) -> str:
         return f"Subscription(id={self.id}, service_handler={self.service_handler}, subscription_handler={self.subscription_handler})"
 
-    def __hash__(self) -> int:  # pyright: reportIncompatibleVariableOverride=false
+    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:

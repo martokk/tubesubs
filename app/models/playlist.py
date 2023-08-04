@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class PlaylistBase(TimestampModel, SQLModel):
     id: str = Field(default=None, primary_key=True, nullable=False)
-    name: str | None = Field(default=None)
+    name: str = Field(default=None)
 
 
 class Playlist(PlaylistBase, table=True):
@@ -29,7 +29,7 @@ class Playlist(PlaylistBase, table=True):
     def __repr__(self) -> str:
         return f"Playlist(id={self.id}, name={self.name if self.name else ''}"
 
-    def __hash__(self) -> int:  # pyright: reportIncompatibleVariableOverride=false
+    def __hash__(self) -> int:  # pyright: ignore[reportIncompatibleVariableOverride]
         return hash(self.id)
 
     def __eq__(self, other: Any) -> bool:

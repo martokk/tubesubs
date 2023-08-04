@@ -7,24 +7,17 @@
 <!-- Header -->
 <div>
     <div class="row align-items-center">
-        <h4 class="col-auto py-1">
+        <h5 class="col-auto py-1">
             <a href="/filter/{{ filter.id }}" class="text-decoration-none text-white">
                 {{ filter.name }}
-                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
                 </span>
             </a>
-        </h4>
+        </h5>
         <div class="col-auto small p-1 ms-auto">
             <a href="/filter/{{ filter.id }}/edit" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>Edit</a>
-            {% if current_user.is_superuser %}
             <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            {% endif %}
-            <a href="#" class="text-decoration-none text-muted me-3"
-                onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
-                    class="fas fa-trash me-2"></i>
-                Delete</a>
         </div>
     </div>
 </div>
@@ -33,89 +26,196 @@
 <!-- List Videos -->
 <div class="container py-3 px-0">
     <div class="small fw-bold w-auto d-flex justify-content-start">
-        Videos ({{ videos|length }})
+        Videos ({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})
         {# Videos ({{ source.videos_sorted()|length }}) #}
     </div>
-    {% for video in videos %}
+
+
 
     <!-- Video Container -->
-    <div class="row px-0 py-3 video-container" style="position: relative;">
+    <div class="row">
+        {% for video in filtered_videos.videos %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-0 py-4 video-container" data-channel-id="{{ video.channel.id }}"
+            style="position: relative;">
 
-        <div class="video-details-container">
+            <div class="video-details-container px-md-2 " data-channel-id="{{ video.channel.id }}">
 
-            <!-- Thumbnail & Duration Overlay -->
-            <div class="col-12 position-relative">
-                <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
-                <div
-                    class="small opacity-85 bg-dark text-white fw-bold position-absolute bottom-0 end-0 mx-3 my-1 p-1 rounded">
-                    {% set hours = (video.duration // 3600) %}
-                    {% set minutes = (video.duration // 60) % 60 %}
-                    {% set seconds = video.duration % 60 %}
-                    {% if hours > 0 %}
-                    {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
-                    {% else %}
-                    {{ '%2d:%02d'|format(minutes, seconds) }}
-                    {% endif %}
-                </div>
-            </div>
+                <!-- Thumbnail Container -->
+                <div class="col-12 position-relative">
+
+                    <!-- Thumbnail -->
+                    <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
 
 
-            <div class="col-12 pt-2">
-                <div class="row align-items-top">
+                    <!-- Overlay Div -->
+                    <div class="overlay-div position-absolute bottom-0 start-0 w-100 py-2 small" data-bs-target="#tagModal" data-bs-toggle="modal"
+                        style="background-color: rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; justify-content: flex-end; position: relative; min-height: 45px;">
 
-                    <!-- Channel Logo -->
-                    <div class="col-auto px-1 ms-3 pt-1">
-                        <img src="{{ video.channel.logo }}" alt="Logo" class="img-fluid rounded-circle"
-                            style="max-height: 40px;" />
-                    </div>
+                        <!-- Tags Container -->
+                        <div class="text-white px-2 w-100 tags-container" data-channel-id="{{ video.channel.id }}">
 
-                    <!-- Video Title & Created At -->
-                    <div class="col ps-1 pe-0">
-                        <h5 class="mb-0 text-smaller">
-                            <a href="/filter/{{ filter.id }}/video/{{ video.id }}"
-                                class="text-decoration-none text-white">{{
-                                video.title }}</a>
-                        </h5>
-                        <small class="text-muted font-weight-bold">{{ video.channel.name }} - {{ video.created_at
-                            }}</small>
-                    </div>
-
-                    <!-- Dropdown Menu -->
-                    <div class="col-auto ps-0">
-                        <div class="dropdown">
-
-                            <!-- Vertical Ellipsis Icon -->
-                            <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false" >
-                                <i class="fas fa-ellipsis-v text-muted py-3 px-3"></i>
-                            </a>
-
-                            <!-- Menu -->
-                            <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
-                                {% for playlist in playlists %}
-                                <li>
-                                    <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#" data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}" data-video-id="{{ video.id }}"" data-video-url="{{ video.url }}" data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
-                                        Add to '{{ playlist.name }}' playlist.
+                            <!-- Tags Modal Plus Button -->
+                            <div class="d-inline-block">
+                                <div class=" text-white px-2 py-1 me-1 fw-bold rounded bg-dark" >
+                                    <a href="#" role="button" data-bs-target="#tagModal" data-bs-toggle="modal">
+                                        <i class="fas fa-plus text-muted"></i>
                                     </a>
-                                </li>
-                                {% endfor %}
-                                <hr class="dropdown-divider">
-                                <li>
-                                    <a class="dropdown-item p-2 text-white hide-channel-link" href="#" data-channel-id="{{ video.channel.id }}">
-                                        Hide Channel.
-                                    </a>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
 
+                            <!-- Tags -->
+                            {% for tag in video.channel.tags %}
+                            <div class="tag-container d-inline-block" data-tag-id="{{ tag.id }}" data-channel-id="{{ video.channel.id }}">
+                                <a href="#" class="tag text-decoration-none" role="button" data-bs-target="#tagModal" data-bs-toggle="modal">
+                                    <div class="small text-white px-2 py-1 me-1 fw-bold rounded " style="background-color: {{ tag.color }};">
+                                        {{ tag.name }}
+                                    </div>
+                                </a>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+
+                        <!-- Duration -->
+                        <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded bg-dark position-absolute bottom-0 end-0">
+                            {% set hours = (video.duration // 3600) %}
+                            {% set minutes = (video.duration // 60) % 60 %}
+                            {% set seconds = video.duration % 60 %}
+                            {% if hours > 0 %}
+                            {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
+                            {% else %}
+                            {{ '%2d:%02d'|format(minutes, seconds) }}
+                            {% endif %}
                         </div>
                     </div>
 
                 </div>
+
+                <div class="col-12 pt-2">
+                    <div class="row align-items-top">
+
+                        <!-- Channel Logo -->
+                        <div class="col-auto px-1 ms-3 pt-1" data-bs-target="#channelModal" data-bs-toggle="modal">
+                            <img src="{{ video.channel.logo }}" alt="Logo" class="img-fluid rounded-circle"
+                                style="max-height: 40px;" />
+                        </div>
+
+                        <!-- Video Title & Created At -->
+                        <div class="col ps-1 pe-0">
+                            <h5 class="mb-0 video-container-title">
+                                {{ video.title }}
+                            </h5>
+                            <div  data-bs-target="#channelModal" data-bs-toggle="modal">
+                            <small class="text-muted font-weight-bold small" >{{ video.channel.name }} - {{ video.created_at | humanize
+                                }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Modal Ellipsis Button -->
+                        <div class="col-auto ps-0" data-bs-target="#videoModal" data-bs-toggle="modal" >
+                            <a href="#" role="button" data-bs-target="#videoModal" data-bs-toggle="modal" >
+                                <i class="fas fa-ellipsis-v text-muted py-3 px-4"></i>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
 
-        </div>
+            <!-- Tags Modal -->
+            <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
 
+                        <!-- Modal Hedaer -->
+                        <div class="modal-header">
+                            <h5 class="modal-title small" id="tagModalLabel">Tags</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+
+                            <!-- Add/Remove Tags -->
+                            {% for tag in tags %}
+                            {% set tag_in_channel_tags = tag in video.channel.tags %}
+                            {% set action_text = 'Remove' if tag in video.channel.tags else 'Add' %}
+                            {% set action_link_class = 'remove-tag-link' if tag in video.channel.tags else 'add-tag-link' %}
+                            {% set action_text_color = 'text-danger' if tag in video.channel.tags else 'text-white' %}
+
+                            <a class="tag-modal-link dropdown-item p-2 {{ action_text_color }} {{ action_link_class }}" href="#"
+                                data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}" data-tag-color="{{ tag.color }}"
+                                data-channel-id="{{ video.channel.id }}" data-channel-name="{{ video.channel.name }}"
+                                data-action="{{ action_text }}">
+                                <span class="opacity-50">{{ action_text }} '</span><strong>{{ tag.name }}</strong><span class="opacity-50">' tag.</span>
+                            </a>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Channel Modal -->
+            <div class="modal fade" id="channelModal" tabindex="-1" aria-labelledby="channelModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Hedaer -->
+                        <div class="modal-header">
+                            <h5 class="modal-title small" id="channelModalLabel">Channel Options</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+
+                            <!-- Hide Channel -->
+                            <a class="dropdown-item p-2 text-white hide-channel-link" href="#"
+                                data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filter.id }}" data-action="Hide" data-action-scope="Global">
+                                Hide Channel (Global).
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Video Modal -->
+            <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+
+                        <!-- Modal Hedaer -->
+                        <div class="modal-header">
+                            <h5 class="modal-title small" id="videoModalLabel">Video Options</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <!-- Modal Body -->
+                        <div class="modal-body">
+
+                            <!-- Add to Playlists -->
+                            {% for playlist in playlists %}
+                            <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#"
+                                data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
+                                data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
+                                data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
+                                Add to '{{ playlist.name }}' playlist.
+                            </a>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </div>
 
 
@@ -125,7 +225,7 @@
     <div class="d-flex flex-column">
 
         <!-- Hidden input fields for video IDs -->
-        {% for video in videos %}
+        {% for video in filtered_videos.videos %}
         <input type="hidden" name="video_ids" value="{{ video.id }}">
         {% endfor %}
 
@@ -137,7 +237,23 @@
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Modal Show/Hide -->
+<script>
+    $(document).ready(function () {
+        // Hide the modal when the user clicks outside of it
+        $('.modal').on('click', function (event) {
+            if ($(event.target).hasClass('modal')) {
+                $('.modal').modal('hide');
+            }
+        });
 
+        // Show the modal when the button is clicked
+        $('[data-bs-toggle="modal"]').on('click', function () {
+            var target = $(this).data('bs-target');
+            $(target).modal('show');
+        });
+    });
+</script>
 
 
 
@@ -204,43 +320,236 @@
 <!-- Hide Channel Event Listener -->
 <script>
     $(document).ready(function () {
-        $(".hide-channel-link").click(function (event) {
+        $(".hide-channel-link, .unhide-channel-link").click(function (event) {
             event.preventDefault();
             var channelId = $(this).data("channel-id");
+            var filterId = $(this).data("filter-id");
+            var action = $(this).data("action");
+            var actionScope = $(this).data("action-scope");
             var videoContainer = $(this).closest(".video-container");
             var videoDetailsContainer = $(this).closest(".video-details-container");
+
+            // Determine the API endpoint based on the action
+            var apiEndpoint;
+            if (action === "Hide") {
+                apiEndpoint = "/api/v1/channel/hide";
+            } else {
+                apiEndpoint = "/api/v1/channel/unhide";
+            }
 
             // AJAX POST request to the API endpoint
             data = {
                 "channel_id": channelId,
+                "filter_id": filterId,
+                "scope": actionScope,
             }
             $.ajax({
                 type: "POST",
-                url: "/api/v1/channel/hide",
+                url: apiEndpoint,
                 contentType: "application/json",
                 data: JSON.stringify(data),
                 success: function (response) {
-                    // Handle success
-                    // alert("Video successfully added to '" + playlistName + "' playlist.");
+                    // close modal
+                    $('.modal').modal('hide');
 
-                    // Add the "dimmed" class to the video container
-                    videoDetailsContainer.addClass("dimmed");
+                    // Update the html
+                    if (action === "Hide") {
+                        // Add the "dimmed" class all videos from channel
+                        $('.video-details-container').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
 
-                    // Add the "Added to playlist" overlay
-                    var overlay = $("<div>", {
-                        class: "channel-hidden-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white",
-                        text: "Channel Hidden",
-                        style: "pointer-events: none; display: none;" // Initially hide the overlay
-                    });
-                    videoContainer.append(overlay);
+                            if (containerChannelId === channelId) {
+                                container.addClass("dimmed");
+                            }
+                        });
 
-                    // Show the overlay when the video is added to the playlist
-                    overlay.fadeIn();
+
+                        // Add the "Added to playlist" overlay
+                        // Add the "dimmed" class all videos from channel
+                        $('.video-container').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
+
+                            if (containerChannelId === channelId) {
+                                var overlay = $("<div>", {
+                                    class: "channel-hidden-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-white",
+                                    text: "Channel Hidden",
+                                    style: "pointer-events: none; display: none;", // Initially hide the overlay
+                                    "data-channel-id": channelId
+                                });
+                                container.append(overlay);
+
+                                // Show the overlay when the video is added to the playlist
+                                overlay.fadeIn();
+                            }
+                        });
+
+                        // Change "hide channel" to "unhide channel" in Channel Modal
+                        $('.hide-channel-link').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
+
+                            if (containerChannelId === channelId ) {
+                                container.removeClass('hide-channel-link').addClass('unhide-channel-link').data('action', 'Unhide').html("Unhide Channel (" + actionScope + ").");
+                            }
+                        });
+
+
+                    } else {
+
+                        // Add the "dimmed" class all videos from channel
+                        $('.video-details-container').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
+
+                            if (containerChannelId === channelId) {
+                                container.removeClass("dimmed");
+                            }
+                        });
+
+
+                        // Add the "Added to playlist" overlay
+                        // Add the "dimmed" class all videos from channel
+                        $('.channel-hidden-overlay').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
+
+                            if (containerChannelId === channelId) {
+                                container.remove()
+                            }
+                        });
+
+                        // Change "hide channel" to "unhide channel" in Channel Modal
+                        $('.unhide-channel-link').each(function () {
+                            var container = $(this);
+                            var containerChannelId = container.data("channel-id");
+
+                            if (containerChannelId === channelId) {
+                                container.removeClass('unhide-channel-link').addClass('hide-channel-link').data('action', 'Hide').html("Hide Channel (" + actionScope + ").");
+                            }
+                        });
+
+                    }
+
 
                 },
                 error: function (xhr, status, error) {
                     // Handle error
-                    var errorMessage = "Failed to hide channel";
+                    var errorMessage = "Failed to " + action.toLowerCase() + " channel";
+                    errorMessage += "\nStatus Code: " + xhr.status;
+                    errorMessage += "\nStatus Text: " + xhr.statusText;
+                    errorMessage += "\nResponse Text: " + xhr.responseText;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
+
+<!-- Add/Remove Channel Tag -->
+<script>
+    $(document).ready(function () {
+        $(".add-tag-link, .remove-tag-link").click(function (event) {
+            event.preventDefault();
+            var channelId = $(this).data("channel-id");
+            var channelName = $(this).data("channel-name");
+            var tagId = $(this).data("tag-id");
+            var tagName = $(this).data("tag-name");
+            var tagColor = $(this).data("tag-color");
+            var action = $(this).data("action");
+            var videoContainer = $(this).closest(".video-container");
+            var videoDetailsContainer = $(this).closest(".video-details-container");
+
+            // AJAX POST request to the API endpoint
+            var apiEndpoint = $(this).hasClass("remove-tag-link")
+                ? "/api/v1/channel/remove_tag"
+                : "/api/v1/channel/add_tag";
+
+            var data = {
+                "channel_id": channelId,
+                "tag_id": tagId,
+            };
+
+            $.ajax({
+                type: "POST",
+                url: apiEndpoint,
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    // close modal
+                    $('.modal').modal('hide');
+
+                    // Update the html
+                    if (action === "Remove") {
+
+                        // Remove Tag from all videos in channel
+                        $('.tag-container').each(function () {
+                            var tagContainer = $(this);
+                            var tagContainerTagId = tagContainer.data("tag-id");
+                            var tagContainerChannelId = tagContainer.data("channel-id");
+
+                            if (tagContainerChannelId === channelId && tagContainerTagId === tagId) {
+                                tagContainer.remove();
+                            }
+                        });
+
+                        // Change "remove tag" to "add tag" in Tags Modal
+                        $('.tag-modal-link').each(function () {
+                            var tagModalLink = $(this);
+                            var tagModalLinkTagId = tagModalLink.data("tag-id");
+                            var tagModalLinkChannelId = tagModalLink.data("channel-id");
+
+                            if (tagModalLinkChannelId === channelId && tagModalLinkTagId === tagId) {
+                                tagModalLink.removeClass('remove-tag-link').removeClass('text-danger').addClass('add-tag-link').addClass('text-white').data('action', 'Add').html("<span class=\"opacity-50\">Add '</span><strong>" + tagName + "</strong><span class=\"opacity-50\">' tag.</span>");
+                            }
+                        });
+
+
+
+                    } else {
+
+                        // Add Tag to all videos in channel
+                        $('.tags-container').each(function () {
+                            var tagsContainer = $(this);
+                            var tagsContainerChannelId = tagsContainer.data("channel-id");
+
+                            if (tagsContainerChannelId === channelId) {
+                                tagsContainer.append(`
+                                    <div class="tag-container d-inline-block" data-tag-id="${tagId}" data-channel-id="${tagsContainerChannelId}">
+                                        <a href="#" class="tag text-decoration-none" role="button" data-bs-target="#tagModal" data-bs-toggle="modal">
+                                            <div class="small text-white px-2 py-1 me-1 fw-bold rounded" style="background-color: ${tagColor};">
+                                                ${tagName}
+                                            </div>
+                                        </a>
+                                    </div>
+                                `);
+                            };
+                        });
+
+
+                        // Change "remove tag" to "add tag" in Tags Modal
+                        $('.tag-modal-link').each(function () {
+                            var tagModalLink = $(this);
+                            var tagModalLinkTagId = tagModalLink.data("tag-id");
+                            var tagModalLinkChannelId = tagModalLink.data("channel-id");
+
+                            if (tagModalLinkChannelId === channelId && tagModalLinkTagId === tagId) {
+                                tagModalLink.removeClass('add-tag-link').removeClass('text-white').addClass('remove-tag-link').addClass('text-danger').data('action', 'Remove').html("<span class=\"opacity-50\">Remove '</span><strong>" + tagName + "</strong><span class=\"opacity-50\">' tag.</span>");
+                            }
+                        });
+
+
+
+                    }
+
+                    // Send Alert
+                    alert("'" + tagName + "' tag " + action.toLowerCase() + "ed from '" + channelName + "'.");
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    var errorMessage = "Failed to " + action.toLowerCase() + " tag";
                     errorMessage += "\nStatus Code: " + xhr.status;
                     errorMessage += "\nStatus Text: " + xhr.statusText;
                     errorMessage += "\nResponse Text: " + xhr.responseText;

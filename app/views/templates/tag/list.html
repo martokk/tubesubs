@@ -1,0 +1,76 @@
+{% extends "base/base.html" %}
+
+{% block title %} Tag ({{ tags|length }}){% endblock %}
+
+{% block content_header %}Tags ({{ tags|length }}){% endblock %}
+
+{% block content %}
+<div class="container">
+    <table class="table table-hover table-sm">
+
+        <!-- Table Headers -->
+        <thead>
+            <tr>
+                <th scope="col" class="w-100">Tags</th>
+                <th scope="col" class="w-auto"></th>
+            </tr>
+        </thead>
+
+        <!-- Table Body -->
+        <tbody>
+            {% for tag in tags %}
+            <tr class="py-3">
+
+                <!-- Tag -->
+                <td class="py-3">
+                    <div class="d-flex align-items-center">
+
+                        <!-- Color Preview Square -->
+                        <div class="d-inline-block me-3" style="width: 20px; height: 20px; background-color: {{ tag.color }};"></div>
+
+                        <!-- Tag Name -->
+                        <a href="/tag/{{ tag.id }}" class="text-decoration-none text-white">{{ tag.name }}</a>
+
+                    </div>
+                </td>
+
+
+                <!-- Dropdown Menu -->
+                <td class=" py-3">
+                    <div class="dropdown">
+
+                        <!-- Vertical Ellipsis Icon -->
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="fas fa-ellipsis-v text-muted  px-3"></i>
+                        </a>
+
+                        <!-- Menu -->
+                        <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+
+                            <li><a class="dropdown-item p-2" href="/tag/{{ tag.id }}/edit">Edit</a></li>
+
+                            <hr class="dropdown-divider">
+
+                            <li><a class="dropdown-item p-2" href="#"
+                                    onclick="confirmDelete('/tag/{{ tag.id }}/delete')">Delete</a></li>
+
+                        </ul>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+</div>
+<script>
+    function confirmDelete(url) {
+        if (confirm("Are you sure you want to delete this video?")) {
+            window.location.href = url;
+        }
+    }
+</script>
+{% endblock %}

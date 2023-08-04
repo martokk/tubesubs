@@ -1,0 +1,114 @@
+{% extends "base/base.html" %}
+
+{% block title %}Edit Channel{% endblock %}
+
+
+{% block content %}
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+
+        <!-- Header -->
+
+        <div class="d-flex align-items-center">
+            <img src="{{ channel.logo }}" alt="Logo" class="img-fluid rounded-circle px-3" style="max-height: 40px;" />
+
+            <h4 class="col-auto py-1">
+                <a href="/channel/{{ channel.id }}" class="text-decoration-none text-white">
+                    {{ channel.name }}
+                    <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                    </span>
+                </a>
+            </h4>
+
+        </div>
+
+
+
+        <!-- Header Menu -->
+        <div class="col-auto small p-1 ms-auto">
+
+            <!-- Edit -->
+            <a href="/channel/{{ channel.id }}" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>View</a>
+
+        </div>
+
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            Channel Details
+        </div>
+        <div class="card-body p-4">
+            <form method="POST">
+
+                <!-- Channel ID -->
+                <div class="form-group">
+                    <label for="id">Id:</label>
+                    <input type="text" class="form-control mb-3" id="id" name="id" value="{{ channel.id }}" disabled>
+                </div>
+
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control mb-3" id="name" name="name"
+                        value="{{ channel.name }}" disabled>
+                </div>
+
+                <!-- Service Handler -->
+                <div class="form-group">
+                    <label for="service_handler">Service Handler:</label>
+                    <input type="text" class="form-control mb-3" id="service_handler" name="service_handler"
+                        value="{{ channel.service_handler }}" disabled>
+                </div>
+
+                <!-- remote_channel_id -->
+                <div class="form-group">
+                    <label for="remote_channel_id">Remote Channel ID:</label>
+                    <input type="text" class="form-control mb-3" id="remote_channel_id" name="remote_channel_id"
+                        value="{{ channel.remote_channel_id }}" disabled>
+                </div>
+
+                <!-- Logo -->
+                <div class="form-group">
+                    <label for="logo">Logo:</label>
+                    <input type="text" class="form-control mb-3" id="logo" name="logo"
+                        value="{{ channel.logo }}" disabled>
+                </div>
+
+                <!-- is_hidden -->
+                <div class="form-group">
+                    <label for="is_hidden">Visibility:</label>
+                    <div class="form-check">
+                        <label class="form-check-label mb-3" for="is_hidden">Is Hidden</label>
+                        <input class="form-check-input mb-3" type="checkbox" id="is_hidden" name="is_hidden" {% if channel.is_hidden==True
+                            %}checked{% endif %}>
+                    </div>
+
+                </div>
+
+                <!-- Tags -->
+                <div class="form-group">
+                    <label for="tags">Tags:</label>
+                    <select class="form-control" id="tags" name="tags" multiple>
+                        {% for option in options_tags %}
+                        <option value="{{ option.id }}" {% if option in channel.tags %}selected{% endif %}>{{ option.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!--Submit -->
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

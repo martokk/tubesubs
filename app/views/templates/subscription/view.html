@@ -18,10 +18,8 @@
         <div class="col-auto small p-1 ms-auto">
             <a href="/subscription/{{ subscription.id }}/edit" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>Edit</a>
-            {% if current_user.is_superuser %}
             <a href="/subscription/{{ subscription.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            {% endif %}
             <a href="#" class="text-decoration-none text-muted me-3"
                 onclick="confirmDelete('/subscription/{{ subscription.id }}/delete', '{{ subscription.name }}')"><i
                     class="fas fa-trash me-2"></i>
@@ -37,7 +35,7 @@
         Videos ({{ subscription.videos|length }})
         {# Videos ({{ source.videos_sorted()|length }}) #}
     </div>
-    {% for video in subscription.videos_sorted(sort_by="created_at", reverse=True) %}
+    {% for video in subscription.videos %}
     <div class="row px-0 py-3">
         <div class="col-12 position-relative">
             <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />

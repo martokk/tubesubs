@@ -790,7 +790,7 @@ version = "2.10.0"
 description = "Python style guide checker"
 category = "dev"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.6"
 
 [[package]]
 name = "pycparser"
@@ -843,7 +843,7 @@ version = "3.0.1"
 description = "passive checker of Python programs"
 category = "dev"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.6"
 
 [[package]]
 name = "pygments"
@@ -1049,7 +1049,7 @@ optional = false
 python-versions = ">=3.8.1"
 
 [package.dependencies]
-tokenize-rt = ">=5.2.0"
+tokenize-rt = ">=3.2.0"
 
 [[package]]
 name = "pyyaml"
@@ -1473,7 +1473,7 @@ websockets = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "b98438c1b1cd6ae28622f3b091b450d2668d9c05daeb0b5f5cd233da732c8615"
+content-hash = "924ea1d4cb1a699215eaec0f1ec0532129d68753c59c98402b7419b28a7e68dc"
 
 [metadata.files]
 alembic = [

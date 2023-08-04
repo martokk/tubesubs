@@ -46,6 +46,7 @@
 html,
 body {
     height: 100%;
+    overflow-x: hidden;
 }
 
 .d-flex.flex-column {
@@ -64,4 +65,9 @@ body {
 .dimmed {
     opacity: 0.25;
     /* Adjust the opacity as per your requirement */
+}
+
+
+.video-container-title {
+    font-size: medium;
 }
