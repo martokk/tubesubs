@@ -7,22 +7,17 @@
 <!-- Header -->
 <div>
     <div class="row align-items-center">
-        <h4 class="col-auto py-1">
+        <h5 class="col-auto py-1">
             <a href="/filter/{{ filter.id }}" class="text-decoration-none text-white">
                 {{ filter.name }}
-                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
                 </span>
             </a>
-        </h4>
+        </h5>
         <div class="col-auto small p-1 ms-auto">
             <a href="/filter/{{ filter.id }}/edit" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-pencil-alt me-2"></i>Edit</a>
             <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
-            <a href="#" class="text-decoration-none text-muted me-3"
-                onclick="confirmDelete('/filter/{{ filter.id }}/delete', '{{ filter.name }}')"><i
-                    class="fas fa-trash me-2"></i>
-                Delete</a>
         </div>
     </div>
 </div>
@@ -39,87 +34,180 @@
 
     <!-- Video Container -->
     {% for video in filtered_videos.videos %}
-    <div class="row px-0 py-3 video-container" style="position: relative;">
+    <div class="row px-0 py-4 video-container" style="position: relative;">
 
-        <div class="video-details-container">
+        <div class="video-details-container p-0">
 
-            <!-- Thumbnail & Duration Overlay -->
+            <!-- Thumbnail Container -->
             <div class="col-12 position-relative">
-                <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
-                <div
-                    class="small opacity-85 bg-dark text-white fw-bold position-absolute bottom-0 end-0 mx-3 my-1 p-1 rounded">
-                    {% set hours = (video.duration // 3600) %}
-                    {% set minutes = (video.duration // 60) % 60 %}
-                    {% set seconds = video.duration % 60 %}
-                    {% if hours > 0 %}
-                    {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
-                    {% else %}
-                    {{ '%2d:%02d'|format(minutes, seconds) }}
-                    {% endif %}
-                </div>
-            </div>
 
+                <!-- Thumbnail -->
+                <img src="{{ video.thumbnail }}" class="img-fluid w-100" style="object-fit: cover;" alt="" />
+
+
+                <!-- Overlay Div -->
+                <div class="overlay-div position-absolute bottom-0 start-0 w-100 py-2 small" data-bs-target="#tagModal" data-bs-toggle="modal"
+                    style="background-color: rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; justify-content: flex-end; position: relative; min-height: 45px;">
+
+                    <!-- Tags Container -->
+                    <div class="text-white px-2 w-100 tags-container">
+
+                        <!-- Tags Modal Plus Button -->
+                        <div class="tag-container d-inline-block">
+                            <div class=" text-white px-2 py-1 me-1 fw-bold rounded bg-dark" >
+                                <a href="#" role="button" data-bs-target="#tagModal" data-bs-toggle="modal">
+                                    <i class="fas fa-plus text-muted"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Tags -->
+                        {% for tag in video.channel.tags %}
+                        <div class="d-inline-block">
+                            <a href="#" class="text-decoration-none" role="button" data-bs-target="#tagModal" data-bs-toggle="modal">
+                                <div class="small text-white px-2 py-1 me-1 fw-bold rounded " style="background-color: {{ tag.color }};">
+                                    {{ tag.name }}
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+
+                    </div>
+
+                    <!-- Duration -->
+                    <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded bg-dark position-absolute bottom-0 end-0">
+                        {% set hours = (video.duration // 3600) %}
+                        {% set minutes = (video.duration // 60) % 60 %}
+                        {% set seconds = video.duration % 60 %}
+                        {% if hours > 0 %}
+                        {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
+                        {% else %}
+                        {{ '%2d:%02d'|format(minutes, seconds) }}
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
 
             <div class="col-12 pt-2">
                 <div class="row align-items-top">
 
                     <!-- Channel Logo -->
-                    <div class="col-auto px-1 ms-3 pt-1">
+                    <div class="col-auto px-1 ms-3 pt-1" data-bs-target="#channelModal" data-bs-toggle="modal">
                         <img src="{{ video.channel.logo }}" alt="Logo" class="img-fluid rounded-circle"
                             style="max-height: 40px;" />
                     </div>
 
                     <!-- Video Title & Created At -->
                     <div class="col ps-1 pe-0">
-                        <h5 class="mb-0 text-smaller">
-                            <a href="/filter/{{ filter.id }}/video/{{ video.id }}"
-                                class="text-decoration-none text-white">{{
-                                video.title }}</a>
+                        <h5 class="mb-0 video-container-title">
+                            {{ video.title }}
                         </h5>
-                        <small class="text-muted font-weight-bold">{{ video.channel.name }} - {{ video.created_at
+                        <div  data-bs-target="#channelModal" data-bs-toggle="modal">
+                        <small class="text-muted font-weight-bold small" >{{ video.channel.name }} - {{ video.created_at | humanize
                             }}</small>
-                    </div>
-
-                    <!-- Dropdown Menu -->
-                    <div class="col-auto ps-0">
-                        <div class="dropdown">
-
-                            <!-- Vertical Ellipsis Icon -->
-                            <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
-                                <i class="fas fa-ellipsis-v text-muted py-3 px-3"></i>
-                            </a>
-
-                            <!-- Menu -->
-                            <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
-                                {% for playlist in playlists %}
-                                <li>
-                                    <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#" data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}" data-video-id="{{ video.id }}"" data-video-url="{{ video.url }}" data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
-                                        Add to '{{ playlist.name }}' playlist.
-                                    </a>
-                                </li>
-                                {% endfor %}
-                                <hr class="dropdown-divider">
-                                <li>
-                                    <a class="dropdown-item p-2 text-white hide-channel-link" href="#" data-channel-id="{{ video.channel.id }}">
-                                        Hide Channel (Global).
-                                    </a>
-                                </li>
-                                <hr class="dropdown-divider">
-                                {% for tag in tags %}
-                                <li>
-                                    <a class="dropdown-item p-2 text-white add-to-tag-link" href="#" data-tag-id="{{ tag.id }}"
-                                        data-tag-name="{{ tag.name }}" data-channel-id="{{ video.channel.id }}"  data-channel-name="{{ video.channel.name }}">
-                                        Add to '{{ tag.name }}' tag.
-                                    </a>
-                                </li>
-                                {% endfor %}
-
-
-
-                            </ul>
-
                         </div>
                     </div>
+
+                    <!-- Modal Ellipsis Button -->
+                    <div class="col-auto ps-0" data-bs-target="#videoModal" data-bs-toggle="modal" >
+                        <a href="#" role="button" data-bs-target="#videoModal" data-bs-toggle="modal" >
+                            <i class="fas fa-ellipsis-v text-muted py-3 px-4"></i>
+                        </a>
+                    </div>
+
+                    <!-- Tags Modal -->
+                    <div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Hedaer -->
+                                <div class="modal-header">
+                                    <h5 class="modal-title small" id="tagModalLabel">Tags</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+
+                                    <!-- Add/Remove Tags -->
+                                    {% for tag in tags %}
+                                    {% set tag_in_channel_tags = tag in video.channel.tags %}
+                                    {% set action_text = 'Remove' if tag in video.channel.tags else 'Add' %}
+                                    {% set action_link_class = 'remove-tag-link' if tag in video.channel.tags else 'add-tag-link' %}
+                                    {% set action_text_color = 'text-danger' if tag in video.channel.tags else 'text-white' %}
+
+                                    <a class="dropdown-item p-2 {{ action_text_color }} {{ action_link_class }}" href="#" data-tag-id="{{ tag.id }}"
+                                        data-tag-name="{{ tag.name }}" data-channel-id="{{ video.channel.id }}" data-channel-name="{{ video.channel.name }}"
+                                        data-action="{{ action_text }}">
+                                        {{ action_text }} '<strong>{{ tag.name }}</strong>' tag.
+                                    </a>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Channel Modal -->
+                    <div class="modal fade" id="channelModal" tabindex="-1" aria-labelledby="channelModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Hedaer -->
+                                <div class="modal-header">
+                                    <h5 class="modal-title small" id="channelModalLabel">Channel Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+
+                                    <!-- Hide Channel -->
+                                    <a class="dropdown-item p-2 text-white hide-channel-link" href="#"
+                                        data-channel-id="{{ video.channel.id }}">
+                                        Hide Channel (Global).
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Video Modal -->
+                    <div class="modal fade" id="videoModal" tabindex="-1" aria-labelledby="videoModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- Modal Hedaer -->
+                                <div class="modal-header">
+                                    <h5 class="modal-title small" id="videoModalLabel">Video Options</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="modal-body">
+
+                                    <!-- Add to Playlists -->
+                                    {% for playlist in playlists %}
+                                    <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#"
+                                        data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
+                                        data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
+                                        data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
+                                        Add to '{{ playlist.name }}' playlist.
+                                    </a>
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+
+
 
                 </div>
             </div>
@@ -149,7 +237,23 @@
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Modal Show/Hide -->
+<script>
+    $(document).ready(function () {
+        // Hide the modal when the user clicks outside of it
+        $('.modal').on('click', function (event) {
+            if ($(event.target).hasClass('modal')) {
+                $('.modal').modal('hide');
+            }
+        });
 
+        // Show the modal when the button is clicked
+        $('[data-bs-toggle="modal"]').on('click', function () {
+            var target = $(this).data('bs-target');
+            $(target).modal('show');
+        });
+    });
+</script>
 
 
 
@@ -264,37 +368,55 @@
     });
 </script>
 
-<!-- Add Channel Tag -->
+<!-- Add/Remove Channel Tag -->
 <script>
     $(document).ready(function () {
-        $(".add-to-tag-link").click(function (event) {
+        $(".add-tag-link, .remove-tag-link").click(function (event) {
             event.preventDefault();
             var channelId = $(this).data("channel-id");
             var channelName = $(this).data("channel-name");
             var tagId = $(this).data("tag-id");
             var tagName = $(this).data("tag-name");
+            var action = $(this).data("action");
             var videoContainer = $(this).closest(".video-container");
             var videoDetailsContainer = $(this).closest(".video-details-container");
 
             // AJAX POST request to the API endpoint
-            data = {
+            var apiEndpoint = $(this).hasClass("remove-tag-link")
+                ? "/api/v1/channel/remove_tag"
+                : "/api/v1/channel/add_tag";
+
+            var data = {
                 "channel_id": channelId,
                 "tag_id": tagId,
-            }
+            };
+
             $.ajax({
                 type: "POST",
-                url: "/api/v1/channel/add_tag",
+                url: apiEndpoint,
                 contentType: "application/json",
                 data: JSON.stringify(data),
                 success: function (response) {
-                    // Handle success
-                    alert("'" + tagName + "' tag added to '" + channelName + "'.");
+                    // close modal
+                    $('.modal').modal('hide');
 
+                    // Update modal option/color/text if needed
+                    if ($(this).hasClass("remove-tag-link")) {
+                        // Update modal options for "remove-tag-link"
+                        // For example, change modal content, colors, or text
+                        // Add code here if required for specific modifications
+                    } else {
+                        // Update modal options for "add-tag-link"
+                        // For example, change modal content, colors, or text
+                        // Add code here if required for specific modifications
+                    }
 
+                    // Send Alert
+                    alert("'" + tagName + "' tag " + action.toLowerCase() + "ed from '" + channelName + "'.");
                 },
                 error: function (xhr, status, error) {
                     // Handle error
-                    var errorMessage = "Failed to add tag";
+                    var errorMessage = "Failed to " + action.toLowerCase() + " tag";
                     errorMessage += "\nStatus Code: " + xhr.status;
                     errorMessage += "\nStatus Text: " + xhr.statusText;
                     errorMessage += "\nResponse Text: " + xhr.responseText;
@@ -305,5 +427,6 @@
         });
     });
 </script>
+
 
 {% endblock content %}

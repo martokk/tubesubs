@@ -9,35 +9,44 @@
     <table class="table table-hover table-sm">
         <thead>
             <tr>
-                <th scope="col" class="w-75">Filter</th>
-                <th scope="col" class="d-none d-md-table-cell w-25"></th>
+                <th scope="col" class="w-100">Filter</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
         <tbody>
 
             {% for filter_ in filters %}
-            <tr>
+            <tr class="py-3">
 
-                <td class="">
-                    <a href="/filter/{{ filter_.id }}" class="">{{ filter_.name }}</a>
+                <td class="py-4">
+                    <a href="/filter/{{ filter_.id }}" class="text-decoration-none text-white">
+                        <h5 class="mb-0 text-smaller">
+                            {{ filter_.name }}
+                        </h5>
+                    </a>
                 </td>
 
                 <td class="">
+                    <div class="dropdown">
 
-                </td>
+                        <!-- Vertical Ellipsis Icon -->
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="fas fa-ellipsis-v text-muted py-4 px-3"></i>
+                        </a>
 
-                <td class="">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-sm btn-dark btn-transparent dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right p-1">
-                            <a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/fetch">Fetch Videos</a>
-                            <a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/edit">Edit</a>
-                            <a class="dropdown-item p-2" href="#"
-                                onclick="confirmDelete('/filter/{{ filter_.id }}/delete')">Delete</a>
-                        </div>
+                        <!-- Menu -->
+                        <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+
+                            <li><a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/edit">Edit</a></li>
+
+                            <li><a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/fetch">Fetch Videos</a></li>
+
+                            <hr class="dropdown-divider">
+
+                            <li><a class="dropdown-item p-2" href="#" onclick="confirmDelete('/filter/{{ filter_.id }}/delete')">Delete</a></li>
+
+                        </ul>
                     </div>
                 </td>
 
