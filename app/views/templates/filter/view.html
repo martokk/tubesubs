@@ -208,7 +208,7 @@
                             <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#"
                                 data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
                                 data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
-                                data-video-thumbnail="{{ video.thumbnail }}" data-video-title="{{ video.title }}">
+                                data-video-thumbnail="{{ video.thumbnail }}" data-video-duration="{{ video.duration }}" data-video-title="{{ video.title }}">
                                 Add to '{{ playlist.name }}' playlist.
                             </a>
                             {% endfor %}
@@ -271,6 +271,7 @@
             var videoId = $(this).data("video-id");
             var videoUrl = $(this).data("video-url");
             var videoThumbnail = $(this).data("video-thumbnail");
+            var videoDuration = $(this).data("video-duration");
             var videoTitle = $(this).data("video-title");
             var playlistId = $(this).data("playlist-id");
             var playlistName = $(this).data("playlist-name");
@@ -283,6 +284,7 @@
                 "title": videoTitle,
                 "url": videoUrl,
                 "thumbnail": videoThumbnail,
+                "duration": videoDuration,
                 "playlist_id": playlistId
             }
             $.ajax({

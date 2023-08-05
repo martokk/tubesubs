@@ -18,6 +18,7 @@ async def handle_add_to_playlist(
     title: str = Body(...),
     url: str = Body(...),
     thumbnail: str = Body(...),
+    duration: int = Body(...),
     playlist_id: str = Body(...),
     db: Session = Depends(deps.get_db),
 ) -> None:
@@ -41,7 +42,7 @@ async def handle_add_to_playlist(
 
     # Add playlist_item to playlist
     playlist_item_create = models.PlaylistItemCreate(
-        title=title, url=url, playlist_id=playlist_id, thumbnail=thumbnail
+        title=title, url=url, playlist_id=playlist_id, thumbnail=thumbnail, duration=duration
     )
     try:
         await crud.playlist_item.create(db=db, obj_in=playlist_item_create)
