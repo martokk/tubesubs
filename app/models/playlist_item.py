@@ -18,6 +18,8 @@ class PlaylistItemBase(TimestampModel, SQLModel):
     title: str | None = Field(default=None)
     url: str | None = Field(default=None)
     thumbnail: str | None = Field(default=None)
+    duration: int | None = Field(default=None)
+    description: str | None = Field(default=None)
     playlist_id: str = Field(default=None, foreign_key="playlist.id", nullable=False)
 
     # Define a custom constraint to ensure the uniqueness of url per playlist_id
