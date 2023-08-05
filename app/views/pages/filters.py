@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app import crud, models
 from app.handlers import get_registered_subscription_handlers
-from app.services.fetch import fetch_filter
+from app.services.fetch import fetch_all_subscriptions, fetch_filter
 from app.services.filter_videos import get_filtered_videos
 from app.views import deps, templates
 
@@ -36,14 +36,31 @@ async def list_filters(
     # Get alerts dict from cookies
     alerts = models.Alerts().from_cookies(request.cookies)
 
+    # Get all filters
     filters = await crud.filter.get_all(db=db)
     filters.sort(key=lambda x: x.name)
+
+    # Get unread count for each filter
+    filter_unread_count = {}
+    for filter_ in filters:
+        filtered_videos = await get_filtered_videos(filter_=filter_)
+        filter_unread_count[filter_.id] = filtered_videos.videos_not_limited_count
+
+    # Separate pinned filters
+    pinned_filter_names = ["All Unread", "Missing Tags"]
+    pinned_filters = []
+    for filter_ in filters:
+        if filter_.name in pinned_filter_names:
+            pinned_filters.append(filter_)
+            filters.remove(filter_)
 
     return templates.TemplateResponse(
         "filter/list.html",
         {
             "request": request,
+            "pinned_filters": pinned_filters,
             "filters": filters,
+            "filter_unread_count": filter_unread_count,
             "current_user": current_user,
             "alerts": alerts,
         },
@@ -253,6 +270,13 @@ async def view_filter(
         return response
 
     filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
+
+    # Redirect to /filters if no unread videos in filter
+    if filtered_videos.videos_not_limited_count == 0:
+        alerts.warning.append(f"No unread videos in '{db_filter.name}' filter.")
+        response = RedirectResponse("/filters", status_code=status.HTTP_303_SEE_OTHER)
+        response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
+        return response
 
     playlists = await crud.playlist.get_all(db=db)
     playlists.sort(key=lambda x: x.name)
@@ -480,6 +504,36 @@ async def delete_filter(
 #         deps.get_current_active_user
 #     ),
 # ) -> Response:
+
+
+@router.get("/filters/fetch", response_class=HTMLResponse)
+async def fetch_all_filters(
+    request: Request,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Fetch all filters
+
+    Args:
+        filter_id(str): The filter id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Fetches videos and redirects back to /filter/filter_id.
+    """
+    alerts = models.Alerts()
+
+    fetch_results = await fetch_all_subscriptions(db=db)
+
+    alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
+
+    response = RedirectResponse(url="/filters", status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+    return response
 
 
 @router.get("/filter/{filter_id}/fetch", response_class=HTMLResponse)
