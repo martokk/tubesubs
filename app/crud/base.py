@@ -85,7 +85,7 @@ class BaseCRUD(Generic[ModelType, ModelCreateType, ModelUpdateType]):
         *args: BinaryExpression[Any],
         db: Session,
         skip: int = 0,
-        limit: int = 100,
+        limit: int = 999999,
         **kwargs: Any,
     ) -> list[ModelType]:
         """

@@ -1,17 +1,18 @@
 from typing import Any
 
-from sqlalchemy import and_, asc, desc, or_, select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import Session, asc, desc, select
 
 from app import models
-from app.models import SubscriptionVideoLink
 
 from .base import BaseCRUD
 
 
 class VideoCRUD(BaseCRUD[models.Video, models.VideoCreate, models.VideoUpdate]):
+    def __init__(self, model: type[models.Video]) -> None:
+        super().__init__(model=model)
+        self.channel = models.Channel
+
     async def get_multi(
         self,
         *args: BinaryExpression[Any],
@@ -51,6 +52,18 @@ class VideoCRUD(BaseCRUD[models.Video, models.VideoCreate, models.VideoUpdate]):
             .limit(limit)
         )
         return db.execute(statement).fetchall()
+
+    async def get_unread_videos(
+        self, db: Session, is_read: bool = False, channel_is_hidden: bool = False
+    ) -> list[models.Video]:
+        """Get all videos where is_read is False and channel is not hidden."""
+        return (
+            db.query(self.model)
+            .join(self.channel, self.model.remote_channel_id == self.channel.remote_channel_id)
+            .filter(self.model.is_read == is_read)  # type: ignore
+            .filter(self.channel.is_hidden == channel_is_hidden)  # type: ignore
+            .all()
+        )
 
 
 video = VideoCRUD(models.Video)
