@@ -92,9 +92,9 @@ class PlaylistFeedGenerator(FeedGenerator):
             post.podcast.itunes_duration(  # type: ignore # pylint: disable=no-member
                 itunes_duration=item.duration
             )
-            # post.podcast.itunes_image(  # type: ignore # pylint: disable=no-member
-            #     itunes_image=f"{video.thumbnail}?=.jpg"
-            # )  # type: ignore # pylint: disable=no-member
+            post.podcast.itunes_image(  # type: ignore # pylint: disable=no-member
+                itunes_image=f"{item.thumbnail}?=.jpg"
+            )  # type: ignore # pylint: disable=no-member
 
     async def save(self) -> Path:
         """
