@@ -37,6 +37,8 @@ async def list_filters(
     alerts = models.Alerts().from_cookies(request.cookies)
 
     filters = await crud.filter.get_all(db=db)
+    filters.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "filter/list.html",
         {
@@ -344,6 +346,7 @@ async def edit_filter(
     ]
 
     all_tags = await crud.tag.get_all(db=db)
+    all_tags.sort(key=lambda x: x.name)
     options_tag_values = [tag.name for tag in all_tags]
     options_tag_values.append("ANY")
 

@@ -43,7 +43,9 @@ class TagCreate(TagBase):
     def set_pre_validation_defaults(cls, values: dict[str, Any]) -> dict[str, Any]:
         name = values["name"].lower()
         tag_id = generate_uuid_from_string(string=name)
-        color = values.get("color", get_color_from_string(string=name))
+        color = values.get("color")
+        if not color:
+            color = get_color_from_string(string=name)
         return {
             **values,
             "id": tag_id,
