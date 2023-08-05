@@ -9,12 +9,11 @@ router = APIRouter()
 
 
 @router.get("/channels", response_class=HTMLResponse)
+@router.get("/channels/hidden", response_class=HTMLResponse)
 async def list_channels(
     request: Request,
     db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(  # pylint: disable=unused-argument
-        deps.get_current_active_user
-    ),
+    current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Response:
     """
     Returns HTML response with list of channels.
@@ -31,20 +30,31 @@ async def list_channels(
     # Get alerts dict from cookies
     alerts = models.Alerts().from_cookies(request.cookies)
 
-    visible_channels = await crud.channel.get_multi(db=db, is_hidden=False)
-    visible_channels.sort(key=lambda x: x.name)
+    if "/channels/hidden" in request.url.path:
+        title = "Hidden Channels"
+        is_hidden = True
+        action = "unhide"
+    else:
+        title = "Visible Channels"
+        is_hidden = False
+        action = "hide"
 
-    hidden_channels = await crud.channel.get_multi(db=db, is_hidden=True)
-    hidden_channels.sort(key=lambda x: x.name)
+    channels = await crud.channel.get_multi(db=db, is_hidden=is_hidden)
+    channels.sort(key=lambda x: x.name)
+
+    tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
 
     return templates.TemplateResponse(
         "channel/list.html",
         {
             "request": request,
-            "visible_channels": visible_channels,
-            "hidden_channels": hidden_channels,
+            "title": title,
+            "channels": channels,
+            "tags": tags,
             "current_user": current_user,
             "alerts": alerts,
+            "action": action,  # Pass the action variable to the template
         },
     )
 
