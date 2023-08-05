@@ -40,7 +40,8 @@
         <!-- Table Body -->
         <tbody>
             {% for channel in channels %}
-            <tr class="py-3 channel-row" data-channel-id="{{ channel.id }}">
+            {% set tr_bg_color = "" if channel.tags else "bg-secondary"%}
+            <tr class="py-3 channel-row {{ tr_bg_color }}" data-channel-id="{{ channel.id }}">
 
                 <!-- Channel Logo & Channel Name -->
                 <td class="">
@@ -64,9 +65,11 @@
 
                                 <!-- Tags Modal Plus Button -->
                                 <div class="d-inline-block small">
-                                    <div class="text-white px-2 py-1 me-0 fw-bold rounded bg-dark small">
+                                    {% set badge = "bg-dark" if channel.tags else "bg-danger" %}
+                                    <div class="text-white px-2 py-1 me-0 fw-bold rounded {{ badge }} small">
                                         <a href="#" role="button" data-bs-target="#tagModal-{{ channel.id }}" data-bs-toggle="modal">
-                                            <i class="fas fa-plus text-muted small"></i>
+                                            {% set color = "text-muted" if channel.tags else "text-white px-4" %}
+                                            <i class="fas fa-plus small {{ color }}"></i>
                                         </a>
                                     </div>
                                 </div>
@@ -285,6 +288,8 @@
 
 
 
+
+
                     } else {
 
                         // Add Tag to all videos in channel
@@ -314,6 +319,16 @@
 
                             if (tagModalLinkChannelId === channelId && tagModalLinkTagId === tagId) {
                                 tagModalLink.removeClass('add-tag-link').removeClass('text-white').addClass('remove-tag-link').addClass('text-danger').data('action', 'Remove').html("<span class=\"opacity-50\">Remove '</span><strong>" + tagName + "</strong><span class=\"opacity-50\">' tag.</span>");
+                            }
+                        });
+
+                        // Change "remove tag" to "add tag" in Tags Modal
+                        $('.bg-secondary').each(function () {
+                            var tr = $(this);
+                            var trChannelId = tr.data("channel-id");
+
+                            if (trChannelId === channelId) {
+                                tr.removeClass('bg-secondary');
                             }
                         });
 
