@@ -181,9 +181,22 @@ async def view_tag(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    tags = await crud.tag.get_all(db=db)
+    tags.sort(key=lambda x: x.name)
+
+    tag_channels = tag.channels
+    tag_channels.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "tag/view.html",
-        {"request": request, "tag": tag, "current_user": current_user, "alerts": alerts},
+        {
+            "request": request,
+            "tag": tag,
+            "tag_channels": tag_channels,
+            "tags": tags,
+            "current_user": current_user,
+            "alerts": alerts,
+        },
     )
 
 
