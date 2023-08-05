@@ -9,4 +9,5 @@ class FilteredVideos(SQLModel):
     show_hidden_channels: bool
     criterias: list  # type: ignore
     reverse_order: bool
-    limit: int
+    limit: int | None
+    ordered_by: str
