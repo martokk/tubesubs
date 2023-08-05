@@ -33,6 +33,8 @@ async def list_playlists(
     alerts = models.Alerts().from_cookies(request.cookies)
 
     playlists = await crud.playlist.get_all(db=db)
+    playlists.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "playlist/list.html",
         {

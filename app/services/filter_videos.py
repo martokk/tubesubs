@@ -11,7 +11,7 @@ from app.models.subscription import Subscription
 from app.models.video import Video
 
 
-async def get_filtered_videos(filter_: "Filter", max_videos: int) -> FilteredVideos:
+async def get_filtered_videos(filter_: "Filter", max_videos: int | None = None) -> FilteredVideos:
     """
     Filter videos based on the filter criteria.
     """
@@ -34,7 +34,7 @@ async def get_filtered_videos(filter_: "Filter", max_videos: int) -> FilteredVid
 
     # Limit Videos
     videos_not_limited_count = len(videos)
-    videos = await limit_videos(videos=videos, max_videos=max_videos)
+    videos = videos if not max_videos else await limit_videos(videos=videos, max_videos=max_videos)
 
     return FilteredVideos(
         videos=videos,
