@@ -201,7 +201,9 @@ async def handle_create_filter(
 
     # Redirect on Success
     alerts.success.append("Filter successfully created")
-    response = RedirectResponse(url="/filters", status_code=status.HTTP_303_SEE_OTHER)
+    response = RedirectResponse(
+        url=f"/filter/{db_filter.id}/edit", status_code=status.HTTP_303_SEE_OTHER
+    )
     response.headers["Method"] = "GET"
     response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
     return response

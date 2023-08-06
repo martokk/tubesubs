@@ -1,6 +1,5 @@
 from typing import TYPE_CHECKING, Any
 
-import operator
 from enum import Enum
 
 from pydantic import root_validator
@@ -10,8 +9,7 @@ from app.core.uuid import generate_uuid_random
 from app.models.subscription_filter_link import SubscriptionFilterLink
 
 from .common import TimestampModel
-from .criteria import Criteria, CriteriaField, CriteriaOperator  # pragma: no cover
-from .video import Video  # pragma: no cover
+from .criteria import Criteria
 
 if TYPE_CHECKING:
     from .subscription import Subscription  # pragma: no cover

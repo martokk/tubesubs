@@ -1,13 +1,11 @@
 from sqlmodel import SQLModel
 
+from app.models.filter import Filter
+
 
 class FilteredVideos(SQLModel):
-    videos: list  # type: ignore
-    videos_limited_count: int
-    videos_not_limited_count: int
-    read_status: str
-    show_hidden_channels: bool
-    criterias: list  # type: ignore
-    reverse_order: bool
-    limit: int | None
-    ordered_by: str
+    filter: Filter | None = None
+    videos: list = []  # type: ignore
+    videos_limited_count: int = 0
+    videos_not_limited_count: int = 0
+    limit: int | None = None

@@ -2,8 +2,6 @@ from app.models.criteria import (
     Criteria,
     CriteriaField,
     CriteriaOperator,
-    CriteriaUnitOfMeasure,
-    CriteriaValue,
 )
 from app.models.filter import Filter, FilterOrderedBy, FilterReadStatus
 from app.models.filtered_videos import FilteredVideos
@@ -37,14 +35,10 @@ async def get_filtered_videos(filter_: "Filter", max_videos: int | None = None) 
     videos = videos if not max_videos else await limit_videos(videos=videos, max_videos=max_videos)
 
     return FilteredVideos(
+        filter=filter_,
         videos=videos,
         videos_limited_count=len(videos),
         videos_not_limited_count=videos_not_limited_count,
-        read_status=filter_.read_status,
-        show_hidden_channels=filter_.show_hidden_channels,
-        criterias=filter_.criterias,
-        ordered_by=filter_.ordered_by,
-        reverse_order=filter_.reverse_order,
         limit=max_videos,
     )
 

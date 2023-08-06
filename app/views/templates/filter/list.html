@@ -27,18 +27,18 @@
 
 
 <!-- Pinned Filters -->
-{% for filter_group in [pinned_filters, filters] %}
+{% for filter_type in [pinned_filters, filters] %}
 <div class="container mt-5 pt-1">
     <table class="table table-hover table-sm">
         <thead>
             <tr>
-                <th scope="col" class="w-100">{{ "Pinned Filters" if filter_group == pinned_filters else "Filters" }}</th>
+                <th scope="col" class="w-100">{{ "Pinned Filters" if filter_type == pinned_filters else "Filters" }}</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
         <tbody>
 
-            {% for filter_ in filter_group %}
+            {% for filter_ in filter_type %}
             {% set color_classes = "text-muted" if filter_unread_count[filter_.id] == 0 else "" %}
             <tr class="py-3 " style="{{ "display:none;" if filter_unread_count[filter_.id] == 0 else "" }}">
 
