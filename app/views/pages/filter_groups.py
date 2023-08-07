@@ -325,6 +325,10 @@ async def view_filter_group(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    # Get total unread videos
+    total_unread_videos = await crud.video.get_unread_videos(db=db)
+
+    # Get all playlists and tags for Modals
     playlists = await crud.playlist.get_all(db=db)
     playlists.sort(key=lambda x: x.name)
 
@@ -341,6 +345,7 @@ async def view_filter_group(
             "redirect_url": redirect_url,
             "playlists": playlists,
             "tags": tags,
+            "total_unread_videos": total_unread_videos,
             "current_user": current_user,
             "alerts": alerts,
         },

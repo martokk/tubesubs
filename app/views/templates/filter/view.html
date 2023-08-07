@@ -21,7 +21,7 @@
     <div class="row">
         <div class="col">
             <h5 class="pt-0 mt-0 pb-1">
-                {{ filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})</span>
+                {{ filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }} {{ "/" + total_unread_videos if total_unread_videos else "" }})</span>
             </h5>
         </div>
     </div>
