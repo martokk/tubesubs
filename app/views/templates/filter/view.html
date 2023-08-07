@@ -89,7 +89,14 @@
                         </div>
 
                         <!-- Duration -->
-                        <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded bg-dark position-absolute bottom-0 end-0">
+                        {% if video.duration > 60 * 50 %}
+                        {% set duration_color = "#480000" %}
+                        {% elif video.duration > 60 * 25 %}
+                        {% set duration_color = "#483D00" %}
+                        {% else %}
+                        {% set duration_color = "#232323" %}
+                        {% endif%}
+                        <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded position-absolute bottom-0 end-0" style="background-color: {{ duration_color }}">
                             {% set hours = (video.duration // 3600) %}
                             {% set minutes = (video.duration // 60) % 60 %}
                             {% set seconds = video.duration % 60 %}
@@ -156,7 +163,7 @@
                             {% set action_link_class = 'remove-tag-link' if tag in video.channel.tags else 'add-tag-link' %}
                             {% set action_text_color = 'text-danger' if tag in video.channel.tags else 'text-white' %}
 
-                            <a class="tag-modal-link dropdown-item p-3 {{ action_text_color }} {{ action_link_class }}" href="#"
+                            <a class="tag-modal-link dropdown-item p-3 border-bottom {{ action_text_color }} {{ action_link_class }}" href="#"
                                 data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}" data-tag-color="{{ tag.color }}"
                                 data-channel-id="{{ video.channel.id }}" data-channel-name="{{ video.channel.name }}"
                                 data-action="{{ action_text }}">
@@ -184,12 +191,12 @@
                         <div class="modal-body py-0">
 
                             <!-- Hide Channel -->
-                            <a class="dropdown-item p-5 text-white hide-channel-link border-bottom" href="#"
+                            <a class="dropdown-item p-4 text-white hide-channel-link border-bottom" href="#"
                                 data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filtered_videos.filter.id }}" data-action="Hide" data-action-scope="Global">
                                 Hide Channel (Global)
                             </a>
 
-                            <a class="dropdown-item p-5 text-white" href="{{ video.channel.url }}">
+                            <a class="dropdown-item p-4 text-white border-bottom " href="{{ video.channel.url }}">
                                 Open {{ video.channel.service | title }} Channel URL
                             </a>
 
@@ -215,7 +222,7 @@
 
                             <!-- Add to Playlists -->
                             {% for playlist in playlists %}
-                            <a class="dropdown-item p-5 text-white add-to-playlist-link" href="#"
+                            <a class="dropdown-item p-4 border-bottom text-white add-to-playlist-link" href="#"
                                 data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
                                 data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
                                 data-video-thumbnail="{{ video.thumbnail }}" data-video-duration="{{ video.duration }}" data-video-title="{{ video.title }}">
