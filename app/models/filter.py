@@ -6,12 +6,14 @@ from pydantic import root_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 from app.core.uuid import generate_uuid_random
+from app.models.filter_filter_group_link import FilterFilterGroupLink
 from app.models.subscription_filter_link import SubscriptionFilterLink
 
 from .common import TimestampModel
 from .criteria import Criteria
 
 if TYPE_CHECKING:
+    from .filter_group import FilterGroup  # pragma: no cover
     from .subscription import Subscription  # pragma: no cover
 
 
@@ -44,6 +46,10 @@ class Filter(FilterBase, table=True):
     subscriptions: list["Subscription"] = Relationship(
         back_populates="filters",
         link_model=SubscriptionFilterLink,
+    )
+    filter_groups: list["FilterGroup"] = Relationship(
+        back_populates="filters",
+        link_model=FilterFilterGroupLink,
     )
 
     @property

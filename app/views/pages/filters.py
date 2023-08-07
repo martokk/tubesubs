@@ -6,6 +6,7 @@ from app import crud, models
 from app.handlers import get_registered_subscription_handlers
 from app.services.fetch import fetch_all_subscriptions, fetch_filter
 from app.services.filter_videos import get_filtered_videos
+from app.services.videos import mark_videos_as_read
 from app.views import deps, templates
 
 # from app.services.fetch import fetch_filter
@@ -209,38 +210,6 @@ async def handle_create_filter(
     return response
 
 
-@router.post("/filter/{filter_id}/mark_as_read", response_class=HTMLResponse)
-async def handle_mark_as_read(
-    filter_id: str,
-    video_ids: list[str] = Form(...),
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(  # pylint: disable=unused-argument
-        deps.get_current_active_user
-    ),
-) -> Response:
-    """
-    Delete Filter view.
-
-    Args:
-        filter_id(str): The filter id
-        db(Session): The database session.
-        current_user(User): The authenticated user.
-
-    Returns:
-        Response: Form to delete a new filter
-    """
-    alerts = models.Alerts()
-
-    for video_id in video_ids:
-        await crud.video.update(
-            db=db, id=video_id, obj_in=models.VideoUpdate(id=video_id, is_read=True)
-        )
-
-    response = RedirectResponse(url=f"/filter/{filter_id}", status_code=status.HTTP_303_SEE_OTHER)
-    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
-    return response
-
-
 @router.get("/filter/{filter_id}", response_class=HTMLResponse)
 async def view_filter(
     request: Request,
@@ -286,12 +255,15 @@ async def view_filter(
     tags = await crud.tag.get_all(db=db)
     tags.sort(key=lambda x: x.name)
 
+    redirect_url = f"/filter/{filter_id}"
+
     return templates.TemplateResponse(
         "filter/view.html",
         {
             "request": request,
             "filter": db_filter,
             "filtered_videos": filtered_videos,
+            "redirect_url": redirect_url,
             "playlists": playlists,
             "tags": tags,
             "current_user": current_user,

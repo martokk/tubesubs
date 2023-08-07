@@ -1,8 +1,4 @@
-from app.models.criteria import (
-    Criteria,
-    CriteriaField,
-    CriteriaOperator,
-)
+from app.models.criteria import Criteria, CriteriaField, CriteriaOperator
 from app.models.filter import Filter, FilterOrderedBy, FilterReadStatus
 from app.models.filtered_videos import FilteredVideos
 from app.models.subscription import Subscription

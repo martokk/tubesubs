@@ -1,0 +1,94 @@
+{% extends "base/base.html" %}
+
+{% block title %} Filter Groups ({{ filter_groups |length }}){% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div>
+    <div class="row align-items-center mb-3">
+
+        <!-- Title -->
+        <h4 class="col-auto py-1">
+            Filter Groups ({{ filter_groups |length }})
+        </h4>
+
+        <!-- Menu -->
+        <div class="col-auto small p-1 ms-auto">
+            <a href="/filter-group/create" class="text-decoration-none text-muted me-3">
+                <i class="fas fa-pencil-alt me-2"></i>
+                Add Filter Group
+            </a>
+            <a href="/filter-group/fetch" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-arrow-circle-right me-2"></i>Fetch All</a>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Pinned Filters -->
+{# {% for filter_group in filter_groups %} #}
+<div class="container mt-5 pt-1">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col" class="w-100">Filter Groups</th>
+                <th scope="col" class="w-auto"></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {% for filter_group in filter_groups %}
+            {% set color_classes = "text-muted" if filter_group_unread_count[filter_group.id] == 0 else "" %}
+            <tr class="py-3 " style="{{ "display:none;" if filter_group_unread_count[filter_group.id] == 0 else "" }}">
+
+                <!-- Filter Name & Unread Count -->
+                <td class="py-4">
+                    <a href="/filter-group/{{ filter_group.id }}" class="text-decoration-none text-white">
+                        <h5 class="mb-0 text-smaller {{ color_classes }}">
+                            {{ filter_group.name }} ({{ filter_group_unread_count[filter_group.id] }})
+                        </h5>
+                    </a>
+                </td>
+
+                <!-- Dropdown Menu -->
+                <td class="">
+                    <div class="dropdown">
+
+                        <!-- Vertical Ellipsis Icon -->
+                        <a href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                            <i class="fas fa-ellipsis-v text-muted py-4 px-3"></i>
+                        </a>
+
+                        <!-- Menu -->
+                        <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+
+                            <li><a class="dropdown-item p-2" href="/filter-group/{{ filter_group.id }}/edit">Edit</a></li>
+
+                            <li><a class="dropdown-item p-2" href="/filter-group/{{ filter_group.id }}/fetch">Fetch Videos</a></li>
+
+                            <hr class="dropdown-divider">
+
+                            <li><a class="dropdown-item p-2" href="#" onclick="confirmDelete('/filter-group/{{ filter_group.id }}/delete')">Delete</a></li>
+
+                        </ul>
+                    </div>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{# {% endfor %} #}
+
+
+<script>
+    function confirmDelete(url) {
+        if (confirm("Are you sure you want to delete this filter group?")) {
+            window.location.href = url;
+        }
+    }
+</script>
+{% endblock %}

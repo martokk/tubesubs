@@ -1,0 +1,160 @@
+{% extends "base/base.html" %}
+
+{% block title %}Edit Filter Group: {{ filter_group.name }} {% endblock %}
+
+
+
+{% block content %}
+<!-- Header -->
+<div>
+    <div class="row align-items-center">
+        <h4 class="col-auto py-1">
+            <a href="/filter-group/{{ filter_group.id }}" class="text-decoration-none text-white">
+                Edit Filter Group
+                <span class="small mx-1"> <i class="fas fa-external-link-alt fa-sm small"></i>
+                </span>
+            </a>
+        </h4>
+        <div class="col-auto small p-1 ms-auto">
+            <a href="/filter-group/{{ filter_group.id }}" class="text-decoration-none text-muted me-3"><i
+                    class="fas fa-pencil-alt me-2"></i>View</a>
+            <a href="#" class="text-decoration-none text-muted me-3"
+                onclick="confirmDelete('/filter-group/{{ filter_group.id }}/delete', '{{ filter_group.name }}')"><i
+                    class="fas fa-trash me-2"></i>
+                Delete</a>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container">
+
+    <!-- Edit Filter Card -->
+    <div class="card">
+
+        <div class="card-header">
+            Edit Filter Group
+        </div>
+
+        <div class="card-body p-4">
+
+            <!-- Form -->
+            <form id="listForm" method="POST">
+
+                <!-- Name -->
+                <div class="form-group my-2">
+                    <label for="name">Name:</label>
+                    <input type="text" class="form-control mb-3" id="name" name="name" value="{{ filter_group.name }}">
+                </div>
+
+                <!-- Filters -->
+                <div class="form-group my-2">
+                    <label for="filter_ids">Edit Filters:</label>
+                    <select class="form-control" id="filter_ids" name="filter_ids" size="8" multiple>
+                        {% for options_filter in options_filters %}
+                            <option value="{{ options_filter.id }}" {% if options_filter in filter_group.filters %}selected{% endif %}>{{ options_filter.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Sortable Filters Order -->
+                <div class="form-group mb-2 mt-4">
+                    <label for="sortable">Edit Order:</label>
+                    <ul id="sortable" class="list-group" data-sortable="true">
+                        {% for filter_ in filter_group.ordered_filters %}
+                        <li class="list-group-item py-4" data-id="{{ filter_.id }}">{{ filter_.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <input type="hidden" name="ordered_filter_ids_str" id="ordered_filter_ids_str">
+
+                <!-- Submit -->
+                <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+<!-- JavaScript to enable drag-and-drop functionality -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
+
+<script>
+
+    // Function to update the 'sortable' list based on 'filter_ids' select
+    function updateSortableList() {
+        const sortableList = document.getElementById('sortable');
+        const filterIdsSelect = document.getElementById('filter_ids');
+
+        const selectedFilterIds = Array.from(filterIdsSelect.options)
+            .filter(option => option.selected)
+            .map(option => option.value);
+
+        const existingSortableListIds = Array.from(sortableList.children)
+            .map(li => li.dataset.id);
+
+        // Remove <li> not in 'selectedFilterIds'
+        Array.from(sortableList.children)
+            .forEach(li => {
+                if (!selectedFilterIds.includes(li.dataset.id)) {
+                    sortableList.removeChild(li);
+                }
+            });
+
+        // Add new items from 'selectedFilterIds'
+        selectedFilterIds.forEach(li => {
+            if (!existingSortableListIds.includes(li)) {
+                const optionText = filterIdsSelect.querySelector(`[value="${li}"]`).innerText;
+                const newItem = document.createElement('li');
+                newItem.classList.add('list-group-item', 'py-4');
+                newItem.setAttribute('data-id', li);
+                newItem.innerText = optionText;
+                sortableList.appendChild(newItem);
+            }
+
+        updateHiddenInput()
+
+        });
+    }
+
+    function updateHiddenInput() {
+        const sortableList = document.getElementById('sortable');
+
+        // update hidden input field
+        const listItems = sortableList.querySelectorAll('li');
+        const listItemsById = Array.from(listItems).map((item) => item.dataset.id);
+
+        // Update the hidden input field with the new order
+        const hiddenInput = document.querySelector('#ordered_filter_ids_str');
+        const listItemsByIdJSON = JSON.stringify(listItemsById)
+        hiddenInput.value = listItemsByIdJSON;
+        console.log('ordered_filter_ids_str:', listItemsByIdJSON)
+    }
+
+    // Enable drag-and-drop functionality using Sortable.js library
+    document.addEventListener('DOMContentLoaded', function () {
+        const sortableList = document.getElementById('sortable');
+
+        // Call the updateHiddenInput function when the user rearranges the list
+        Sortable.create(sortableList, {
+            animation: 150,
+            onEnd: updateHiddenInput
+        });
+
+    });
+
+    // Add event listener to 'filter_ids' select to update 'sortable' list when changed
+    const filterIdsSelect = document.getElementById('filter_ids');
+    filterIdsSelect.addEventListener('change', updateSortableList);
+
+    // Initial update of 'sortable' list when the page loads
+    updateSortableList();
+
+</script>
+
+{% endblock content %}
