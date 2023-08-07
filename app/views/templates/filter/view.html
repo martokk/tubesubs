@@ -1,39 +1,53 @@
 {% extends "base/base.html" %}
 
-{% block title %}{{ filter.name }}{% endblock %}
+{% block title %}{{ filter_group.name if filter_group else "Filter"}}{% endblock %}
 
 {% block content %}
 <!-- Header -->
 <div>
     <div class="row align-items-end">
+
+        <!-- Sub Header -->
         <div class="col-auto">
             <span class="text-muted ">{{ filter_group.name if filter_group else "Filter"}}</span>
         </div>
+
+        <!-- Buttons -->
         <div class="col text-end small">
-            <a href="{{ '/filter-group/' + filter_group.id if filter_group else '/filter/' + filter.id }}/edit" class="btn btn-link text-muted me-3 pb-0">
+            <a href="{{ '/filter-group/' + filter_group.id if filter_group else '/filter/' + filtered_videos.filter.id }}/edit" class="btn btn-link text-muted me-3 pb-0">
                 <i class="fas fa-pencil-alt me-2"></i>Edit
             </a>
-            <a href="{{ '/filter-group/' + filter_group.id if filter_group else '/filter/' + filter.id }}/fetch" class="btn btn-link text-muted me-3 pb-0">
+            <a href="/filter-groups/fetch" class="btn btn-link text-muted me-3 pb-0">
                 <i class="fas fa-arrow-circle-right me-2"></i>Fetch
             </a>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <h5 class="pt-0 mt-0 pb-1">
-                {{ filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})</span>
-            </h5>
-        </div>
+
     </div>
 </div>
 
-<!-- List Videos -->
-<div class="container py-3 px-0">
+
+{% for filtered_videos in filter_group_filtered_videos or [filtered_videos] %}
+
+<!-- Filter Header -->
+<div class="row">
+    <div class="col">
+        <h3 class="pt-4 mt-0 pb-1 border-bottom">
+            {{ filtered_videos.filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{
+                filtered_videos.videos_not_limited_count }} {{ "/" + total_unread_videos if total_unread_videos else ""
+                }})</span>
+        </h3>
+    </div>
+</div>
+
+
+
+<!-- List Filter Videos -->
+<div class="container pt-1 pb-5 px-0">
 
     <!-- Video Container -->
     <div class="row">
         {% for video in filtered_videos.videos %}
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-0 py-4 video-container" data-channel-id="{{ video.channel.id }}"
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-0 pb-5 mb-1 video-container" data-channel-id="{{ video.channel.id }}"
             style="position: relative;">
 
             <div class="video-details-container px-md-2 " data-channel-id="{{ video.channel.id }}">
@@ -175,7 +189,7 @@
 
                             <!-- Hide Channel -->
                             <a class="dropdown-item p-2 text-white hide-channel-link" href="#"
-                                data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filter.id }}" data-action="Hide" data-action-scope="Global">
+                                data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filtered_videos.filter.id }}" data-action="Hide" data-action-scope="Global">
                                 Hide Channel (Global).
                             </a>
 
@@ -222,21 +236,29 @@
     </div>
 </div>
 
+{% endfor %}
 
 <!-- Mark as read -->
 <form id="markAsReadForm" class="form-group">
     <div class="d-flex flex-column">
 
         <!-- Hidden input fields for video IDs -->
+        {% for filtered_videos in filter_group_filtered_videos or [filtered_videos] %}
         {% for video in filtered_videos.videos %}
         <input type="hidden" name="video_ids" value="{{ video.id }}">
         {% endfor %}
+        {% endfor %}
 
         <!-- Button -->
-        <button id="submit" type="submit" class="btn btn-primary w-100">Mark as Read</button>
+        <button id="submit" type="submit" class="btn btn-primary w-100 py-4">Mark as Read</button>
 
     </div>
 </form>
+
+
+
+
+
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

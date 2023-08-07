@@ -305,26 +305,47 @@ async def view_filter_group(
         return response
 
     # Get Filter from FilterGroup that will be displayed
-    ordered_filters = db_filter_group.ordered_filters
     filtered_videos = FilteredVideos()
+    filter_group_filtered_videos: list[FilteredVideos] = []
+    max_videos = 20
+    unread_video_count = 0
     redirect_url = f"/filter-group/{db_filter_group.id}"
     db_filter = None
+
+    ordered_filters = db_filter_group.ordered_filters
     for i, db_filter in enumerate(ordered_filters):
+        # Skip to the ordered filter index
         if i < ordered_filter_index:
             continue
+
         filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
-        if filtered_videos.videos_not_limited_count != 0:
-            redirect_url = f"/filter-group/{db_filter_group.id}/{i}"
+        if filtered_videos.videos_not_limited_count == 0:
+            continue
+
+        max_videos_from_filtered_videos = max_videos - unread_video_count
+        if filtered_videos.videos_limited_count > max_videos_from_filtered_videos:
+            filtered_videos.videos_limited_count = max_videos_from_filtered_videos
+            filtered_videos.videos = filtered_videos.videos[:max_videos_from_filtered_videos]
+
+        unread_video_count += filtered_videos.videos_limited_count
+        filter_group_filtered_videos.append(filtered_videos)
+
+        if unread_video_count >= max_videos:
             ordered_filter_index = i
+            redirect_url = f"/filter-group/{db_filter_group.id}/{i}"
             break
 
     # Redirect to /filter_groups if no unread videos in filter_group
-    if filtered_videos.videos_not_limited_count == 0:
+    if unread_video_count == 0:
         alerts.warning.append(f"No unread videos in '{db_filter_group.name}' filter_group.")
         response = RedirectResponse("/filter-groups", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    # Get total unread videos
+    total_unread_videos = str(len(await crud.video.get_unread_videos(db=db)))
+
+    # Get all playlists and tags for Modals
     playlists = await crud.playlist.get_all(db=db)
     playlists.sort(key=lambda x: x.name)
 
@@ -336,11 +357,11 @@ async def view_filter_group(
         {
             "request": request,
             "filter_group": db_filter_group,
-            "filter": db_filter,
-            "filtered_videos": filtered_videos,
+            "filter_group_filtered_videos": filter_group_filtered_videos,
             "redirect_url": redirect_url,
             "playlists": playlists,
             "tags": tags,
+            "total_unread_videos": total_unread_videos,
             "current_user": current_user,
             "alerts": alerts,
         },

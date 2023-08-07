@@ -27,26 +27,33 @@
 
 
 <!-- Pinned Filters -->
-{% for filter_type in [pinned_filters, filters] %}
+{% for filter_type in [pinned_filters, filters, read_filters] %}
+{% if filter_type == pinned_filters %}
+{% set filter_type_title = "Pinned Filters"%}
+{% elif filter_type == filters %}
+{% set filter_type_title = "Filters"%}
+{% else %}
+{% set filter_type_title = "Read Filters"%}
+{% endif %}
 <div class="container mt-5 pt-1">
     <table class="table table-hover table-sm">
         <thead>
             <tr>
-                <th scope="col" class="w-100">{{ "Pinned Filters" if filter_type == pinned_filters else "Filters" }}</th>
+                <th scope="col" class="w-100">{{ filter_type_title }}</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
         <tbody>
 
             {% for filter_ in filter_type %}
-            {% set color_classes = "text-muted" if filter_unread_count[filter_.id] == 0 else "" %}
-            <tr class="py-3 " style="{{ "display:none;" if filter_unread_count[filter_.id] == 0 else "" }}">
+            {% set color_classes = "text-muted" if filters_unread_count[filter_.id] == 0 else "" %}
+            <tr class="py-3">
 
                 <!-- Filter Name & Unread Count -->
                 <td class="py-4">
                     <a href="/filter/{{ filter_.id }}" class="text-decoration-none text-white">
                         <h5 class="mb-0 text-smaller {{ color_classes }}">
-                            {{ filter_.name }} ({{ filter_unread_count[filter_.id] }})
+                            {{ filter_.name }} ({{ filters_unread_count[filter_.id] }})
                         </h5>
                     </a>
                 </td>
