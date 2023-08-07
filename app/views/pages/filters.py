@@ -47,6 +47,13 @@ async def list_filters(
         filtered_videos = await get_filtered_videos(filter_=filter_)
         filter_unread_count[filter_.id] = filtered_videos.videos_not_limited_count
 
+    # Seperate read filters
+    read_fitlers = []
+    for filter_ in filters:
+        if filter_unread_count[filter_.id] == 0:
+            read_fitlers.append(filter_)
+            filters.remove(filter_)
+
     # Separate pinned filters
     pinned_filter_names = ["All Unread", "Missing Tags"]
     pinned_filters = []
@@ -59,6 +66,7 @@ async def list_filters(
         "filter/list.html",
         {
             "request": request,
+            "read_fitlers": read_fitlers,
             "pinned_filters": pinned_filters,
             "filters": filters,
             "filter_unread_count": filter_unread_count,
@@ -73,7 +81,7 @@ async def list_all_filters(
     request: Request,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
-        deps.get_current_active_superuser
+        deps.get_current_active_user
     ),
 ) -> Response:
     """
