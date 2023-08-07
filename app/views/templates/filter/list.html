@@ -27,7 +27,7 @@
 
 
 <!-- Pinned Filters -->
-{% for filter_type in [pinned_filters, filters, read_fitlers] %}
+{% for filter_type in [pinned_filters, filters, read_filters] %}
 {% if filter_type == pinned_filters %}
 {% set filter_type_title = "Pinned Filters"%}
 {% elif filter_type == filters %}
@@ -46,14 +46,14 @@
         <tbody>
 
             {% for filter_ in filter_type %}
-            {% set color_classes = "text-muted" if filter_unread_count[filter_.id] == 0 else "" %}
+            {% set color_classes = "text-muted" if filters_unread_count[filter_.id] == 0 else "" %}
             <tr class="py-3">
 
                 <!-- Filter Name & Unread Count -->
                 <td class="py-4">
                     <a href="/filter/{{ filter_.id }}" class="text-decoration-none text-white">
                         <h5 class="mb-0 text-smaller {{ color_classes }}">
-                            {{ filter_.name }} ({{ filter_unread_count[filter_.id] }})
+                            {{ filter_.name }} ({{ filters_unread_count[filter_.id] }})
                         </h5>
                     </a>
                 </td>
