@@ -156,7 +156,7 @@
                             {% set action_link_class = 'remove-tag-link' if tag in video.channel.tags else 'add-tag-link' %}
                             {% set action_text_color = 'text-danger' if tag in video.channel.tags else 'text-white' %}
 
-                            <a class="tag-modal-link dropdown-item p-2 {{ action_text_color }} {{ action_link_class }}" href="#"
+                            <a class="tag-modal-link dropdown-item p-3 {{ action_text_color }} {{ action_link_class }}" href="#"
                                 data-tag-id="{{ tag.id }}" data-tag-name="{{ tag.name }}" data-tag-color="{{ tag.color }}"
                                 data-channel-id="{{ video.channel.id }}" data-channel-name="{{ video.channel.name }}"
                                 data-action="{{ action_text }}">
@@ -181,19 +181,17 @@
                         </div>
 
                         <!-- Modal Body -->
-                        <div class="modal-body">
-
-                            <a class="dropdown-item p-2 text-white border-bottom" href="{{ video.channel.url }}">
-                                Open {{ video.channel.service | title }} Channel URL
-                            </a>
+                        <div class="modal-body py-0">
 
                             <!-- Hide Channel -->
-                            <a class="dropdown-item p-2 text-white hide-channel-link" href="#"
+                            <a class="dropdown-item p-5 text-white hide-channel-link border-bottom" href="#"
                                 data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filtered_videos.filter.id }}" data-action="Hide" data-action-scope="Global">
-                                Hide Channel (Global).
+                                Hide Channel (Global)
                             </a>
 
-
+                            <a class="dropdown-item p-5 text-white" href="{{ video.channel.url }}">
+                                Open {{ video.channel.service | title }} Channel URL
+                            </a>
 
                         </div>
                     </div>
@@ -217,7 +215,7 @@
 
                             <!-- Add to Playlists -->
                             {% for playlist in playlists %}
-                            <a class="dropdown-item p-2 text-white add-to-playlist-link" href="#"
+                            <a class="dropdown-item p-5 text-white add-to-playlist-link" href="#"
                                 data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
                                 data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
                                 data-video-thumbnail="{{ video.thumbnail }}" data-video-duration="{{ video.duration }}" data-video-title="{{ video.title }}">
