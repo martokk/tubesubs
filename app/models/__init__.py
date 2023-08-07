@@ -4,6 +4,8 @@ from .channel_tag_link import *
 from .criteria import *
 from .fetch import *
 from .filter import *
+from .filter_filter_group_link import *
+from .filter_group import *
 from .filtered_videos import *
 from .msg import *
 from .playlist import *

@@ -1,6 +1,6 @@
 {% extends "base/base.html" %}
 
-{% block title %} Filters ({{ filters|length }}){% endblock %}
+{% block title %} Filter Groups ({{ filter_groups |length }}){% endblock %}
 
 {% block content %}
 <!-- Header -->
@@ -9,16 +9,16 @@
 
         <!-- Title -->
         <h4 class="col-auto py-1">
-            Filters ({{ filters|length }})
+            Filter Groups ({{ filter_groups |length }})
         </h4>
 
         <!-- Menu -->
         <div class="col-auto small p-1 ms-auto">
-            <a href="/filter/create" class="text-decoration-none text-muted me-3">
+            <a href="/filter-group/create" class="text-decoration-none text-muted me-3">
                 <i class="fas fa-pencil-alt me-2"></i>
-                Add Filter
+                Add Filter Group
             </a>
-            <a href="/filters/fetch" class="text-decoration-none text-muted me-3"><i
+            <a href="/filter-group/fetch" class="text-decoration-none text-muted me-3"><i
                     class="fas fa-arrow-circle-right me-2"></i>Fetch All</a>
         </div>
 
@@ -27,26 +27,26 @@
 
 
 <!-- Pinned Filters -->
-{% for filter_type in [pinned_filters, filters] %}
+{# {% for filter_group in filter_groups %} #}
 <div class="container mt-5 pt-1">
     <table class="table table-hover table-sm">
         <thead>
             <tr>
-                <th scope="col" class="w-100">{{ "Pinned Filters" if filter_type == pinned_filters else "Filters" }}</th>
+                <th scope="col" class="w-100">Filter Groups</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
         <tbody>
 
-            {% for filter_ in filter_type %}
-            {% set color_classes = "text-muted" if filter_unread_count[filter_.id] == 0 else "" %}
-            <tr class="py-3 " style="{{ "display:none;" if filter_unread_count[filter_.id] == 0 else "" }}">
+            {% for filter_group in filter_groups %}
+            {% set color_classes = "text-muted" if filter_group_unread_count[filter_group.id] == 0 else "" %}
+            <tr class="py-3 " style="{{ "display:none;" if filter_group_unread_count[filter_group.id] == 0 else "" }}">
 
                 <!-- Filter Name & Unread Count -->
                 <td class="py-4">
-                    <a href="/filter/{{ filter_.id }}" class="text-decoration-none text-white">
+                    <a href="/filter-group/{{ filter_group.id }}" class="text-decoration-none text-white">
                         <h5 class="mb-0 text-smaller {{ color_classes }}">
-                            {{ filter_.name }} ({{ filter_unread_count[filter_.id] }})
+                            {{ filter_group.name }} ({{ filter_group_unread_count[filter_group.id] }})
                         </h5>
                     </a>
                 </td>
@@ -64,13 +64,13 @@
                         <!-- Menu -->
                         <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
 
-                            <li><a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/edit">Edit</a></li>
+                            <li><a class="dropdown-item p-2" href="/filter-group/{{ filter_group.id }}/edit">Edit</a></li>
 
-                            <li><a class="dropdown-item p-2" href="/filter/{{ filter_.id }}/fetch">Fetch Videos</a></li>
+                            <li><a class="dropdown-item p-2" href="/filter-group/{{ filter_group.id }}/fetch">Fetch Videos</a></li>
 
                             <hr class="dropdown-divider">
 
-                            <li><a class="dropdown-item p-2" href="#" onclick="confirmDelete('/filter/{{ filter_.id }}/delete')">Delete</a></li>
+                            <li><a class="dropdown-item p-2" href="#" onclick="confirmDelete('/filter-group/{{ filter_group.id }}/delete')">Delete</a></li>
 
                         </ul>
                     </div>
@@ -81,12 +81,12 @@
         </tbody>
     </table>
 </div>
-{% endfor %}
+{# {% endfor %} #}
 
 
 <script>
     function confirmDelete(url) {
-        if (confirm("Are you sure you want to delete this filter?")) {
+        if (confirm("Are you sure you want to delete this filter group?")) {
             window.location.href = url;
         }
     }

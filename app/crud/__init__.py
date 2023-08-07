@@ -2,6 +2,7 @@ from .channel import *
 from .criteria import *
 from .exceptions import *
 from .filter import *
+from .filter_group import *
 from .playlist import *
 from .playlist_item import *
 from .subscription import *

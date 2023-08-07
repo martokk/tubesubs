@@ -2,35 +2,33 @@
 
 {% block title %}{{ filter.name }}{% endblock %}
 
-
 {% block content %}
 <!-- Header -->
 <div>
-    <div class="row align-items-center">
-        <h5 class="col-auto py-1">
-            <a href="/filter/{{ filter.id }}" class="text-decoration-none text-white">
-                {{ filter.name }}
-                </span>
+    <div class="row align-items-end">
+        <div class="col-auto">
+            <span class="text-muted ">{{ filter_group.name if filter_group else "Filter"}}</span>
+        </div>
+        <div class="col text-end small">
+            <a href="{{ '/filter-group/' + filter_group.id if filter_group else '/filter/' + filter.id }}/edit" class="btn btn-link text-muted me-3 pb-0">
+                <i class="fas fa-pencil-alt me-2"></i>Edit
             </a>
-        </h5>
-        <div class="col-auto small p-1 ms-auto">
-            <a href="/filter/{{ filter.id }}/edit" class="text-decoration-none text-muted me-3"><i
-                    class="fas fa-pencil-alt me-2"></i>Edit</a>
-            <a href="/filter/{{ filter.id }}/fetch" class="text-decoration-none text-muted me-3"><i
-                    class="fas fa-arrow-circle-right me-2"></i>Fetch</a>
+            <a href="{{ '/filter-group/' + filter_group.id if filter_group else '/filter/' + filter.id }}/fetch" class="btn btn-link text-muted me-3 pb-0">
+                <i class="fas fa-arrow-circle-right me-2"></i>Fetch
+            </a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h5 class="pt-0 mt-0 pb-1">
+                {{ filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})</span>
+            </h5>
         </div>
     </div>
 </div>
 
-
 <!-- List Videos -->
 <div class="container py-3 px-0">
-    <div class="small fw-bold w-auto d-flex justify-content-start">
-        Videos ({{ filtered_videos.videos_limited_count }} / {{ filtered_videos.videos_not_limited_count }})
-        {# Videos ({{ source.videos_sorted()|length }}) #}
-    </div>
-
-
 
     <!-- Video Container -->
     <div class="row">
@@ -226,8 +224,7 @@
 
 
 <!-- Mark as read -->
-<!-- Form -->
-<form method="POST" class="form-group" action="/filter/{{ filter.id }}/mark_as_read">
+<form id="markAsReadForm" class="form-group">
     <div class="d-flex flex-column">
 
         <!-- Hidden input fields for video IDs -->
@@ -235,14 +232,15 @@
         <input type="hidden" name="video_ids" value="{{ video.id }}">
         {% endfor %}
 
-        <!-- Submit -->
-        <button type="submit" class="btn btn-primary w-100">Mark as Read</button>
+        <!-- Button -->
+        <button id="submit" type="submit" class="btn btn-primary w-100">Mark as Read</button>
+
     </div>
 </form>
 
-
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <!-- Modal Show/Hide -->
 <script>
     $(document).ready(function () {
@@ -261,7 +259,41 @@
     });
 </script>
 
+<!-- Mark as Read -->
+<script>
+    $(document).ready(function () {
+        $("#submit").click(function (event) {
+            event.preventDefault(); // Prevent the default form submission
 
+            // Collect video IDs from the hidden inputs
+            const videoIds = [];
+            const hiddenInputs = document.querySelectorAll("input[name='video_ids']");
+            hiddenInputs.forEach(input => videoIds.push(input.value));
+
+            // AJAX POST request to the API endpoint
+            data = {
+                "video_ids": videoIds,
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/v1/video/mark-videos-read",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    window.location.href = "{{ redirect_url }}";
+                },
+                error: function (xhr, status, error) {
+                    var errorMessage = "Failed to add video to mark as read";
+                    errorMessage += "\nStatus Code: " + xhr.status;
+                    errorMessage += "\nStatus Text: " + xhr.statusText;
+                    errorMessage += "\nResponse Text: " + xhr.responseText;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
 
 <!-- Add to Playlist Event Listener -->
 <script>
@@ -337,8 +369,6 @@
             var filterId = $(this).data("filter-id");
             var action = $(this).data("action");
             var actionScope = $(this).data("action-scope");
-            var videoContainer = $(this).closest(".video-container");
-            var videoDetailsContainer = $(this).closest(".video-details-container");
 
             // Determine the API endpoint based on the action
             var apiEndpoint;
@@ -470,8 +500,6 @@
             var tagName = $(this).data("tag-name");
             var tagColor = $(this).data("tag-color");
             var action = $(this).data("action");
-            var videoContainer = $(this).closest(".video-container");
-            var videoDetailsContainer = $(this).closest(".video-details-container");
 
             // AJAX POST request to the API endpoint
             var apiEndpoint = $(this).hasClass("remove-tag-link")
