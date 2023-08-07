@@ -308,7 +308,7 @@ async def view_filter_group(
     filtered_videos = FilteredVideos()
     filter_group_filtered_videos: list[FilteredVideos] = []
     max_videos = 20
-    unread_video_count = 0
+    unread_videos: list[models.Video] = []
     redirect_url = f"/filter-group/{db_filter_group.id}"
     db_filter = None
 
@@ -318,25 +318,36 @@ async def view_filter_group(
         if i < ordered_filter_index:
             continue
 
+        # Get filtered videos
         filtered_videos = await get_filtered_videos(filter_=db_filter, max_videos=20)
         if filtered_videos.videos_not_limited_count == 0:
             continue
 
-        max_videos_from_filtered_videos = max_videos - unread_video_count
+        # Remove videos found in previous filters
+        for video in filtered_videos.videos.copy():
+            if video.id in [video.id for video in unread_videos]:
+                filtered_videos.videos.remove(video)
+                filtered_videos.videos_limited_count -= 1
+                filtered_videos.videos_not_limited_count -= 1
+
+        # Limit the number of videos
+        max_videos_from_filtered_videos = max_videos - len(unread_videos)
         if filtered_videos.videos_limited_count > max_videos_from_filtered_videos:
             filtered_videos.videos_limited_count = max_videos_from_filtered_videos
             filtered_videos.videos = filtered_videos.videos[:max_videos_from_filtered_videos]
 
-        unread_video_count += filtered_videos.videos_limited_count
+        # Add unread videos to filter group filtered videos
+        unread_videos.extend(filtered_videos.videos)
         filter_group_filtered_videos.append(filtered_videos)
 
-        if unread_video_count >= max_videos:
+        # if max_video is reached, break
+        if len(unread_videos) >= max_videos:
             ordered_filter_index = i
             redirect_url = f"/filter-group/{db_filter_group.id}/{i}"
             break
 
     # Redirect to /filter_groups if no unread videos in filter_group
-    if unread_video_count == 0:
+    if len(unread_videos) == 0:
         alerts.warning.append(f"No unread videos in '{db_filter_group.name}' filter_group.")
         response = RedirectResponse("/filter-groups", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)

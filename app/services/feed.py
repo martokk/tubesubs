@@ -82,7 +82,7 @@ class PlaylistFeedGenerator(FeedGenerator):
             post.id(item.id)
             post.title(item.title)
             post.link(href=item.url)
-            post.description(" ")
+            post.description(f"Link: {item.url}")
             post.enclosure(
                 url=item.url,
                 length=str(0),
