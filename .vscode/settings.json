@@ -110,6 +110,7 @@
 		"subqueryload",
 		"tabmix",
 		"templating",
+		"tubesubs",
 		"typehints",
 		"typer",
 		"tzutc",
