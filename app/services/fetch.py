@@ -63,7 +63,7 @@ async def fetch_all_subscriptions(db: Session) -> FetchResults:
     return results
 
 
-async def fetch_filter(db: Session, id: str) -> FetchResults:
+async def fetch_filter(db: Session, filter_id: str) -> FetchResults:
     """
     Fetch new data from yt-dlp for the filter and update the filter in the database.
 
@@ -75,7 +75,7 @@ async def fetch_filter(db: Session, id: str) -> FetchResults:
         models.FetchResult: The result of the fetch.
     """
 
-    db_filter = await crud.filter.get(id=id, db=db)
+    db_filter = await crud.filter.get(id=filter_id, db=db)
 
     info_message = f"Fetching {db_filter.__repr__()}"
     logger.info(info_message)
@@ -95,6 +95,43 @@ async def fetch_filter(db: Session, id: str) -> FetchResults:
     success_message = (
         f"Completed fetching {db_filter.__repr__()}. Added {results.added_videos} new videos. "
     )
+    logger.success(success_message)
+
+    return results
+
+
+async def fetch_filter_group(db: Session, filter_group_id: str) -> FetchResults:
+    """
+    Fetch new data from yt-dlp for the filter and update the filter in the database.
+
+    Args:
+        db (Session): The database session.
+        id: The id of the filter to fetch and update.
+
+    Returns:
+        models.FetchResult: The result of the fetch.
+    """
+
+    db_filter_group = await crud.filter_group.get(id=filter_group_id, db=db)
+
+    info_message = f"Fetching {len(db_filter_group.subscriptions)} subscriptions in '{db_filter_group.__repr__()}' Filter Group"
+    logger.info(info_message)
+
+    # Get Subscriptions from Filter Group
+
+    results = FetchResults()
+    for subscription in db_filter_group.subscriptions:
+        try:
+            subscription_fetch_results = await fetch_subscription(id=subscription.id, db=db)
+        except FetchCanceledError:
+            continue
+
+        results += subscription_fetch_results
+
+        # Allow other tasks to run
+        await asyncio.sleep(0)
+
+    success_message = f"Completed fetching {db_filter_group.__repr__()}. Added {results.added_videos} new videos. "
     logger.success(success_message)
 
     return results

@@ -23,7 +23,7 @@
                     <label for="subscription_handlers">Edit Subscriptions:</label>
                     <select class="form-control" id="subscription_handlers" name="subscription_handlers" size="4" multiple>
                         {% for option_subscription_handler in options_subscription_handlers %}
-                        <option value="{{ option_subscription_handler }}" >{{ option_subscription_handler }}</option>
+                        <option value="{{ option_subscription_handler }}" {{ "selected" if option_subscription_handler=="YoutubeSubscriptionHandler" else "" }}>{{ option_subscription_handler }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -33,7 +33,7 @@
                     <label for="read_status">Read Status:</label>
                     <select class="form-control mb-3" id="read_status" name="read_status">
                         {% for option in options_read_status %}
-                        <option value="{{ option }}" >{{ option }}</option>
+                        <option value="{{ option }}" {{ "selected" if option=="unread" else "" }}>{{ option }}</option>
                         {% endfor %}
                     </select>
                 </div>

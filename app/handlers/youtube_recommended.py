@@ -12,13 +12,13 @@ if TYPE_CHECKING:
 settings = _Settings()
 
 
-class YoutubeSubscriptionHandler(SubscriptionHandler):
-    TITLE = "Youtube Subscription"
+class YoutubeRecommendedHandler(SubscriptionHandler):
+    TITLE = "Youtube Recommended"
     SERVICE = "YoutubeHandler"
     COLOR = "#333333"
-    URL = "https://www.youtube.com/feed/subscriptions"
+    URL = "https://www.youtube.com/feed/recommended"
     COOKIES_FILE = paths.YOUTUBE_COOKIES_FILE
-    IS_SUBSCRIPTION_FEED = True  # if user is already subscribed to all channels
+    IS_SUBSCRIPTION_FEED = False  # if user is already subscribed to all channels
 
     def get_subscription_ydl_opts(
         self,

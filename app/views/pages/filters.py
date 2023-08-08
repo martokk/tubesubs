@@ -548,7 +548,7 @@ async def fetch_filter_page(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
-    fetch_results = await fetch_filter(db=db, id=filter_id)
+    fetch_results = await fetch_filter(db=db, filter_id=filter_id)
 
     alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
 
