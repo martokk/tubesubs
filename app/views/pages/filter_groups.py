@@ -6,7 +6,7 @@ from sqlmodel import Session
 
 from app import crud, models
 from app.models.filtered_videos import FilteredVideos
-from app.services.fetch import fetch_all_subscriptions
+from app.services.fetch import fetch_all_subscriptions, fetch_filter_group
 from app.services.filter_videos import get_filtered_videos
 from app.views import deps, templates
 
@@ -272,6 +272,69 @@ async def handle_edit_filter_group(
     return response
 
 
+@router.get("/filter-groups/fetch", response_class=HTMLResponse)
+async def fetch_all_filter_groups(
+    request: Request,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Fetch all filter_groups
+
+    Args:
+        filter_group_id(str): The filter_group id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Fetches videos and redirects back to /filter_group/filter_group_id.
+    """
+    alerts = models.Alerts()
+
+    fetch_results = await fetch_all_subscriptions(db=db)
+
+    alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
+
+    response = RedirectResponse(url="/filter-groups", status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+    return response
+
+
+@router.get("/filter-group/{filter_group_id}/fetch", response_class=HTMLResponse)
+async def fetch_all_filter_group(
+    request: Request,
+    filter_group_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(  # pylint: disable=unused-argument
+        deps.get_current_active_user
+    ),
+) -> Response:
+    """
+    Fetch all filter_groups
+
+    Args:
+        filter_group_id(str): The filter_group id
+        db(Session): The database session.
+        current_user(User): The authenticated user.
+
+    Returns:
+        Fetches videos and redirects back to /filter_group/filter_group_id.
+    """
+    alerts = models.Alerts()
+
+    fetch_results = await fetch_filter_group(db=db, filter_group_id=filter_group_id)
+
+    alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
+
+    response = RedirectResponse(
+        url=f"/filter-group/{filter_group_id}", status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
+    return response
+
+
 @router.get("/filter-group/{filter_group_id}/{ordered_filter_index}", response_class=HTMLResponse)
 @router.get("/filter-group/{filter_group_id}", response_class=HTMLResponse)
 async def view_filter_group(
@@ -406,36 +469,6 @@ async def delete_filter_group(
         alerts.danger.append("FilterGroup not found")
     except crud.DeleteError:
         alerts.danger.append("Error deleting filter_group")
-
-    response = RedirectResponse(url="/filter-groups", status_code=status.HTTP_303_SEE_OTHER)
-    response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)
-    return response
-
-
-@router.get("/filter-groups/fetch", response_class=HTMLResponse)
-async def fetch_all_filter_groups(
-    request: Request,
-    db: Session = Depends(deps.get_db),
-    current_user: models.User = Depends(  # pylint: disable=unused-argument
-        deps.get_current_active_user
-    ),
-) -> Response:
-    """
-    Fetch all filter_groups
-
-    Args:
-        filter_group_id(str): The filter_group id
-        db(Session): The database session.
-        current_user(User): The authenticated user.
-
-    Returns:
-        Fetches videos and redirects back to /filter_group/filter_group_id.
-    """
-    alerts = models.Alerts()
-
-    fetch_results = await fetch_all_subscriptions(db=db)
-
-    alerts.success.append(f"Fetched {fetch_results.added_videos} new videos")
 
     response = RedirectResponse(url="/filter-groups", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(key="alerts", value=alerts.json(), max_age=5, httponly=True)

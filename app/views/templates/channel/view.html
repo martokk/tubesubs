@@ -108,6 +108,20 @@
                 </div>
             </div>
 
+            <!-- is_hidden -->
+            <div class="row">
+                <div class="col-4 text-right font-weight-bold">
+                    Subscription Status
+                </div>
+                <div class="col-8">
+                    {% if channel.is_subscribed == True %}
+                    Is Subscribed
+                    {% else %}
+                    Is NOT Subscribed
+                    {% endif %}
+                </div>
+            </div>
+
             <!-- Tags -->
             <div class="row">
                 <div class="col-4 text-right font-weight-bold">

@@ -39,8 +39,15 @@ async def list_channels(
         is_hidden = False
         action = "hide"
 
-    channels = await crud.channel.get_multi(db=db, is_hidden=is_hidden)
-    channels.sort(key=lambda x: x.name)
+    subscribed_channels = await crud.channel.get_multi(
+        db=db, is_hidden=is_hidden, is_subscribed=True
+    )
+    subscribed_channels.sort(key=lambda x: x.name)
+
+    not_subscribed_channels = await crud.channel.get_multi(
+        db=db, is_hidden=is_hidden, is_subscribed=False
+    )
+    not_subscribed_channels.sort(key=lambda x: x.name)
 
     tags = await crud.tag.get_all(db=db)
     tags.sort(key=lambda x: x.name)
@@ -50,7 +57,8 @@ async def list_channels(
         {
             "request": request,
             "title": title,
-            "channels": channels,
+            "subscribed_channels": subscribed_channels,
+            "not_subscribed_channels": not_subscribed_channels,
             "tags": tags,
             "current_user": current_user,
             "alerts": alerts,

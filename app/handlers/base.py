@@ -17,6 +17,7 @@ class SubscriptionHandler:
     SERVICE = ""
     COLOR = "#333333"
     URL = ""
+    IS_SUBSCRIPTION_FEED = False  # if user is already subscribed to all channels
 
     @property
     def name(self) -> str:

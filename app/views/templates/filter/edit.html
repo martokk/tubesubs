@@ -111,7 +111,7 @@
     </div>
 
     <!-- Criteria Card -->
-    <div class="col-12 col-lg-6 my-3">
+    <div class="col-12 my-3">
         <div class="card h-100">
 
             {% if filter.criterias %}
@@ -176,26 +176,27 @@
 
                         <!-- Form -->
                         <form method="POST" class="form-group" action="/filter/{{ filter.id }}/criteria/create">
-                            <div class="d-flex">
+                            <div class="d-flex flex-column flex-md-row">
+                                <!-- Use flex-column for stacking on mobile, and flex-md-row for horizontal layout on larger screens -->
 
                                 <!-- Field -->
-                                <div class=" col-3 form-group pe-1">
+                                <div class="col-md-3 form-group pe-md-1 py-2">
                                     <select class="form-control" id="fieldInput" name="field">
                                         {% for option in options_criteria_fields %}
-                                        <option value="{{ option }}">{{ option }}</option>
+                                        <option value="{{ option }}" {{ "selected" if option=="channel" else "" }}>{{ option }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
 
                                 <!-- Operator -->
-                                <div class="col-3 form-group pe-1">
+                                <div class="col-md-3 form-group pe-md-1 py-2">
                                     <select class="form-control" id="operatorInput" name="operator">
                                         <option value="">Criteria</option>
                                     </select>
                                 </div>
 
                                 <!-- Value -->
-                                <div class="col-2 form-group pe-1">
+                                <div class="col-md-2 form-group pe-md-1 py-2">
                                     {% if fieldInput == 'read_status' %}
                                     <select class="form-control" id="valueInput" name="value">
                                         {% for option in options_read_status_values %}
@@ -208,19 +209,20 @@
                                 </div>
 
                                 <!-- UOM -->
-                                <div class="col-2 form-group pe-1">
+                                <div class="col-md-2 form-group pe-md-1 py-2">
                                     <select class="form-control" id="uomInput" name="unit_of_measure">
                                         <option value="">Unit</option>
                                     </select>
                                 </div>
 
                                 <!-- Submit -->
-                                <div class="col-2 form-group text-end ">
+                                <div class="col-md-2 form-group text-md-end py-2">
                                     <button type="submit"
                                         class="btn {% if not filter.criterias %} btn-warning{% else %}btn-primary{% endif %} w-100">Add</button>
                                 </div>
                             </div>
                         </form>
+
                     </div>
                 </div>
 

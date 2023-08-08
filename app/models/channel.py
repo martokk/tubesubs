@@ -24,6 +24,7 @@ class ChannelBase(TimestampModel, SQLModel):
     name: str = Field(default=None)
     logo: str | None = Field(default=None)
     is_hidden: bool = Field(default=False)
+    is_subscribed: bool = Field(default=False)
 
 
 class Channel(ChannelBase, table=True):

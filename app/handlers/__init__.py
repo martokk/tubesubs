@@ -5,10 +5,11 @@ from app.handlers.exceptions import HandlerNotFoundError
 from .base import ServiceHandler, SubscriptionHandler
 from .rumble import RumbleHandler
 from .youtube import YoutubeHandler
+from .youtube_recommended import YoutubeRecommendedHandler
 from .youtube_subscription import YoutubeSubscriptionHandler
 
 registered_service_handlers = [YoutubeHandler()]
-registered_subscription_handlers = [YoutubeSubscriptionHandler()]
+registered_subscription_handlers = [YoutubeSubscriptionHandler(), YoutubeRecommendedHandler()]
 
 
 def get_registered_service_handlers() -> list[str]:
@@ -49,4 +50,6 @@ def get_service_handler_from_string(handler_string: str) -> ServiceHandler:
 def get_subscription_handler_from_string(handler_string: str) -> SubscriptionHandler:
     if handler_string == "YoutubeSubscriptionHandler" or handler_string == "YoutubeSubscription":
         return YoutubeSubscriptionHandler()
+    if handler_string == "YoutubeRecommendedHandler" or handler_string == "YoutubeRecommended":
+        return YoutubeRecommendedHandler()
     raise HandlerNotFoundError(f"A handler could not be found for {handler_string=}.")

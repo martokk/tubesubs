@@ -7,6 +7,7 @@ from sqlmodel import Field, Relationship, SQLModel
 
 from app import models
 from app.core.uuid import generate_uuid_random
+from app.models.subscription import Subscription
 
 from .common import TimestampModel
 
@@ -38,6 +39,12 @@ class FilterGroup(FilterGroupBase, table=True):
         except ValueError as e:
             print(e)
             return self.filters
+
+    @property
+    def subscriptions(self) -> list[Subscription]:
+        return list(
+            {subscription for filter_ in self.filters for subscription in filter_.subscriptions}
+        )
 
 
 class FilterGroupCreate(FilterGroupBase, TimestampModel):

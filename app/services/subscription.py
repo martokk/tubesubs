@@ -4,7 +4,7 @@ from sqlmodel import Session
 
 from app import crud
 from app.models import Subscription, VideoCreate
-from app.models.channel import ChannelCreate
+from app.models.channel import ChannelCreate, ChannelUpdate
 from app.services.ytdlp import get_info_dict
 
 
@@ -58,6 +58,11 @@ async def add_new_subscription_info_dict_videos_to_subscription(
     Returns:
         A list of Video objects that were added to the database.
     """
+
+    # Check if is Subscription Feed (user is subscribed to all channels in feed)
+    is_subscription_feed = db_subscription.subscription_handler_obj.IS_SUBSCRIPTION_FEED
+
+    # Fetch Videos from Feed
     fetched_videos = get_subscription_videos_from_subscription_info_dict(
         subscription_info_dict=subscription_info_dict, db_subscription=db_subscription
     )
@@ -67,15 +72,18 @@ async def add_new_subscription_info_dict_videos_to_subscription(
     new_videos = []
     for fetched_video in fetched_videos:
         if fetched_video.id not in db_video_ids:
-            # Create Channel in Database
+            # Get Channel in Database
             db_channel = await crud.channel.get_or_none(
                 db=db, remote_channel_id=fetched_video.remote_channel_id
             )
+
+            # Create Channel if Needed
             if not db_channel:
                 new_channel = ChannelCreate(
                     service_handler=db_subscription.service_handler,
                     remote_channel_id=fetched_video.remote_channel_id,
                     name=fetched_video.remote_channel_name,
+                    is_subscribed=True if is_subscription_feed else False,
                 )
                 try:
                     db_channel = await crud.channel.create(obj_in=new_channel, db=db)
@@ -83,6 +91,13 @@ async def add_new_subscription_info_dict_videos_to_subscription(
                     db_channel = await crud.channel.get(
                         db=db, remote_channel_id=new_channel.remote_channel_id
                     )
+
+            # Check if channel is subscribed to
+            if db_channel.is_subscribed is False and is_subscription_feed:
+                channel_update = ChannelUpdate(is_subscribed=True)
+                db_channel = await crud.channel.update(
+                    db=db, id=db_channel.id, obj_in=channel_update
+                )
 
             # Create Video in Database
             new_video = VideoCreate(**fetched_video.dict())

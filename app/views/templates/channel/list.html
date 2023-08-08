@@ -26,13 +26,15 @@
 
 
 <!-- List Channels -->
-<div class="container">
-    <table class="table table-hover table-sm">
+{% for channels in [subscribed_channels, not_subscribed_channels]%}
+<div class="container pb-5 mb-5">
+
+    <table class="table table-hover table-sm pt-2 pb-5 mb-5">
 
         <!-- Table Headers -->
         <thead>
             <tr>
-                <th scope="col" class="w-100">Channel</th>
+                <th scope="col" class="w-100">{{ "Subscribed Channels" if channels == subscribed_channels else "Not Subscribed Channels" }}</th>
                 <th scope="col" class="w-auto"></th>
             </tr>
         </thead>
@@ -165,6 +167,7 @@
     </table>
 
 </div>
+{% endfor %}
 
 <!-- Scripts -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
