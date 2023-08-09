@@ -199,8 +199,8 @@ async def test_get_tokens_from_refresh_token(
     response = client.get("/account")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.template.name == "user/view.html"  # type: ignore
-    assert response.url.path == "/account/"  # type: ignore
+    assert response.template.name == "filter_group/list.html"  # type: ignore
+    assert response.url.path == "/filter-groups"  # type: ignore
 
 
 async def test_get_tokens_from_invalid_refresh_token(
@@ -217,8 +217,8 @@ async def test_get_tokens_from_invalid_refresh_token(
     response = client.get("/account")
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.template.name == "user/view.html"  # type: ignore
-    assert response.url.path == "/account/"  # type: ignore
+    assert response.template.name == "filter_group/list.html"  # type: ignore
+    assert response.url.path == "/filter-groups"  # type: ignore
 
     # Test invalid refresh token
     with patch(

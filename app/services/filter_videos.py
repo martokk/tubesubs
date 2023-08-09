@@ -145,15 +145,16 @@ async def filter_by_criteria_tags(videos: list[Video], criterias: list[Criteria]
 
         # Must NOT Contain Tags
         if criteria_must_not_contain_tags:
-            for video_channel_tag in video_channel_tags:
-                if video_channel_tag in criteria_must_not_contain_tags:
-                    append_video = False
-                    break
-                else:
-                    if "ANY" in criteria_must_not_contain_tags and len(video_channel_tags) > 0:
+            if "ANY" in criteria_must_not_contain_tags:
+                if not video_channel_tags:
+                    append_video = True
+            else:
+                for video_channel_tag in video_channel_tags:
+                    if video_channel_tag in criteria_must_not_contain_tags:
                         append_video = False
                         break
-                    append_video = True
+                    else:
+                        append_video = True
 
         # Duration
         if criteria_duration:
