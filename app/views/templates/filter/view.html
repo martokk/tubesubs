@@ -60,8 +60,15 @@
 
 
                     <!-- Overlay Div -->
+                    {% if video.duration > 60 * 50 %}
+                    {% set duration_color = "#A70000" %}
+                    {% elif video.duration > 60 * 25 %}
+                    {% set duration_color = "#cc7a00" %}
+                    {% else %}
+                    {% set duration_color = "#232323" %}
+                    {% endif%}
                     <div class="overlay-div position-absolute bottom-0 start-0 w-100 py-2 small" data-bs-target="#tagModal-{{ video.id }}" data-bs-toggle="modal"
-                        style="background-color: rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; justify-content: flex-end; position: relative; min-height: 45px;">
+                        style="background-color: rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; justify-content: flex-end; position: relative; min-height: 45px; {{ "border-bottom: 5px solid" + duration_color if video.duration > 60 * 35 else ""}};">
 
                         <!-- Tags Container -->
                         <div class="text-white px-2 w-100 tags-container" data-channel-id="{{ video.channel.id }}">
@@ -89,13 +96,7 @@
                         </div>
 
                         <!-- Duration -->
-                        {% if video.duration > 60 * 50 %}
-                        {% set duration_color = "#480000" %}
-                        {% elif video.duration > 60 * 25 %}
-                        {% set duration_color = "#483D00" %}
-                        {% else %}
-                        {% set duration_color = "#232323" %}
-                        {% endif%}
+
                         <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded position-absolute bottom-0 end-0" style="background-color: {{ duration_color }}">
                             {% set hours = (video.duration // 3600) %}
                             {% set minutes = (video.duration // 60) % 60 %}

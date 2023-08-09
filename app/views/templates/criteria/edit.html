@@ -49,6 +49,7 @@
                 <form method="POST" class="justify-content-center"
                     action="/filter/{{ criteria.filter.id }}/criteria/{{ criteria.id }}/edit">
                     <div class="d-flex flex-wrap justify-content-center">
+
                         <div class="col-lg-2 col-12 form-group m-2">
                             <select class="form-control" id="fieldInput" name="field">
                                 <option value="{{ criteria.field }}">{{ criteria.field}}</option>
@@ -57,6 +58,7 @@
                                 {% endfor %}
                             </select>
                         </div>
+
                         <div class="col-lg-2 col-12 form-group m-2">
                             <select class="form-control" id="operatorInput" name="operator">
                                 <option value="{{ criteria.operator }}">{{ criteria.operator}}</option>
@@ -65,10 +67,12 @@
                                 {% endfor %}
                             </select>
                         </div>
+
                         <div class="col-lg-2 col-12 form-group m-2">
                             <input type="text" class="form-control" id="valueInput" name="value"
                                 value="{{ criteria.value }}">
                         </div>
+
                         <div class="col-lg-2 col-12 form-group m-2">
                             <select class="form-control" id="uomInput" name="unit_of_measure">
                                 <option value="{{ criteria.unit_of_measure }}">{{ criteria.unit_of_measure}}</option>
@@ -77,9 +81,11 @@
                                 {% endfor %}
                             </select>
                         </div>
+
                         <div class="col-lg-auto col-12 form-group m-2 text-end">
                             <button type="submit" class="btn btn-primary">Update</button>
                         </div>
+
                     </div>
                 </form>
             </div>
@@ -154,7 +160,7 @@
         } else {
             // Replace the ValueInput with the text input
             $("#valueInput").replaceWith(`
-                <input type="text" class="form-control" id="valueInput" name="value" placeholder="Value">
+                <input type="text" class="form-control" id="valueInput" name="value" value="{{ criteria.value }}">
             `);
         }
 
