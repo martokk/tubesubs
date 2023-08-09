@@ -152,7 +152,7 @@ async def get_current_active_user(
         HTTPException: If the user is inactive.
     """
     if not current_user:
-        RedirectException(url="/login")
+        raise RedirectException(url="/login")
     if not crud.user.is_active(current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Inactive user"
@@ -176,7 +176,7 @@ async def get_current_active_superuser(
         HTTPException: If the user is not a superuser.
     """
     if not current_user:
-        RedirectException(url="/login")
+        raise RedirectException(url="/login")
     if not crud.user.is_superuser(user_=current_user):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
