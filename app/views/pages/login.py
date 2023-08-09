@@ -6,7 +6,7 @@ from pydantic import EmailStr
 from sqlmodel import Session
 
 from app import logger, models, settings
-from app.api.deps import get_db
+from app.views import deps
 from app.core import security
 from app.views import templates
 
@@ -33,7 +33,7 @@ async def login(request: Request) -> Response:
 async def handle_login(
     request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
-    db: Session = Depends(get_db),
+    db: Session = Depends(deps.get_db),
 ) -> Response:
     """
     Handle login.
