@@ -49,6 +49,15 @@ body {
     overflow-x: hidden;
 }
 
+.bg-dark {
+    background-color: #1c1c1c !important;
+}
+
+:root {
+    --bs-body-bg: #1c1c1c !important;
+
+}
+
 .d-flex.flex-column {
     min-height: 100%;
 }
