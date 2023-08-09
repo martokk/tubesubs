@@ -98,6 +98,7 @@
                         <!-- Duration -->
 
                         <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded position-absolute bottom-0 end-0" style="background-color: {{ duration_color }}">
+                            {% if video.duration %}
                             {% set hours = (video.duration // 3600) %}
                             {% set minutes = (video.duration // 60) % 60 %}
                             {% set seconds = video.duration % 60 %}
@@ -105,6 +106,7 @@
                             {{ '%d:%02d:%02d'|format(hours, minutes, seconds) }}
                             {% else %}
                             {{ '%2d:%02d'|format(minutes, seconds) }}
+                            {% endif %}
                             {% endif %}
                         </div>
                     </div>
