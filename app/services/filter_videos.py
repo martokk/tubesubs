@@ -1,4 +1,4 @@
-from app.models.criteria import Criteria, CriteriaField, CriteriaOperator
+from app.models.criteria import Criteria, CriteriaField, CriteriaOperator, CriteriaUnitOfMeasure
 from app.models.filter import Filter, FilterOrderedBy, FilterReadStatus
 from app.models.filtered_videos import FilteredVideos
 from app.models.subscription import Subscription
@@ -96,30 +96,81 @@ async def filter_by_criteria_tags(videos: list[Video], criterias: list[Criteria]
         and criteria.operator == CriteriaOperator.MUST_NOT_CONTAIN.value
     ]
 
-    if not criteria_must_contain_tags and not criteria_must_not_contain_tags:
+    criteria_duration = False
+    criteria_duration_greater_than = 0
+    criteria_duration_shorter_than = 86400
+    for criteria in criterias:
+        if criteria.field == CriteriaField.DURATION.value:
+            criteria_duration = True
+
+            # set value in seconds
+            if criteria.unit_of_measure == CriteriaUnitOfMeasure.MINUTES.value:
+                criteria_value_seconds = int(criteria.value) * 60
+            elif criteria.unit_of_measure == CriteriaUnitOfMeasure.HOURS.value:
+                criteria_value_seconds = int(criteria.value) * 60 * 60
+            else:
+                criteria_value_seconds = int(criteria.value)
+
+            if criteria.operator == CriteriaOperator.LONGER_THAN.value:
+                if criteria_value_seconds > criteria_duration_greater_than:
+                    criteria_duration_greater_than = criteria_value_seconds
+
+            if criteria.operator == CriteriaOperator.SHORTER_THAN.value:
+                if criteria_value_seconds < criteria_duration_shorter_than:
+                    criteria_duration_shorter_than = criteria_value_seconds
+
+    if (
+        not criteria_must_contain_tags
+        and not criteria_must_not_contain_tags
+        and not criteria_duration
+    ):
         return videos
+
+    # Filter Tags
 
     filtered_videos = []
     for video in videos:
+        append_video = False
         video_channel_tags = [tag.name for tag in video.channel.tags]
 
+        # Must Contain Tags
         if criteria_must_contain_tags:
             for video_channel_tag in video_channel_tags:
                 if (
                     video_channel_tag in criteria_must_contain_tags
                     or "ANY" in criteria_must_contain_tags
                 ):
-                    filtered_videos.append(video)
+                    append_video = True
                     break
 
+        # Must NOT Contain Tags
         if criteria_must_not_contain_tags:
             for video_channel_tag in video_channel_tags:
                 if video_channel_tag in criteria_must_not_contain_tags:
+                    append_video = False
                     break
+                else:
+                    if "ANY" in criteria_must_not_contain_tags and len(video_channel_tags) > 0:
+                        append_video = False
+                        break
+                    append_video = True
+
+        # Duration
+        if criteria_duration:
+            if not video.duration:
+                append_video = True
             else:
-                if "ANY" in criteria_must_not_contain_tags and len(video_channel_tags) > 0:
-                    continue
-                filtered_videos.append(video)
+                if (
+                    video.duration >= criteria_duration_greater_than
+                    and video.duration <= criteria_duration_shorter_than
+                ):
+                    append_video = True
+                else:
+                    append_video = False
+
+        # Append video
+        if append_video:
+            filtered_videos.append(video)
 
     return filtered_videos
 
