@@ -88,6 +88,7 @@ class YoutubeHandler(ServiceHandler):
             "remote_video_id": entry_info_dict["id"],
             "remote_channel_id": entry_info_dict["channel_id"],
             "remote_channel_name": entry_info_dict["channel"],
+            "view_count": int(entry_info_dict.get("view_count", 0)),
         }
 
     def get_channel_ydl_opts(self) -> dict[str, Any]:

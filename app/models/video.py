@@ -26,6 +26,7 @@ class VideoBase(TimestampModel, SQLModel):
     description: str | None = Field(default=None)
     duration: int | None = Field(default=None)
     thumbnail: str | None = Field(default=None)
+    view_count: int = Field(default=0)
     url: str = Field(default=None, nullable=False)
     released_at: datetime.datetime = Field(default=None)
     remote_channel_id: str = Field(
