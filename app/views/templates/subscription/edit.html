@@ -13,31 +13,45 @@
         </div>
         <div class="card-body p-4">
             <form method="POST">
+
+                <!-- ID -->
                 <div class="form-group">
                     <label for="id">Id:</label>
                     <input type="text" class="form-control mb-3" id="id" name="id" value="{{ subscription.id }}" disabled>
                 </div>
 
+                <!-- Service Handler -->
                 <div class="form-group">
                     <label for="service_handler">Service Handler:</label>
                     <input type="text" class="form-control mb-3" id="service_handler" name="service_handler"
                         value="{{ subscription.service_handler }}">
                 </div>
+
+                <!-- Subscription Handler -->
                 <div class="form-group">
                     <label for="subscription_handler">Subscription Handler:</label>
                     <input type="text" class="form-control mb-3" id="subscription_handler" name="subscription_handler"
                         value="{{ subscription.subscription_handler }}">
                 </div>
 
+                <!-- Max Videos Per Fetch -->
+                <div class="form-group my-2">
+                    <label for="max_videos_per_fetch">Max Videos Per Fetch:</label>
+                    <input type="text" class="form-control mb-3" id="max_videos_per_fetch" name="max_videos_per_fetch" value="{{ subscription.max_videos_per_fetch }}">
+                </div>
+
+                <!-- Created By -->
                 <div class="form-group">
                     <label for="created_by">Created By:</label>
                     <input type="text" class="form-control mb-3" id="created_by" name="created_by"
                         value="{{ subscription.created_by }}" disabled>
                 </div>
 
+                <!-- Submit -->
                 <div class="d-flex justify-content-end mt-3">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
+
             </form>
         </div>
     </div>

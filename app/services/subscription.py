@@ -29,7 +29,7 @@ async def get_subscription_info_dict(
 
     # Get ydl_opts from handler
     ydl_opts = db_subscription.subscription_handler_obj.get_subscription_ydl_opts(
-        playlistend=max_videos, playlistreverse=playlistreverse
+        playlistend=db_subscription.max_videos_per_fetch, playlistreverse=playlistreverse
     )
 
     # Build subscription_info_dict

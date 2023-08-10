@@ -29,6 +29,7 @@ class SubscriptionBase(TimestampModel, SQLModel):
     created_by: str = Field(default=None, foreign_key="user.id", nullable=False)
     service_handler: str = Field(default=None)
     subscription_handler: str = Field(default=None)
+    max_videos_per_fetch: int = Field(nullable=False)
 
 
 class Subscription(SubscriptionBase, table=True):
