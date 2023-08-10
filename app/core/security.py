@@ -111,7 +111,7 @@ async def get_tokens(user_id: str, fresh: bool = False) -> models.Tokens:
     refresh_token = encode_token(
         subject=user_id,
         key=settings.JWT_REFRESH_SECRET_KEY,
-        expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_MINUTES),
+        expires_delta=timedelta(minutes=settings.REFRESH_TOKEN_EXPIRE_MINUTES),
         fresh=fresh,
     )
     return models.Tokens(access_token=access_token, refresh_token=refresh_token)
