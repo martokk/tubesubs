@@ -96,7 +96,6 @@
                         </div>
 
                         <!-- Duration -->
-
                         <div class="text-white px-2 py-1 me-2 my-2 small text-white fw-bold rounded position-absolute bottom-0 end-0" style="background-color: {{ duration_color }}">
                             {% if video.duration %}
                             {% set hours = (video.duration // 3600) %}
@@ -128,7 +127,19 @@
                                 {{ video.title }}
                             </h5>
                             <div  data-bs-target="#channelModal-{{ video.id }}" data-bs-toggle="modal">
-                            <small class="text-muted font-weight-bold small" >{{ video.channel.name }} - {{ video.created_at | humanize
+                            {%if video.view_count > 0 %}
+                                {% if video.view_count > 999999 %}
+                                {% set formatted_view_count = (video.view_count / 1000000) | round(1) | string + "M" %}
+                                {% elif video.view_count > 999 %}
+                                {% set formatted_view_count = (video.view_count / 1000) | round(1) | string + "K" %}
+                                {% else %}
+                                {% set formatted_view_count = video.view_count | string %}
+                                {% endif %}
+                                {% set view_count_str = formatted_view_count + " views · " %}
+                            {% else %}
+                                {% set view_count_str = "" %}
+                            {% endif %}
+                            <small class="text-muted font-weight-bold small" >{{ video.channel.name }} · {{ view_count_str }}{{ video.created_at | humanize
                                 }}</small>
                             </div>
                         </div>
@@ -197,6 +208,11 @@
                             <a class="dropdown-item p-4 text-white hide-channel-link border-bottom" href="#"
                                 data-channel-id="{{ video.channel.id }}" data-filter-id="{{ filtered_videos.filter.id }}" data-action="Hide" data-action-scope="Global">
                                 Hide Channel (Global)
+                            </a>
+
+                            <!-- Open Links -->
+                            <a class="dropdown-item p-4 text-white border-bottom " href="{{ video.url }}">
+                                Open {{ video.channel.service | title }} Video URL
                             </a>
 
                             <a class="dropdown-item p-4 text-white border-bottom " href="{{ video.channel.url }}">

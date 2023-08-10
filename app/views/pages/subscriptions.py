@@ -116,6 +116,7 @@ async def create_subscription(
 )
 async def handle_create_subscription(
     subscription_handler: str = Form(...),
+    max_videos_per_fetch: int = Form(...),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -141,6 +142,7 @@ async def handle_create_subscription(
         subscription_create = models.SubscriptionCreate(
             service_handler=handler.SERVICE,
             subscription_handler=subscription_handler,
+            max_videos_per_fetch=max_videos_per_fetch,
             created_by=current_user.id,
         )
     except ValueError as e:
@@ -251,6 +253,7 @@ async def handle_edit_subscription(
     subscription_id: str,
     service_handler: str = Form(...),
     subscription_handler: str = Form(...),
+    max_videos_per_fetch: int = Form(...),
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(  # pylint: disable=unused-argument
         deps.get_current_active_user
@@ -272,7 +275,9 @@ async def handle_edit_subscription(
     """
     alerts = models.Alerts()
     subscription_update = models.SubscriptionUpdate(
-        service_handler=service_handler, subscription_handler=subscription_handler
+        service_handler=service_handler,
+        subscription_handler=subscription_handler,
+        max_videos_per_fetch=max_videos_per_fetch,
     )
 
     try:

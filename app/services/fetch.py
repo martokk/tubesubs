@@ -159,7 +159,8 @@ async def fetch_subscription(
     # Fetch subscription information from yt-dlp and create the subscription object
     try:
         subscription_info_dict = await get_subscription_info_dict(
-            db_subscription=db_subscription, reverse_import_order=True, max_videos=400
+            db_subscription=db_subscription,
+            reverse_import_order=True,
         )
     except (NoUploadsError, Exception) as e:
         raise FetchCanceledError from e
