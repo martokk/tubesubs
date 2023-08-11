@@ -1,13 +1,9 @@
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from app import paths
 from app.handlers.base import SubscriptionHandler
-from app.handlers.youtube import YoutubeHandler
 from app.models.settings import Settings as _Settings
-from app.services.ytdlp import get_info_dict
-
-if TYPE_CHECKING:
-    from app.models.video import Video
+import yt_dlp
 
 settings = _Settings()
 
@@ -42,7 +38,7 @@ class YoutubeRecommendedHandler(SubscriptionHandler):
             "extract_flat": True,
             "no_warnings": True,
             "playlistreverse": playlistreverse,
-            # "outtmpl": '%(id)s',
             "playliststart": 0,
             "playlistend": playlistend,
+            "match_filter": yt_dlp.utils.match_filter_func("duration < 3600"),
         }
