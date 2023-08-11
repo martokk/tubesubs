@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from sqlmodel import Session
 
-from app import logger, settings, version
+from app import logger, settings, version, crud
 from app.api import deps
 from app.api.v1.api import api_router
 from app.core import notify
@@ -53,3 +53,23 @@ async def repeating_fetch_all_sources() -> None:  # pragma: no cover
     db: Session = next(deps.get_db())
     fetch_results = await fetch_all_subscriptions(db=db)
     logger.success(f"Completed refreshing {fetch_results.subscriptions} Subscriptions from yt-dlp.")
+
+
+# @app.on_event("startup")  # type: ignore
+# async def delete_long_videos() -> None:  # pragma: no cover
+#     """
+#     Fetches all Sources from yt-dlp.
+#     """
+#     logger.debug("Deleting Long Videos")
+#     db: Session = next(deps.get_db())
+
+#     videos = await crud.video.get_all(db=db)
+
+#     deleted_count = 0
+#     for video in videos:
+#         if video.duration and video.duration > 6300:
+#             print(f"dur={video.duration} title={video.title}")
+#             await crud.video.remove(db=db, id=video.id)
+#             deleted_count += 1
+
+#     logger.success(f"Completed deleting {deleted_count} Long Videos")
