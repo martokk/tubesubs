@@ -76,13 +76,16 @@ class YoutubeHandler(ServiceHandler):
             else None
         )
         url = entry_info_dict.get("webpage_url", entry_info_dict["url"])
+        duration = entry_info_dict.get("duration")
+        if not duration:
+            duration = 0
         return {
             "subscription_id": subscription_id,
             "url": url,
             "added_at": datetime.datetime.now(tz=datetime.timezone.utc),
             "title": entry_info_dict["title"],
             "description": entry_info_dict["description"],
-            "duration": int(entry_info_dict.get("duration", 0)),
+            "duration": int(duration),
             "thumbnail": entry_info_dict["thumbnails"][-1]["url"],
             "released_at": released_at,
             "remote_video_id": entry_info_dict["id"],
