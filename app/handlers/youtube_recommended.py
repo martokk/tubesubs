@@ -1,9 +1,10 @@
 from typing import Any
 
+import yt_dlp
+
 from app import paths
 from app.handlers.base import SubscriptionHandler
 from app.models.settings import Settings as _Settings
-import yt_dlp
 
 settings = _Settings()
 

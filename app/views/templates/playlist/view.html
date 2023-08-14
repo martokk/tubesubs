@@ -86,11 +86,22 @@
 
                     <!-- Menu -->
                     <ul class="dropdown-menu p-3 border border-secondary" aria-labelledby="dropdownMenuLink">
+
                         <li>
                             <a class="dropdown-item p-3 text-white" href="/playlist/{{ playlist.id }}/playlist_item/{{ item.id }}/delete">
                                 Delete
                             </a>
                         </li>
+
+                        <!-- Modal Ellipsis Button -->
+                        <li data-bs-target="#videoModal-{{ item.id }}" data-bs-toggle="modal">
+                            <a href="#" class="dropdown-item p-3 text-white" role="button" data-bs-target="#videoModal-{{ item.id }}" data-bs-toggle="modal">
+                                Add to Playlist
+                            </a>
+                        </li>
+
+
+
                     </ul>
 
                 </div>
@@ -99,10 +110,90 @@
         </div>
     </div>
 
+    <!-- Video Modal -->
+    <div class="modal fade" id="videoModal-{{ item.id }}" tabindex="-1" aria-labelledby="videoModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Hedaer -->
+                <div class="modal-header">
+                    <h5 class="modal-title small" id="videoModalLabel">Video</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="modal-body">
+
+                    <!-- Add to Playlists -->
+                    {% for playlist in playlists %}
+                    <a class="dropdown-item p-4 border-bottom text-white add-to-playlist-link" href="#"
+                        data-playlist-id="{{ playlist.id }}" data-video-url="{{ item.url }}"
+                        data-video-thumbnail="{{ item.thumbnail }}" data-video-duration="{{ item.duration }}"
+                        data-video-title="{{ item.title }}">
+                        Add to '{{ playlist.name }}' playlist.
+                    </a>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     {% endfor %}
 </div>
 
 <!-- Include Font Awesome for the vertical dots icon -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Add to Playlist Event Listener -->
+<script>
+    $(document).ready(function () {
+        $(".add-to-playlist-link").click(function (event) {
+            event.preventDefault();
+            var videoUrl = $(this).data("video-url");
+            var videoThumbnail = $(this).data("video-thumbnail");
+            var videoDuration = $(this).data("video-duration");
+            var videoTitle = $(this).data("video-title");
+            var playlistId = $(this).data("playlist-id");
+
+
+            // AJAX POST request to the API endpoint
+            data = {
+                "title": videoTitle,
+                "url": videoUrl,
+                "thumbnail": videoThumbnail,
+                "duration": videoDuration,
+                "playlist_id": playlistId
+            }
+            $.ajax({
+                type: "POST",
+                url: "/api/v1/playlist-item",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
+                    // Handle success
+                    // alert("Video successfully added to '" + playlistName + "' playlist.");
+
+                    // close modal
+                    $('.modal').modal('hide');
+
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    var errorMessage = "Failed to add video to '" + playlistName + "' playlist.";
+                    errorMessage += "\nStatus Code: " + xhr.status;
+                    errorMessage += "\nStatus Text: " + xhr.statusText;
+                    errorMessage += "\nResponse Text: " + xhr.responseText;
+                    console.error(errorMessage);
+                    alert(errorMessage);
+                }
+            });
+        });
+    });
+</script>
 
 {% endblock content %}

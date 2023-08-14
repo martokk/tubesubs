@@ -14,7 +14,7 @@ model_crud = crud.video
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def handle_add_to_playlist(
-    video_id: str = Body(...),
+    video_id: str = Body(None),
     title: str = Body(...),
     url: str = Body(...),
     thumbnail: str = Body(...),
@@ -52,8 +52,9 @@ async def handle_add_to_playlist(
         ) from exc
 
     # Mark video as read
-    video_update = models.VideoUpdate(is_read=True)
-    await crud.video.update(db=db, id=video_id, obj_in=video_update)
+    if video_id:
+        video_update = models.VideoUpdate(is_read=True)
+        await crud.video.update(db=db, id=video_id, obj_in=video_update)
 
 
 # @router.get("/{id}", response_model=ModelReadClass)

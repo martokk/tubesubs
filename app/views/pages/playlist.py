@@ -187,11 +187,15 @@ async def view_playlist(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    playlists = await crud.playlist.get_all(db=db)
+    playlists.sort(key=lambda x: x.name)
+
     return templates.TemplateResponse(
         "playlist/view.html",
         {
             "request": request,
             "playlist": playlist,
+            "playlists": playlists,
             "current_user": current_user,
             "alerts": alerts,
         },
