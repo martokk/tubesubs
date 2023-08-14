@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi_utils.tasks import repeat_every
 from sqlmodel import Session
 
-from app import logger, settings, version, crud
+from app import crud, logger, settings, version
 from app.api import deps
 from app.api.v1.api import api_router
 from app.core import notify
