@@ -31,7 +31,7 @@
 <!-- Filter Header -->
 <div class="row">
     <div class="col">
-        <h3 class="pt-4 mt-0 pb-1 border-bottom">
+        <h3 class="pt-1 mt-0 pb-1 border-bottom">
             {{ filtered_videos.filter.name}} <span class="small text-muted">({{ filtered_videos.videos_limited_count }} / {{
                 filtered_videos.videos_not_limited_count }} {{ "/" + total_unread_videos if total_unread_videos else ""
                 }})</span>
@@ -42,12 +42,12 @@
 
 
 <!-- List Filter Videos -->
-<div class="container pt-1 pb-5 px-0">
+<div class="container pt-1 pb-2 px-0">
 
     <!-- Video Container -->
     <div class="row">
         {% for video in filtered_videos.videos %}
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-0 pb-5 mb-1 video-container" data-channel-id="{{ video.channel.id }}"
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 px-0 pb-3 mb-1 video-container" data-channel-id="{{ video.channel.id }}"
             style="position: relative;">
 
             <div class="video-details-container px-md-2 " data-channel-id="{{ video.channel.id }}">
@@ -232,7 +232,7 @@
 
                         <!-- Modal Hedaer -->
                         <div class="modal-header">
-                            <h5 class="modal-title small" id="videoModalLabel">Video</h5>
+                            <h5 class="modal-title small" id="videoModalLabel">Add to Playlist</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
@@ -241,11 +241,11 @@
 
                             <!-- Add to Playlists -->
                             {% for playlist in playlists %}
-                            <a class="dropdown-item p-4 border-bottom text-white add-to-playlist-link" href="#"
+                            <a class="dropdown-item p-3 border-bottom text-white add-to-playlist-link" href="#"
                                 data-playlist-id="{{ playlist.id }}" data-playlist-name="{{ playlist.name }}"
                                 data-video-id="{{ video.id }}" data-video-url="{{ video.url }}"
                                 data-video-thumbnail="{{ video.thumbnail }}" data-video-duration="{{ video.duration }}" data-video-title="{{ video.title }}">
-                                Add to '{{ playlist.name }}' playlist.
+                                {{ playlist.name.replace("TS - ", "") }}
                             </a>
                             {% endfor %}
 
