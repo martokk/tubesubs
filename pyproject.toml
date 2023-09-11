@@ -55,7 +55,7 @@ types-requests = "^2.31.0.1"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.1"
-black = {version = "^23.1.0", allow-prereleases = true}
+black = {version = "^23.9.1", allow-prereleases = true}
 darglint = "^1.8.1"
 flake8 = "^6.0.0"
 isort = {extras = ["colors"], version = "^5.10.1"}
