@@ -163,6 +163,7 @@ async def fetch_subscription(
             reverse_import_order=True,
         )
     except (NoUploadsError, Exception) as e:
+        logger.error(e)
         raise FetchCanceledError from e
 
     # Use subscription_info_dict to add new videos to the subscription
