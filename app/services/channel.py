@@ -2,9 +2,9 @@ from typing import Any
 
 from sqlmodel import Session
 
-from app import crud
+from app import crud, logger
 from app.models.channel import Channel, ChannelUpdate
-from app.services.ytdlp import get_info_dict
+from app.services.ytdlp import AccountNotFoundError, get_info_dict
 
 
 async def check_and_update_null_channel_logos(db: Session) -> None:
@@ -14,7 +14,12 @@ async def check_and_update_null_channel_logos(db: Session) -> None:
         if db_channel.logo:
             continue
 
-        channel_logo = await get_channel_logo(db_channel=db_channel)
+        try:
+            channel_logo = await get_channel_logo(db_channel=db_channel)
+        except AccountNotFoundError as e:
+            logger.error(e)
+            await crud.channel.remove(db=db, id=db_channel.id)
+            continue
 
         channel_update = ChannelUpdate(logo=channel_logo)
         await crud.channel.update(db=db, id=db_channel.id, obj_in=channel_update)
