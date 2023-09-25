@@ -419,10 +419,26 @@ async def view_filter_group(
     # Get total unread videos
     total_unread_videos = str(len(await crud.video.get_unread_videos(db=db)))
 
-    # Get all playlists and tags for Modals
+    # Get all playlists for Modals
     playlists = await crud.playlist.get_all(db=db)
     playlists.sort(key=lambda x: x.name)
 
+    # Separate Priority Playlists
+    priority_watch_playlists = []
+    priority_listen_playlists = []
+    for priority in ["P1", "P2", "P3"]:
+        for playlist in playlists.copy():
+            if priority in playlist.name:
+                if "Listen" in playlist.name:
+                    priority_listen_playlists.append(playlist)
+                else:
+                    priority_watch_playlists.append(playlist)
+                playlists.remove(playlist)
+
+    # Merge Playlists into single list
+    playlists = priority_watch_playlists + priority_listen_playlists + playlists
+
+    # Get all tags for Modals
     tags = await crud.tag.get_all(db=db)
     tags.sort(key=lambda x: x.name)
 
