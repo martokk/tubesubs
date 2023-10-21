@@ -187,8 +187,24 @@ async def view_playlist(
         response.set_cookie(key="alerts", value=alerts.json(), httponly=True, max_age=5)
         return response
 
+    # Get all playlists for Modals
     playlists = await crud.playlist.get_all(db=db)
     playlists.sort(key=lambda x: x.name)
+
+    # Separate Priority Playlists
+    priority_watch_playlists = []
+    priority_listen_playlists = []
+    for priority in ["P1", "P2", "P3"]:
+        for playlist in playlists.copy():
+            if priority in playlist.name:
+                if "Listen" in playlist.name:
+                    priority_listen_playlists.append(playlist)
+                else:
+                    priority_watch_playlists.append(playlist)
+                playlists.remove(playlist)
+
+    # Merge Playlists into single list
+    playlists = priority_watch_playlists + priority_listen_playlists + playlists
 
     return templates.TemplateResponse(
         "playlist/view.html",
