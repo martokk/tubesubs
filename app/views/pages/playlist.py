@@ -195,13 +195,13 @@ async def view_playlist(
     priority_watch_playlists = []
     priority_listen_playlists = []
     for priority in ["P1", "P2", "P3"]:
-        for playlist in playlists.copy():
-            if priority in playlist.name:
-                if "Listen" in playlist.name:
-                    priority_listen_playlists.append(playlist)
+        for _playlist in playlists.copy():
+            if priority in _playlist.name:
+                if "Listen" in _playlist.name:
+                    priority_listen_playlists.append(_playlist)
                 else:
-                    priority_watch_playlists.append(playlist)
-                playlists.remove(playlist)
+                    priority_watch_playlists.append(_playlist)
+                playlists.remove(_playlist)
 
     # Merge Playlists into single list
     playlists = priority_watch_playlists + priority_listen_playlists + playlists
