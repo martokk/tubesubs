@@ -126,11 +126,12 @@
 
                     <!-- Add to Playlists -->
                     {% for playlist in playlists %}
-                    <a class="dropdown-item p-4 border-bottom text-white add-to-playlist-link" href="#"
+                    {% set text_color = 'text-primary' if "Listen" in playlist.name else 'text-white' %}
+                    <a class="dropdown-item p-4 border-bottom {{ text_color }} add-to-playlist-link" href="#"
                         data-playlist-id="{{ playlist.id }}" data-video-url="{{ item.url }}"
                         data-video-thumbnail="{{ item.thumbnail }}" data-video-duration="{{ item.duration }}"
                         data-video-title="{{ item.title }}">
-                        Add to '{{ playlist.name }}' playlist.
+                        {{ playlist.name.replace("TS - ", "") }}
                     </a>
                     {% endfor %}
 
